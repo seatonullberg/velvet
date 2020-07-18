@@ -1,4 +1,5 @@
-enum Ensemble {
+#[derive(Clone, Copy, Debug)]
+pub enum Ensemble {
     /// Microcanonical ensemble.
     ///
     /// Simulates an adiabatic process with no heat exchange.
