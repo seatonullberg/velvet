@@ -19,3 +19,4 @@ categories = [
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 
 [dependencies]
+nalgebra = "0.21.1"

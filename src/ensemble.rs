@@ -1,4 +1,4 @@
-pub enum Ensemble {
+enum Ensemble {
     /// Microcanonical ensemble.
     ///
     /// Simulates an adiabatic process with no heat exchange.

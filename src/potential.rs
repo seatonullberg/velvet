@@ -1,4 +1,4 @@
-pub trait PairPotential {
+trait PairPotential {
     fn energy(&self, r: f32) -> f32;
 }
 
@@ -8,7 +8,7 @@ pub trait PairPotential {
 /// V(r) = 4\epsilon \Bigg[\Big(\frac \sigma r\Big)^{12} - \Big(\frac \sigma r\Big)^6\Bigg]
 /// $$
 #[derive(Clone, Copy, Debug, Default)]
-pub struct LennardJones {
+struct LennardJones {
     epsilon: f32,
     sigma: f32,
 }
@@ -26,7 +26,7 @@ impl PairPotential for LennardJones {
 /// V(r) = D_e\Big(e^{-2a(r - r_e)} - 2e^{-a(r - r_e)}\Big)
 /// $$
 #[derive(Clone, Copy, Debug, Default)]
-pub struct Morse {
+struct Morse {
     a: f32,
     de: f32,
     re: f32,
