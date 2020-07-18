@@ -1,2 +1,2 @@
 # velvet
-A tiny Molecular Dynamics engine.
+A tiny molecular dynamics simulator.
