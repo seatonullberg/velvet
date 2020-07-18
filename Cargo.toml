@@ -1,0 +1,18 @@
+[package]
+name = "velvet"
+version = "0.1.0"
+authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+edition = "2018"
+description = "A tiny Molecular Dynamics engine."
+license = "MIT"
+keywords = [
+    "molecular-dynamics",
+    "materials-science",
+    "computational-chemistry",
+]
+categories = [
+    "science",
+    "simulation",
+]
+
+[dependencies]
