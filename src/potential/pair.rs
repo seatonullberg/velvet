@@ -1,3 +1,13 @@
+// TODO: Derive force equations from potential energy equations
+// TODO: Implement ForceEvaluator for Pair
+// TODO: Implement EnergyEvaluator for Pair
+
+use crate::energy::EnergyEvaluator;
+use crate::force::ForceEvaluator;
+use crate::system::System;
+
+use nalgebra::{Dynamic, MatrixMN, U3};
+
 /// Lennard-Jones potential
 ///
 /// $$
@@ -5,14 +15,22 @@
 /// $$
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LennardJones {
+    /// Depth of the potential well.
     epsilon: f32,
+    /// Finite distance at which the potential evaluates to zero.
     sigma: f32,
 }
 
 /// Mie potential
 ///
 /// $$
-/// V(r) = \epsilon\Big[\Big(\frac \sigma r\Big)^{\gamma_r} - \Big(\frac \sigma r\Big)^{\gamma_a}\Big]
+/// V(r) = C\epsilon\Big[\Big(\frac \sigma r\Big)^{\gamma_r} - \Big(\frac \sigma r\Big)^{\gamma_a}\Big]
+/// $$
+///
+/// Where C is a function:
+///
+/// $$
+/// C = \Bigg(\frac {\gamma_r} {\gamma_r - \gamma_a}\Bigg)\Bigg(\frac {\gamma_r} {\gamma_a}\Bigg)^{\big(\frac {\gamma_a} {\gamma_r - \gamma_a}\big)}
 /// $$
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Mie {
@@ -29,11 +47,15 @@ pub struct Mie {
 /// $$
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Morse {
+    /// Potential well width.
     a: f32,
+    /// Potential well depth.
     d_e: f32,
+    /// Equilibrium bond distance.
     r_e: f32,
 }
 
+/// Potentials which take a pairwise distance as their only argument.
 #[derive(Clone, Copy, Debug)]
 pub enum Pair {
     LennardJones(LennardJones),
@@ -42,7 +64,8 @@ pub enum Pair {
 }
 
 impl Pair {
-    fn energy(&self, r: f32) -> f32 {
+    /// Returns the potential energy of a pair interaction.
+    pub fn energy(&self, r: f32) -> f32 {
         match *self {
             Pair::LennardJones(lj) => {
                 let term = (lj.sigma / r).powi(6);
@@ -51,7 +74,9 @@ impl Pair {
             Pair::Mie(mie) => {
                 let term_a = (mie.sigma / r).powf(mie.gamma_r);
                 let term_b = (mie.sigma / r).powf(mie.gamma_a);
-                mie.epsilon * (term_a - term_b)
+                let c = (mie.gamma_r / (mie.gamma_r - mie.gamma_a))
+                    * (mie.gamma_r / mie.gamma_a).powf(mie.gamma_a / (mie.gamma_r - mie.gamma_a));
+                c * mie.epsilon * (term_a - term_b)
             }
             Pair::Morse(morse) => {
                 let term_a = f32::exp(-2.0 * morse.a * (r - morse.r_e));

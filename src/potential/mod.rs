@@ -8,6 +8,7 @@ use nalgebra::{Dynamic, MatrixMN, U3};
 
 trait EnergyForceEvaluator: EnergyEvaluator + ForceEvaluator {}
 
+/// Any interatomic potential.
 pub struct Potential {
     cutoff: f32,
     species: Vec<String>,
@@ -25,3 +26,5 @@ impl ForceEvaluator for Potential {
         self.evaluator.evaluate_force(system)
     }
 }
+
+impl EnergyForceEvaluator for Potential {}
