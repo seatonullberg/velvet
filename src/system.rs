@@ -1,4 +1,5 @@
 use crate::ensemble::Ensemble;
+use crate::potential::Potential;
 use crate::simulation::SimulationState;
 
 pub struct System {
@@ -7,3 +8,5 @@ pub struct System {
     ensemble: Ensemble,
     state: SimulationState,
 }
+
+fn propagate(system: &System, potentials: Vec<Potential>) {}
