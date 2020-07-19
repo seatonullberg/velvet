@@ -8,7 +8,6 @@ license = "MIT"
 keywords = [
     "molecular-dynamics",
     "materials-science",
-    "computational-chemistry",
 ]
 categories = [
     "science",
