@@ -1,0 +1,6 @@
+[book]
+authors = ["Seaton Ullberg"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Velvet"
