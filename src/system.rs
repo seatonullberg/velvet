@@ -1,11 +1,9 @@
 use crate::ensemble::Ensemble;
+use crate::simulation::SimulationState;
 
-#[derive(Clone, Debug)]
-struct System {
+pub struct System {
     timestep: f32,
     n_timesteps: u32,
     ensemble: Ensemble,
-    potentials: Vec<String>,  // TODO
-    output: String,           // TODO
-    simulation_state: String, // TODO
+    state: SimulationState,
 }
