@@ -1,4 +1,4 @@
-# Velvet
+# Introduction
 
 Velvet is a molecular dynamics simulator created as an exercise to sharpen my Rust skills and further my understanding of molecular dynamics. Attaining the performance and scope of established tools such as [LAMMPS](https://lammps.sandia.gov/) is not a goal.
 
