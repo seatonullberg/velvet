@@ -1,6 +1,16 @@
 [book]
+title = "The Velvet Molecular Dynamics Simulator"
 authors = ["Seaton Ullberg"]
 language = "en"
-multilingual = false
-src = "src"
-title = "Velvet"
+
+[rust]
+edition = "2018"
+
+[build]
+build-dir = "../docs/"
+create-missing = false
+
+[output.html]
+preferred-dark-theme = "Ayu"
+mathjax-support = true
+git-repository-url = "https://github.com/seatonullberg/velvet"

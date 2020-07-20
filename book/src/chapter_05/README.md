@@ -1,1 +1,1 @@
-# Integrators
+# Thermodynamic Ensembles

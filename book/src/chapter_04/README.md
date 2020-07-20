@@ -1,1 +1,1 @@
-# Thermodynamic Ensembles
+# Interatomic Potentials

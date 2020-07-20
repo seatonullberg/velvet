@@ -1,8 +1,8 @@
 use crate::system::System;
 
-use nalgebra::{Dynamic, MatrixMN, U3};
+use nalgebra::Vector3;
 
-/// Trait for force evaluation of the system as a whole.
+/// Trait to evaluate the force on an individual atom.
 pub trait ForceEvaluator {
-    fn evaluate_force(&self, system: &System) -> MatrixMN<f32, Dynamic, U3>;
+    fn evaluate_force(&self, system: &System, index: usize) -> Vector3<f32>;
 }

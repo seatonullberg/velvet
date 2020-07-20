@@ -1,8 +1,6 @@
 use crate::system::System;
 
-use nalgebra::{Dynamic, MatrixMN, U3};
-
-/// Trait for potential energy evaluation of the system as a whole.
+/// Trait to evaluate the potential energy of an individual atom.
 pub trait EnergyEvaluator {
-    fn evaluate_energy(&self, system: &System) -> MatrixMN<f32, Dynamic, U3>;
+    fn evaluate_energy(&self, system: &System, index: usize) -> f32;
 }

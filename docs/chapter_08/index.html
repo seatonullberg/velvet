@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Benchmarks - Velvet</title>
+        <title>Benchmarks - The Velvet Molecular Dynamics Simulator</title>
         
         
 
@@ -39,12 +39,15 @@
         
 
         
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
     </head>
     <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "../";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -89,7 +92,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../chapter_01/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../chapter_02/index.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li class="chapter-item expanded "><a href="../chapter_03/index.html"><strong aria-hidden="true">3.</strong> Interatomic Potentials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../chapter_03/pair_potentials.html"><strong aria-hidden="true">3.1.</strong> Pair Potentials</a></li></ol></li><li class="chapter-item expanded "><a href="../chapter_04/index.html"><strong aria-hidden="true">4.</strong> Thermodynamic Enesmbles</a></li><li class="chapter-item expanded "><a href="../chapter_05/index.html"><strong aria-hidden="true">5.</strong> Integrators</a></li><li class="chapter-item expanded "><a href="../chapter_06/index.html"><strong aria-hidden="true">6.</strong> Parallelization</a></li><li class="chapter-item expanded "><a href="../chapter_07/index.html"><strong aria-hidden="true">7.</strong> Examples</a></li><li class="chapter-item expanded "><a href="../chapter_08/index.html" class="active"><strong aria-hidden="true">8.</strong> Benchmarks</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../chapter_01/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../chapter_02/index.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li class="chapter-item expanded "><a href="../chapter_03/index.html"><strong aria-hidden="true">3.</strong> Integrators</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../chapter_03/velocity_verlet.html"><strong aria-hidden="true">3.1.</strong> Velocity Verlet Integration</a></li><li class="chapter-item expanded "><a href="../chapter_03/beeman.html"><strong aria-hidden="true">3.2.</strong> Beeman's Algorithm</a></li></ol></li><li class="chapter-item expanded "><a href="../chapter_04/index.html"><strong aria-hidden="true">4.</strong> Interatomic Potentials</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../chapter_04/pair_potentials.html"><strong aria-hidden="true">4.1.</strong> Pair Potentials</a></li></ol></li><li class="chapter-item expanded "><a href="../chapter_05/index.html"><strong aria-hidden="true">5.</strong> Thermodynamic Enesmbles</a></li><li class="chapter-item expanded "><a href="../chapter_06/index.html"><strong aria-hidden="true">6.</strong> Parallelization</a></li><li class="chapter-item expanded "><a href="../chapter_07/index.html"><strong aria-hidden="true">7.</strong> Examples</a></li><li class="chapter-item expanded "><a href="../chapter_08/index.html" class="active"><strong aria-hidden="true">8.</strong> Benchmarks</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -121,11 +124,15 @@
                         
                     </div>
 
-                    <h1 class="menu-title">Velvet</h1>
+                    <h1 class="menu-title">The Velvet Molecular Dynamics Simulator</h1>
 
                     <div class="right-buttons">
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        <a href="https://github.com/seatonullberg/velvet" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
                         
                     </div>
@@ -186,6 +193,21 @@
 
         </div>
 
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
         
 
         

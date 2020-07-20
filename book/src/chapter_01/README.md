@@ -1,8 +1,15 @@
 # Introduction
 
-Velvet is a molecular dynamics simulator created as an exercise to sharpen my Rust skills and further my understanding of molecular dynamics. Attaining the performance and scope of established tools such as [LAMMPS](https://lammps.sandia.gov/) is not a goal.
+Velvet is a molecular dynamics simulator created as an exercise to further my understanding of atomistic simulation techniques. 
+This guide is intended to exhibit Velvet's features in the context of the relevant theory. 
+To achieve this, each section interweaves three perspectives:
 
-This guide serves as high-level documentation describing the features of Velvet and how to use them. Velvet is written in [Rust](https://www.rust-lang.org/) and packaged as both a library and a CLI. Code snippets are present in the guide to help developers use the library in other Rust projects, but no knowledge of Rust is required to use the CLI. Complete documentation of the library is available on [docs.rs](https://docs.rs/crate/velvet).
+1) Physical and mathematical models or theories used to describe the topic.
+2) Concrete implementations of the concepts taken from source code.
+3) Practical examples using application level abstractions.
+
+Velvet is written in [Rust](https://www.rust-lang.org/) and is available as either a command line application or extensible software library. 
+Documentation of the library is available on [docs.rs](https://docs.rs/crate/velvet).
 
 ## License
 
