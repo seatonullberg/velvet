@@ -8,8 +8,8 @@ To achieve this, each section interweaves three perspectives:
 2) Concrete implementations of the concepts taken from source code.
 3) Practical examples using application level abstractions.
 
-Velvet is written in [Rust](https://www.rust-lang.org/) and is available as either a command line application or extensible software library. 
-Documentation of the library is available on [docs.rs](https://docs.rs/crate/velvet).
+Velvet is written in [Rust](https://www.rust-lang.org/) and is available as either a command line application or an extensible software library. 
+The library documentation is available on [docs.rs](https://docs.rs/crate/velvet).
 
 ## License
 

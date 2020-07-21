@@ -1,7 +1,7 @@
 # Integrators
 
- The beating heart of any molecular dynamics simulation is its integrator.
- When we evolve our system over a number of time steps, what really happens mathematically is just an integration of the system's equations of motion.
+The beating heart of any molecular dynamics simulation is its integrator.
+When we evolve our system over a number of time steps, what really happens mathematically is just an integration of the system's equations of motion.
 More specifically, given that molecular dynamics is an application of classical physics, we integrate Newton's equations of motion.
 
 In the simplest case, I'm sure we can all recall Newton's equation for the force acting on an object.
@@ -24,8 +24,8 @@ For now, it is sufficient to say that we can define \\(F_{ij}\\) as a function o
 We have established that the forces acting on each particle can be calculated in terms of the particles' positions, but how can we use this to propagate the system in time? There are multiple strategies to achieve this, but the general procedure is as follows.
 
 1) Calculate the __position__ at the next timestep from the current velocity and acceleration.
-2) Calculate the __acceleration__ at the next timestep by evaluating an interatomic potential over the updated positions.
-3) Calculate the __velocity__ at the next timestep from the updated accelerations.
+2) Derive the __acceleration__ at the next timestep by evaluating an interatomic potential on the updated position.
+3) Calculate the __velocity__ at the next timestep from the updated acceleration.
 4) Repeat for a number of timesteps.
 
-The following sections explore Velvet's available integrators.
+The following sections explore the integrators available in Velvet.

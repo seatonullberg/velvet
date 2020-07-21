@@ -181,11 +181,11 @@ For now, it is sufficient to say that we can define \(F_{ij}\) as a function of 
 <p>We have established that the forces acting on each particle can be calculated in terms of the particles' positions, but how can we use this to propagate the system in time? There are multiple strategies to achieve this, but the general procedure is as follows.</p>
 <ol>
 <li>Calculate the <strong>position</strong> at the next timestep from the current velocity and acceleration.</li>
-<li>Calculate the <strong>acceleration</strong> at the next timestep by evaluating an interatomic potential over the updated positions.</li>
-<li>Calculate the <strong>velocity</strong> at the next timestep from the updated accelerations.</li>
+<li>Derive the <strong>acceleration</strong> at the next timestep by evaluating an interatomic potential on the updated position.</li>
+<li>Calculate the <strong>velocity</strong> at the next timestep from the updated acceleration.</li>
 <li>Repeat for a number of timesteps.</li>
 </ol>
-<p>The following sections explore Velvet's available integrators.</p>
+<p>The following sections explore the integrators available in Velvet.</p>
 
                     </main>
 

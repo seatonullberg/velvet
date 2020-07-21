@@ -2,6 +2,11 @@ use crate::energy::EnergyEvaluator;
 use crate::force::ForceEvaluator;
 use crate::system::System;
 
+pub trait PairPotential {
+    fn energy(&self, r: f32) -> f32;
+    // fn force(&self, r: f32) -> f32;
+}
+
 /// Lennard-Jones potential
 ///
 /// $$
@@ -13,6 +18,13 @@ pub struct LennardJones {
     epsilon: f32,
     /// Finite distance at which the potential evaluates to zero.
     sigma: f32,
+}
+
+impl PairPotential for LennardJones {
+    fn energy(&self, r: f32) -> f32 {
+        let term = (self.sigma / r).powi(6);
+        4.0 * self.epsilon * (term * term - term)
+    }
 }
 
 /// Mie potential
@@ -34,6 +46,16 @@ pub struct Mie {
     gamma_r: f32,
 }
 
+impl PairPotential for Mie {
+    fn energy(&self, r: f32) -> f32 {
+        let term_a = (self.sigma / r).powf(self.gamma_r);
+        let term_b = (self.sigma / r).powf(self.gamma_a);
+        let c = (self.gamma_r / (self.gamma_r - self.gamma_a))
+            * (self.gamma_r / self.gamma_a).powf(self.gamma_a / (self.gamma_r - self.gamma_a));
+        c * self.epsilon * (term_a - term_b)
+    }
+}
+
 /// Morse potential
 ///
 /// $$
@@ -49,39 +71,10 @@ pub struct Morse {
     r_e: f32,
 }
 
-/// Potentials which take a pairwise distance as their only argument.
-#[derive(Clone, Copy, Debug)]
-pub enum PairPotential {
-    LennardJones(LennardJones),
-    Mie(Mie),
-    Morse(Morse),
-}
-
-impl PairPotential {
-    /// Returns the potential energy of a pair interaction.
-    pub fn energy(&self, r: f32) -> f32 {
-        match *self {
-            PairPotential::LennardJones(lj) => {
-                let term = (lj.sigma / r).powi(6);
-                4.0 * lj.epsilon * (term * term - term)
-            }
-            PairPotential::Mie(mie) => {
-                let term_a = (mie.sigma / r).powf(mie.gamma_r);
-                let term_b = (mie.sigma / r).powf(mie.gamma_a);
-                let c = (mie.gamma_r / (mie.gamma_r - mie.gamma_a))
-                    * (mie.gamma_r / mie.gamma_a).powf(mie.gamma_a / (mie.gamma_r - mie.gamma_a));
-                c * mie.epsilon * (term_a - term_b)
-            }
-            PairPotential::Morse(morse) => {
-                let term_a = f32::exp(-2.0 * morse.a * (r - morse.r_e));
-                let term_b = 2.0 * f32::exp(-morse.a * (r - morse.r_e));
-                morse.d_e * (term_a - term_b)
-            }
-        }
+impl PairPotential for Morse {
+    fn energy(&self, r: f32) -> f32 {
+        let term_a = f32::exp(-2.0 * self.a * (r - self.r_e));
+        let term_b = 2.0 * f32::exp(-self.a * (r - self.r_e));
+        self.d_e * (term_a - term_b)
     }
 }
-
-// TODO
-// impl EnergyEvaluator for PairPotential {}
-// impl ForceEvaluator for PairPotential {}
-// impl EnergyForceEvaluator for PairPotential {}

@@ -2,29 +2,28 @@ pub mod pair;
 
 use crate::energy::EnergyEvaluator;
 use crate::force::ForceEvaluator;
+use crate::potential::pair::PairPotential;
 use crate::system::System;
 
 use nalgebra::Vector3;
 
-trait EnergyForceEvaluator: EnergyEvaluator + ForceEvaluator {}
-
 /// Any interatomic potential.
-pub struct Potential {
+pub struct Potential<T> {
     cutoff: f32,
     species: Vec<String>,
-    evaluator: Box<dyn EnergyForceEvaluator>,
+    evaluator: T,
 }
 
-impl EnergyEvaluator for Potential {
+// TODO
+impl<T: PairPotential> EnergyEvaluator for Potential<T> {
     fn evaluate_energy(&self, system: &System, index: usize) -> f32 {
-        self.evaluator.evaluate_energy(system, index)
+        0.0
     }
 }
 
-impl ForceEvaluator for Potential {
+// TODO
+impl<T: PairPotential> ForceEvaluator for Potential<T> {
     fn evaluate_force(&self, system: &System, index: usize) -> Vector3<f32> {
-        self.evaluator.evaluate_force(system, index)
+        Vector3::default()
     }
 }
-
-impl EnergyForceEvaluator for Potential {}
