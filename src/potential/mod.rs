@@ -14,16 +14,14 @@ pub struct Potential<T> {
     evaluator: T,
 }
 
-// TODO
 impl<T: PairPotential> EnergyEvaluator for Potential<T> {
     fn evaluate_energy(&self, system: &System, index: usize) -> f32 {
-        0.0
+        unimplemented!()
     }
 }
 
-// TODO
 impl<T: PairPotential> ForceEvaluator for Potential<T> {
     fn evaluate_force(&self, system: &System, index: usize) -> Vector3<f32> {
-        Vector3::default()
+        unimplemented!()
     }
 }

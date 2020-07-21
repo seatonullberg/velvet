@@ -1,7 +1,3 @@
-use crate::energy::EnergyEvaluator;
-use crate::force::ForceEvaluator;
-use crate::system::System;
-
 pub trait PairPotential {
     fn energy(&self, r: f32) -> f32;
     // fn force(&self, r: f32) -> f32;
