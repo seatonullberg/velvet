@@ -7,6 +7,7 @@ language = "en"
 edition = "2018"
 
 [build]
+# build in `docs` for automatic deployment to github pages
 build-dir = "../docs/"
 create-missing = false
 

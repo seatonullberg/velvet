@@ -6,10 +6,6 @@ pub trait PairPotential {
 }
 
 /// Lennard-Jones potential
-///
-/// $$
-/// V(r) = 4\epsilon \Bigg[\Big(\frac \sigma r\Big)^{12} - \Big(\frac \sigma r\Big)^6\Bigg]
-/// $$
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LennardJones {
     /// Depth of the potential well.
@@ -34,16 +30,6 @@ impl PairPotential for LennardJones {
 }
 
 /// Mie potential
-///
-/// $$
-/// V(r) = C\epsilon\Big[\Big(\frac \sigma r\Big)^{\gamma_r} - \Big(\frac \sigma r\Big)^{\gamma_a}\Big]
-/// $$
-///
-/// Where C is a function:
-///
-/// $$
-/// C = \Bigg(\frac {\gamma_r} {\gamma_r - \gamma_a}\Bigg)\Bigg(\frac {\gamma_r} {\gamma_a}\Bigg)^{\big(\frac {\gamma_a} {\gamma_r - \gamma_a}\big)}
-/// $$
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Mie {
     epsilon: f32,
@@ -73,10 +59,6 @@ impl PairPotential for Mie {
 }
 
 /// Morse potential
-///
-/// $$
-/// V(r) = D_e\Big(e^{-2a(r - r_e)} - 2e^{-a(r - r_e)}\Big)
-/// $$
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Morse {
     /// Potential well width.

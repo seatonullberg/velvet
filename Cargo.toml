@@ -22,9 +22,5 @@ path = "src/lib.rs"
 name = "velvet"
 path = "src/main.rs"
 
-
-[package.metadata.docs.rs]
-rustdoc-args = [ "--html-in-header", "katex-header.html" ]
-
 [dependencies]
 nalgebra = "0.21.1"

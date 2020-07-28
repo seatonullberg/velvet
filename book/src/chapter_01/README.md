@@ -2,7 +2,7 @@
 
 Velvet is a molecular dynamics simulator created as an exercise to further my understanding of atomistic simulation techniques. 
 This guide is intended to exhibit Velvet's features in the context of the relevant theory. 
-To achieve this, each section interweaves three perspectives:
+To achieve this, each section interleaves three perspectives:
 
 1) Physical and mathematical models or theories used to describe the topic.
 2) Concrete implementations of the concepts taken from source code.

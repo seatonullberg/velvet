@@ -167,7 +167,7 @@
                         <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
 <p>Velvet is a molecular dynamics simulator created as an exercise to further my understanding of atomistic simulation techniques. 
 This guide is intended to exhibit Velvet's features in the context of the relevant theory. 
-To achieve this, each section interweaves three perspectives:</p>
+To achieve this, each section interleaves three perspectives:</p>
 <ol>
 <li>Physical and mathematical models or theories used to describe the topic.</li>
 <li>Concrete implementations of the concepts taken from source code.</li>
@@ -206,6 +206,21 @@ For now, it is sufficient to say that we can define \(F_{ij}\) as a function of 
 <h1><a class="header" href="#beemans-algorithm" id="beemans-algorithm">Beeman's Algorithm</a></h1>
 <h1><a class="header" href="#interatomic-potentials" id="interatomic-potentials">Interatomic Potentials</a></h1>
 <h1><a class="header" href="#pair-potentials" id="pair-potentials">Pair Potentials</a></h1>
+<h2><a class="header" href="#lennard-jones" id="lennard-jones">Lennard-Jones</a></h2>
+<p>$$
+V(r) = 4\epsilon \Bigg[\Big(\frac \sigma r\Big)^{12} - \Big(\frac \sigma r\Big)^6\Bigg]
+$$</p>
+<h2><a class="header" href="#mie" id="mie">Mie</a></h2>
+<p>$$
+V(r) = C\epsilon\Big[\Big(\frac \sigma r\Big)^{\gamma_r} - \Big(\frac \sigma r\Big)^{\gamma_a}\Big]
+$$</p>
+<p>$$
+C = \Bigg(\frac {\gamma_r} {\gamma_r - \gamma_a}\Bigg)\Bigg(\frac {\gamma_r} {\gamma_a}\Bigg)^{\big(\frac {\gamma_a} {\gamma_r - \gamma_a}\big)}
+$$</p>
+<h2><a class="header" href="#morse" id="morse">Morse</a></h2>
+<p>$$
+V(r) = D_e\Big(e^{-2a(r - r_e)} - 2e^{-a(r - r_e)}\Big)
+$$</p>
 <h1><a class="header" href="#thermodynamic-ensembles" id="thermodynamic-ensembles">Thermodynamic Ensembles</a></h1>
 <h1><a class="header" href="#parallelization" id="parallelization">Parallelization</a></h1>
 <h1><a class="header" href="#examples" id="examples">Examples</a></h1>
