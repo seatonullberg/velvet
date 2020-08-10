@@ -1,3 +1,4 @@
+pub mod distance;
 pub mod energy;
 pub mod ensemble;
 pub mod force;
