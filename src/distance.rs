@@ -3,7 +3,7 @@ use crate::system::System;
 use nalgebra::Vector3;
 
 // NOTE: positions a and b are assumed to be within the bounding box
-pub fn distance(system: &System, a: &Vector3<f32>, b: &Vector3<f32>) -> f32 {
+pub fn distance(system: &System, a: &Vector3<f32>, b: &Vector3<f32>) -> Vector3<f32> {
     let mut dist: Vector3<f32> = Vector3::zeros();
     for i in 0..3 {
         let mut a_elem = a[i];
@@ -20,7 +20,7 @@ pub fn distance(system: &System, a: &Vector3<f32>, b: &Vector3<f32>) -> f32 {
         }
         dist[i] = a_elem - b_elem
     }
-    dist.norm()
+    dist
 }
 
 #[cfg(test)]
@@ -51,7 +51,9 @@ mod tests {
         let system = get_test_system();
         let (a, b) = get_test_points();
         let res = distance(&system, &a, &b);
-        assert_eq!(res, 0.935414347)
+        assert_eq!(res[0], -0.25);
+        assert_eq!(res[1], -0.5);
+        assert_eq!(res[2], -0.75);
     }
 
     #[test]
@@ -60,7 +62,9 @@ mod tests {
         system.periodicity = Vector3::new(false, false, true);
         let (a, b) = get_test_points();
         let res = distance(&system, &a, &b);
-        assert_eq!(res, 0.612372436);
+        assert_eq!(res[0], -0.25);
+        assert_eq!(res[1], -0.5);
+        assert_eq!(res[2], -0.25);
     }
 
     #[test]
@@ -69,6 +73,8 @@ mod tests {
         system.periodicity = Vector3::new(true, true, true);
         let (a, b) = get_test_points();
         let res = distance(&system, &a, &b);
-        assert_eq!(res, 0.612372436);
+        assert_eq!(res[0], -0.25);
+        assert_eq!(res[1], -0.5);
+        assert_eq!(res[2], -0.25);
     }
 }

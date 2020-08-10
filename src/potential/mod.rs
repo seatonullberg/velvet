@@ -1,5 +1,6 @@
 pub mod pair;
 
+use crate::distance::distance;
 use crate::energy::EnergyEvaluator;
 use crate::force::ForceEvaluator;
 use crate::potential::pair::PairPotential;
@@ -9,14 +10,40 @@ use nalgebra::Vector3;
 
 /// Any interatomic potential.
 pub struct Potential<T> {
-    cutoff: f32,
-    species: Vec<String>,
-    evaluator: T,
+    pub cutoff: f32,
+    pub symbols: Vec<String>,
+    pub evaluator: T,
 }
 
 impl<T: PairPotential> EnergyEvaluator for Potential<T> {
     fn evaluate_energy(&self, system: &System, index: usize) -> f32 {
-        unimplemented!()
+        let atom = &system.atoms[index];
+        // NOTE: `self.symbols` is assumed to be sorted
+        let defined_symbols: Vec<&str> = self.symbols.iter().map(AsRef::as_ref).collect();
+        let mut energy = 0.0;
+        // iterate over all atoms in the system
+        for (i, atom_i) in system.atoms.iter().enumerate() {
+            // skip the atom of interest
+            if i == index {
+                continue;
+            }
+            // skip undefined symbol pairs
+            let mut current_symbols = vec![&atom.symbol, &atom_i.symbol];
+            current_symbols.sort();
+            if current_symbols != defined_symbols {
+                continue;
+            }
+            // calculate the distance
+            let dist = distance(system, &atom.position, &atom_i.position);
+            let mag = dist.norm();
+            // skip atoms beyond the cutoff radius
+            if mag > self.cutoff {
+                continue;
+            }
+            // add to the total energy
+            energy += self.evaluator.energy(mag);
+        }
+        energy
     }
 }
 
