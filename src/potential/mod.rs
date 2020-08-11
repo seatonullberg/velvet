@@ -80,3 +80,55 @@ impl<T: PairPotential> ForceEvaluator for Potential<T> {
         force
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::energy::EnergyEvaluator;
+    use crate::ensemble::Ensemble;
+    use crate::potential::pair::LennardJones;
+    use crate::potential::Potential;
+    use crate::system::{Atom, System};
+
+    use nalgebra::{Matrix3, Vector3};
+
+    #[test]
+    fn pair_potential_evaluate_energy() {
+        // create some atoms
+        let atoms = vec![
+            Atom {
+                symbol: String::from("Ar"),
+                charge: 0.0,
+                mass: 39.948,
+                position: Vector3::zeros(),
+                velocity: Vector3::zeros(),
+            },
+            Atom {
+                symbol: String::from("Ar"),
+                charge: 0.0,
+                mass: 39.948,
+                position: Vector3::new(2.5, 0.0, 0.0),
+                velocity: Vector3::zeros(),
+            },
+        ];
+        // create a system
+        let mut system = System {
+            atoms: atoms,
+            basis: Matrix3::identity(),
+            ensemble: Ensemble::NVE,
+            n_threads: 1,
+            n_timesteps: 1,
+            periodicity: Vector3::new(false, false, false),
+            timestep: 1.0,
+        };
+        system.basis *= 5.0;
+        // create a potential
+        let lj = LennardJones::new(0.8, 2.0);
+        let potential = Potential {
+            cutoff: 5.0,
+            symbols: vec![String::from("Ar"), String::from("Ar")],
+            evaluator: lj,
+        };
+        let energy = potential.evaluate_energy(&system, 0);
+        assert_eq!(energy, -0.6189586)
+    }
+}

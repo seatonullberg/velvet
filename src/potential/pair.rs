@@ -12,6 +12,12 @@ pub struct LennardJones {
     sigma: f32,
 }
 
+impl LennardJones {
+    pub fn new(epsilon: f32, sigma: f32) -> LennardJones {
+        LennardJones { epsilon, sigma }
+    }
+}
+
 impl PairPotential for LennardJones {
     fn energy(&self, r: f32) -> f32 {
         let term = (self.sigma / r).powi(6);
@@ -32,6 +38,17 @@ pub struct Mie {
     sigma: f32,
     gamma_a: f32,
     gamma_r: f32,
+}
+
+impl Mie {
+    pub fn new(epsilon: f32, sigma: f32, gamma_a: f32, gamma_r: f32) -> Mie {
+        Mie {
+            epsilon,
+            sigma,
+            gamma_a,
+            gamma_r,
+        }
+    }
 }
 
 impl PairPotential for Mie {
@@ -63,6 +80,12 @@ pub struct Morse {
     r_e: f32,
 }
 
+impl Morse {
+    pub fn new(a: f32, d_e: f32, r_e: f32) -> Morse {
+        Morse { a, d_e, r_e }
+    }
+}
+
 impl PairPotential for Morse {
     fn energy(&self, r: f32) -> f32 {
         let term_a = f32::exp(-2.0 * self.a * (r - self.r_e));
@@ -83,10 +106,7 @@ mod tests {
 
     #[test]
     fn lennard_jones() {
-        let lj = LennardJones {
-            epsilon: 0.8,
-            sigma: 2.0,
-        };
+        let lj = LennardJones::new(0.8, 2.0);
         assert_eq!(lj.energy(2.0), 0.0);
         assert_eq!(lj.energy(2.5), -0.6189586);
         assert!(lj.force(f32::powf(2.0, 1.0 / 6.0) * 2.0).abs() < 1e-6);
@@ -95,12 +115,7 @@ mod tests {
 
     #[test]
     fn mie() {
-        let mie = Mie {
-            epsilon: 0.8,
-            sigma: 2.0,
-            gamma_a: 6.0,
-            gamma_r: 12.0,
-        };
+        let mie = Mie::new(0.8, 2.0, 6.0, 12.0);
         assert_eq!(mie.energy(2.0), 0.0);
         assert_eq!(mie.energy(2.5), -0.61895853);
         assert!(mie.force(f32::powf(2.0, 1.0 / 6.0) * 2.0).abs() < 1e-6);
@@ -109,11 +124,7 @@ mod tests {
 
     #[test]
     fn morse() {
-        let morse = Morse {
-            a: 1.3,
-            d_e: 4.0,
-            r_e: 2.0,
-        };
+        let morse = Morse::new(1.3, 4.0, 2.0);
         assert_eq!(morse.energy(2.0), -4.0);
         assert_eq!(morse.force(2.0), 0.0);
     }
