@@ -7,6 +7,7 @@ pub struct Atom {
     pub symbol: String,
     pub charge: f32,
     pub mass: f32,
+    pub force: Vector3<f32>,
     pub position: Vector3<f32>,
     pub velocity: Vector3<f32>,
 }
