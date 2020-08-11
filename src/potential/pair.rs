@@ -76,3 +76,45 @@ impl PairPotential for Morse {
         2.0 * self.a * self.d_e * (term_a - term_b)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::potential::pair::{LennardJones, Mie, Morse, PairPotential};
+
+    #[test]
+    fn lennard_jones() {
+        let lj = LennardJones {
+            epsilon: 0.8,
+            sigma: 2.0,
+        };
+        assert_eq!(lj.energy(2.0), 0.0);
+        assert_eq!(lj.energy(2.5), -0.6189586);
+        assert!(lj.force(f32::powf(2.0, 1.0 / 6.0) * 2.0).abs() < 1e-6);
+        assert_eq!(lj.force(2.5), -0.9577348);
+    }
+
+    #[test]
+    fn mie() {
+        let mie = Mie {
+            epsilon: 0.8,
+            sigma: 2.0,
+            gamma_a: 6.0,
+            gamma_r: 12.0,
+        };
+        assert_eq!(mie.energy(2.0), 0.0);
+        assert_eq!(mie.energy(2.5), -0.61895853);
+        assert!(mie.force(f32::powf(2.0, 1.0 / 6.0) * 2.0).abs() < 1e-6);
+        assert_eq!(mie.force(2.5), -0.9577347);
+    }
+
+    #[test]
+    fn morse() {
+        let morse = Morse {
+            a: 1.3,
+            d_e: 4.0,
+            r_e: 2.0,
+        };
+        assert_eq!(morse.energy(2.0), -4.0);
+        assert_eq!(morse.force(2.0), 0.0);
+    }
+}
