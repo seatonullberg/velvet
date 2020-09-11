@@ -2,11 +2,10 @@
 
 pub mod pair;
 
-use crate::distance::distance;
 use crate::energy::EnergyEvaluator;
 use crate::force::ForceEvaluator;
 use crate::potential::pair::PairPotential;
-use crate::system::System;
+use crate::simcell::SimulationCell;
 
 use nalgebra::Vector3;
 
@@ -18,13 +17,13 @@ pub struct Potential<T> {
 }
 
 impl<T: PairPotential> EnergyEvaluator for Potential<T> {
-    fn evaluate_energy(&self, system: &System, index: usize) -> f32 {
-        let atom = &system.atoms[index];
+    fn evaluate_energy(&self, cell: &SimulationCell, index: usize) -> f32 {
+        let atom = &cell.atoms[index];
         // NOTE: `self.symbols` is assumed to be sorted
         let defined_symbols: Vec<&str> = self.symbols.iter().map(AsRef::as_ref).collect();
         let mut energy = 0.0;
-        // iterate over all atoms in the system
-        for (i, atom_i) in system.atoms.iter().enumerate() {
+        // iterate over all atoms in the cell
+        for (i, atom_i) in cell.atoms.iter().enumerate() {
             // skip the atom of interest
             if i == index {
                 continue;
@@ -35,28 +34,27 @@ impl<T: PairPotential> EnergyEvaluator for Potential<T> {
             if current_symbols != defined_symbols {
                 continue;
             }
-            // calculate the distance
-            let dist = distance(system, &atom.position, &atom_i.position);
-            let mag = dist.norm();
+            // calculate the distance between atoms
+            let dist = cell.distance_between(i, index);
             // skip atoms beyond the cutoff radius
-            if mag > self.cutoff {
+            if dist > self.cutoff {
                 continue;
             }
             // add to the total energy
-            energy += self.evaluator.energy(mag);
+            energy += self.evaluator.energy(dist);
         }
         energy
     }
 }
 
 impl<T: PairPotential> ForceEvaluator for Potential<T> {
-    fn evaluate_force(&self, system: &System, index: usize) -> Vector3<f32> {
-        let atom = &system.atoms[index];
+    fn evaluate_force(&self, cell: &SimulationCell, index: usize) -> Vector3<f32> {
+        let atom = &cell.atoms[index];
         // NOTE: `self.symbols` is assumed to be sorted
         let defined_symbols: Vec<&str> = self.symbols.iter().map(AsRef::as_ref).collect();
         let mut force: Vector3<f32> = Vector3::zeros();
         // iterate over all atoms in the system
-        for (i, atom_i) in system.atoms.iter().enumerate() {
+        for (i, atom_i) in cell.atoms.iter().enumerate() {
             // skip the atom of interest
             if i == index {
                 continue;
@@ -67,15 +65,15 @@ impl<T: PairPotential> ForceEvaluator for Potential<T> {
             if current_symbols != defined_symbols {
                 continue;
             }
-            // calculate the distance
-            let dist = distance(system, &atom.position, &atom_i.position);
-            let mag = dist.norm();
+            // calculate the distance vector between atoms
+            let direction = cell.direction_between(i, index);
+            let distance = cell.distance_between(i, index);
             // skip atoms beyond the cutoff radius
-            if mag > self.cutoff {
+            if distance > self.cutoff {
                 continue;
             }
             // add to the total force
-            force += (dist / mag) * self.evaluator.force(mag);
+            force += direction * self.evaluator.force(distance);
         }
         force
     }
@@ -84,16 +82,14 @@ impl<T: PairPotential> ForceEvaluator for Potential<T> {
 #[cfg(test)]
 mod tests {
     use crate::energy::EnergyEvaluator;
-    use crate::ensemble::Ensemble;
     use crate::potential::pair::LennardJones;
     use crate::potential::Potential;
-    use crate::system::{Atom, System};
+    use crate::simcell::{Atom, Bounds, SimulationCell};
 
     use nalgebra::{Matrix3, Vector3};
 
     #[test]
     fn pair_potential_evaluate_energy() {
-        // create some atoms
         let atoms = vec![
             Atom {
                 symbol: String::from("Ar"),
@@ -112,25 +108,19 @@ mod tests {
                 velocity: Vector3::zeros(),
             },
         ];
-        // create a system
-        let mut system = System {
-            atoms: atoms,
-            basis: Matrix3::identity(),
-            ensemble: Ensemble::NVE,
-            n_threads: 1,
-            n_timesteps: 1,
+        let bounds = Bounds {
+            matrix: Matrix3::identity(),
             periodicity: Vector3::new(false, false, false),
-            timestep: 1.0,
         };
-        system.basis *= 5.0;
-        // create a potential
+        let mut cell = SimulationCell {atoms, bounds};
+        cell.bounds.matrix *= 5.0;        
         let lj = LennardJones::new(0.8, 2.0);
         let potential = Potential {
             cutoff: 5.0,
             symbols: vec![String::from("Ar"), String::from("Ar")],
             evaluator: lj,
         };
-        let energy = potential.evaluate_energy(&system, 0);
+        let energy = potential.evaluate_energy(&cell, 0);
         assert_eq!(energy, -0.6189586)
     }
 }
