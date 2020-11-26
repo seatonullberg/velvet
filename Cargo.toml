@@ -20,6 +20,7 @@ categories = [
 members = [
     "crates/app",
     "crates/core",
+    "crates/potentials/lennard_jones",
 ]
 
 [[bin]]
@@ -27,4 +28,4 @@ name = "velvet"
 path = "crates/app/src/main.rs"
 
 [dependencies]
-nalgebra = "0.21.1"
+nalgebra = "0.23"

@@ -1,0 +1,11 @@
+[package]
+name = "velvet-lennard-jones"
+version = "0.1.0"
+authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+velvet-core = {path = "../../core"}
