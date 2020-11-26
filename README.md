@@ -1,15 +1,3 @@
-# Velvet
-A tiny molecular dynamics simulator.
+# Introduction
 
-## FAQ
-__Why are you doing this?__
-
-This project is an educational exercise to sharpen my Rust skills and understand the inner workings of a molecular dynamics simulator. 
-
-__Why should I use Velvet instead of some other tool like LAMMPS?__
-
-You shouldn't.
-
-__Why the name 'Velvet'?__
-
-The name is a play on (Vel)ocity (V)erl(et) integration. 
+Velvet is an experimental molecular dynamics (MD) engine with a focus on user-friendliness and extensibility - two features that I believe are not well represented in the current scientific software environment. While Velvet will never achieve feature parity with established tools like LAMMPS or GROMACS, applying newer software development concepts may help to achieve significant progress in the aforementioned problem space. Velvet leverages the memory-safety and sophisticated trait system of the Rust programming language in pursuit of these goals. In addition to Velvet's technical features, I've chosen to license the product under the permissive MIT license with the belief that software gets better when more people have a vested interest in maintaining it.
