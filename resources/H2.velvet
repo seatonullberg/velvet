@@ -1,0 +1,36 @@
+(
+    size: 2,
+    cell: (
+        matrix: [5,0,0,0,5,0,0,0,5],
+        inv_matrix: [0.2,0,0,0,0.2,0,0,0,0.2],
+    ),
+    elements: [
+        H,
+        H,
+    ],
+    molecules: [
+        1,
+        1,
+    ],
+    positions: [
+        [0,0,0],
+        [1,1,1],
+    ],
+    velocities: [
+        [0,0,0],
+        [0,0,0],
+    ],
+    masses: [
+        1.01,
+        1.01,
+    ],
+    charges: [
+        0,
+        0,
+    ],
+    bonds: [
+        [(0,1)],
+    ],
+    angles: [],
+    dihedrals: [],
+)

@@ -2,10 +2,12 @@ pub mod cell;
 pub mod element;
 
 use nalgebra::Vector3;
+use serde::{Deserialize, Serialize};
 
 use crate::system::cell::Cell;
 use crate::system::element::Element;
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct System {
     /// Number of atoms in the system.
     size: usize,
@@ -38,5 +40,41 @@ impl System {
     /// Returns the number of atoms in the system.
     pub fn size(&self) -> usize {
         self.size
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::system::cell::Cell;
+    use crate::system::element::Element;
+    use crate::system::System;
+    use nalgebra::Vector3;
+    use ron::de::from_str;
+    use ron::ser::{to_string_pretty, PrettyConfig};
+
+    #[test]
+    fn serde() {
+        let sys = System {
+            size: 2,
+            cell: Cell::new(5.0, 5.0, 5.0, 90.0, 90.0, 90.0),
+            elements: vec![Element::H, Element::H],
+            molecules: vec![1, 1],
+            positions: vec![Vector3::default(), Vector3::new(1.0, 1.0, 1.0)],
+            velocities: vec![Vector3::default(), Vector3::default()],
+            masses: vec![1.01, 1.01],
+            charges: vec![0.0, 0.0],
+            bonds: vec![vec![(0, 1)]],
+            angles: Vec::new(),
+            dihedrals: Vec::new(),
+        };
+        let pretty = PrettyConfig::new().with_depth_limit(2);
+        let s = to_string_pretty(&sys, pretty).unwrap();
+        let _: System = match from_str(&s) {
+            Ok(x) => x,
+            Err(e) => {
+                println!("failed to load system from string: {}", e);
+                std::process::exit(0);
+            }
+        };
     }
 }

@@ -1,4 +1,3 @@
-pub mod integrate;
 pub mod potential;
 pub mod system;
 

@@ -8,4 +8,6 @@ edition = "2018"
 rustc_version = "0.3"
 
 [dependencies]
-nalgebra = "0.23"
+nalgebra = { version = "0.23", features = ["serde-serialize"] }
+ron = "0.6"
+serde = { version = "1.0", features = ["derive"] }

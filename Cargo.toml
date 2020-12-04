@@ -21,7 +21,6 @@ members = [
     "crates/app",
     "crates/core",
     "crates/potentials/lennard_jones",
-    "crates/integrators/velocity_verlet",
 ]
 
 [[bin]]
