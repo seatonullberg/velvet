@@ -6,3 +6,6 @@ edition = "2018"
 
 [build-dependencies]
 rustc_version = "0.3"
+
+[dependencies]
+nalgebra = "0.23"

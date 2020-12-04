@@ -21,11 +21,9 @@ members = [
     "crates/app",
     "crates/core",
     "crates/potentials/lennard_jones",
+    "crates/integrators/velocity_verlet",
 ]
 
 [[bin]]
 name = "velvet"
 path = "crates/app/src/main.rs"
-
-[dependencies]
-nalgebra = "0.23"
