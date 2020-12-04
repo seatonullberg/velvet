@@ -10,15 +10,15 @@ pub struct PluginDeclaration {
     pub register: unsafe extern "C" fn(&mut dyn PluginRegistrar),
 }
 
-use potential::pair::PairArgs;
-use potential::Potential;
+use potential::pair::PairPotential;
 
 // TODO: add other register functions
 pub trait PluginRegistrar {
     fn register_pair_potential(
         &mut self,
         name: &str,
-        potential: Box<dyn Potential<Args = PairArgs>>,
+        params: Vec<&'static str>,
+        potential: Box<dyn PairPotential>,
     );
 }
 

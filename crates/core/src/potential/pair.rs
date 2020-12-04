@@ -1,14 +1,9 @@
 use crate::potential::{Potential, Restriction};
 use crate::system::element::Element;
 
-trait PairPotential {}
-
-impl<T: Potential<Args = PairArgs>> PairPotential for T {}
-
-#[derive(Copy, Clone, Debug)]
-pub struct PairArgs {
-    /// Distance between a pair of atoms.
-    pub r: f32,
+pub trait PairPotential: Potential {
+    fn energy(&self, r: f32) -> f32;
+    fn force(&self, r: f32) -> f32;
 }
 
 /// Pair potential meta data.
