@@ -13,8 +13,16 @@ pub struct Potentials {
 }
 
 impl Potentials {
+    pub fn new() -> Potentials {
+        Potentials { pair: Vec::new() }
+    }
+
     pub fn pairs(&self) -> impl Iterator<Item = &(PairPotentialEnum, PairPotentialMeta)> {
         self.pair.iter()
+    }
+
+    pub fn add_pair(&mut self, potential: PairPotentialEnum, meta: PairPotentialMeta) {
+        self.pair.push((potential, meta))
     }
 }
 

@@ -32,10 +32,24 @@ impl PairPotential for PairPotentialEnum {
 pub struct PairPotentialMeta {
     /// Applicable elements.
     pub elements: (Element, Element),
-    /// Limitation to the applicability.
-    pub restriction: Restriction,
     /// Cutoff radius.
     pub cutoff: f32,
+    /// Limitation to the applicability.
+    pub restriction: Restriction,
+}
+
+impl PairPotentialMeta {
+    pub fn new(
+        elements: (Element, Element),
+        cutoff: f32,
+        restriction: Restriction,
+    ) -> PairPotentialMeta {
+        PairPotentialMeta {
+            elements,
+            cutoff,
+            restriction,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
