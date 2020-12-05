@@ -2,6 +2,13 @@
 ![Crates.io](https://img.shields.io/crates/v/velvet)
 ![Crates.io](https://img.shields.io/crates/l/velvet)
 
-Velvet is an experimental molecular dynamics (MD) engine with a focus on user-friendliness and extensibility - two features that I believe are not well represented in the current scientific software environment. While Velvet will never achieve feature parity with established tools like [LAMMPS](https://github.com/lammps/lammps) or [GROMACS](https://gitlab.com/gromacs/gromacs), applying newer software development concepts may help to achieve significant progress in the aforementioned problem space. Velvet leverages the memory-safety and sophisticated trait system of the Rust programming language in pursuit of these goals. In addition to Velvet's technical features, the product is distributed under the permissive MIT license with the belief that software gets better when more people have a vested interest in maintaining it.
+Velvet is a classical atomistic simulation engine with a focus on user-friendliness and extensibility - two features that I believe are not well represented in the current scientific software environment. Velvet offers a powerful plugin system which allows users to extend the engine with custom behavior from their own Rust modules. Plugin authors may publish their extensions to [crates.io](https://crates.io/) or maintain their own private libraries.
 
-Velvet's design is heavily inspired by [Lumol](https://github.com/lumol-org/lumol). Without the valuable work of Lumol's contributors it is unlikely that Velvet would exist. Velvet differentiates itself from Lumol by offering an alternative strategy for including user-defined behaviors. The strategy makes use of Rust's support for dynamic linkage and allows users to write custom modules in pure Rust which can be incorporated during runtime. Conveniently, this allows authors to publish their extensions to [crates.io](https://crates.io/) or maintain their own private library of extensions. Both options allow users to modify the behavior of Velvet without ever touching the main code base.
+## License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+
+## Acknowledgements
+
+* [Lumol](https://github.com/lumol-org/lumol)
+* [Rust FFI Guide](https://michael-f-bryan.github.io/rust-ffi-guide/dynamic_loading.html)
