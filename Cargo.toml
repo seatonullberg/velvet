@@ -20,7 +20,6 @@ categories = [
 members = [
     "crates/app",
     "crates/core",
-    "crates/potentials/lennard_jones",
 ]
 
 [[bin]]

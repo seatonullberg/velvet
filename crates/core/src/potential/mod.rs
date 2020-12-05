@@ -1,10 +1,6 @@
 pub mod pair;
 
-use std::collections::HashMap;
-
-pub trait Potential {
-    fn setup(&mut self, params: &HashMap<&'static str, f32>);
-}
+pub trait Potential: Clone + Copy + Send + Sync {}
 
 /// Restrictions which can be applied to a potential.
 #[derive(Clone, Copy, Debug)]

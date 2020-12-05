@@ -1,7 +1,6 @@
 use nalgebra::{Matrix3, Vector3};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct Cell {
     matrix: Matrix3<f32>,
     inv_matrix: Matrix3<f32>,
