@@ -2,6 +2,8 @@
 name = "velvet-core"
 version = "0.1.0"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/seatonullberg/velvet"
 edition = "2018"
 
 [dependencies]

@@ -1,3 +1,5 @@
+//! Physical properties of the simulated system.
+
 use nalgebra::Vector3;
 
 use crate::potential::{Potentials, Restriction};
@@ -5,10 +7,13 @@ use crate::system::System;
 
 /// Calculates a system-wide property.
 pub trait Property {
+    /// The property's return type.
     type Output;
+    /// Returns a physical property of the system.
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output;
 }
 
+/// Force acting on each atom in the system.
 #[derive(Clone, Copy, Debug)]
 pub struct Forces;
 
@@ -61,6 +66,7 @@ impl Property for Forces {
     }
 }
 
+/// Potential energy of the whole system.
 #[derive(Clone, Copy, Debug)]
 pub struct PotentialEnergy;
 
@@ -110,6 +116,7 @@ impl Property for PotentialEnergy {
     }
 }
 
+/// Kinetic energy of the whole system
 #[derive(Clone, Copy, Debug)]
 pub struct KineticEnergy;
 
@@ -127,6 +134,7 @@ impl Property for KineticEnergy {
     }
 }
 
+/// Total energy of the system.
 #[derive(Clone, Copy, Debug)]
 pub struct TotalEnergy;
 
