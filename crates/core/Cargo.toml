@@ -1,0 +1,9 @@
+[package]
+name = "velvet-core"
+version = "0.1.0"
+authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+approx = "0.4"
+nalgebra = "0.23"

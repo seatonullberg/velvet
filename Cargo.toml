@@ -3,24 +3,25 @@ name = "velvet"
 version = "0.1.0"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 edition = "2018"
-description = "A tiny molecular dynamics simulator."
+description = "An experimental molecular dynamics engine with a focus on user-friendliness and extensibility."
 license = "MIT"
 keywords = [
-    "molecular-dynamics",
+    "chemistry",
     "materials-science",
+    "molecular-dynamics",
+    "physics",
 ]
 categories = [
     "science",
     "simulation",
 ]
 
-[lib]
-name = "velvet"
-path = "src/lib.rs"
+[workspace]
+members = [
+    "crates/app",
+    "crates/core",
+]
 
 [[bin]]
 name = "velvet"
-path = "src/main.rs"
-
-[dependencies]
-nalgebra = "0.21.1"
+path = "crates/app/src/main.rs"

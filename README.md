@@ -1,15 +1,20 @@
-# Velvet
-A tiny molecular dynamics simulator.
+# :alembic: Velvet
+![Crates.io](https://img.shields.io/crates/v/velvet)
+![Crates.io](https://img.shields.io/crates/l/velvet)
+![Crates.io](https://img.shields.io/crates/d/velvet)
 
-## FAQ
-__Why are you doing this?__
+Velvet is a classical atomistic simulation engine with a focus on user-friendliness and portability - two features that I believe are not well represented in the current scientific software environment. This project is largely a learning exercise, but as development continues I hope to accomplish the following goals:
 
-This project is an educational exercise to sharpen my Rust skills and understand the inner workings of a molecular dynamics simulator. 
+* Extensibility via user-defined plugin modules
+* Optimized single CPU performace with multithreading and SIMD support
+* Implement a wide variety of interatomic potentials
+* Molecular Dynamics, Monte Carlo, and Minimization routines
+* Visualization tools to analyze simulation results
 
-__Why should I use Velvet instead of some other tool like LAMMPS?__
+## License
 
-You shouldn't.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
-__Why the name 'Velvet'?__
+## Acknowledgements
 
-The name is a play on (Vel)ocity (V)erl(et) integration. 
+* [Lumol](https://github.com/lumol-org/lumol)

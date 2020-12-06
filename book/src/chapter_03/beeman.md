@@ -1,1 +1,0 @@
-# Beeman's Algorithm
