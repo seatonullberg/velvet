@@ -5,5 +5,5 @@ authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-approx = "0.4.0"
+approx = "0.4"
 nalgebra = "0.23"
