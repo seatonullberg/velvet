@@ -93,7 +93,12 @@ pub struct Mie {
 
 impl Mie {
     pub fn new(epsilon: f32, sigma: f32, gamma_a: f32, gamma_r: f32) -> Mie {
-        Mie { epsilon, sigma, gamma_a, gamma_r }
+        Mie {
+            epsilon,
+            sigma,
+            gamma_a,
+            gamma_r,
+        }
     }
 }
 
@@ -148,7 +153,7 @@ impl PairPotential for Morse {
 
 #[cfg(test)]
 mod tests {
-    use crate::potential::pair::{Harmonic, Morse, LennardJones, PairPotential, Mie};
+    use crate::potential::pair::{Harmonic, LennardJones, Mie, Morse, PairPotential};
     use approx::*;
 
     #[test]
@@ -178,7 +183,11 @@ mod tests {
         let mie = Mie::new(0.8, 2.0, 6.0, 12.0);
         assert_relative_eq!(mie.energy(2.0), 0.0);
         assert_relative_eq!(mie.energy(2.5), -0.61895853);
-        assert_relative_eq!(mie.force(f32::powf(2.0, 1.0 / 6.0) * 2.0).abs(), 0.0, epsilon = 1e-5);
+        assert_relative_eq!(
+            mie.force(f32::powf(2.0, 1.0 / 6.0) * 2.0).abs(),
+            0.0,
+            epsilon = 1e-5
+        );
         assert_relative_eq!(mie.force(2.5), -0.9577347);
     }
 

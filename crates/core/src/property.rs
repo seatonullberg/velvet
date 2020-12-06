@@ -61,12 +61,92 @@ impl Property for Forces {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct PotentialEnergy;
+
+impl Property for PotentialEnergy {
+    type Output = f32;
+
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+        let sys_size = system.size();
+        let mut potential_energy: f32 = 0.0 as f32;
+
+        // iterate over all pairs of atoms
+        for i in 0..sys_size {
+            // skip duplicate or identical pairs
+            for j in (i + 1)..sys_size {
+                // calculate distance between the pair
+                let pos1 = &system.positions[i];
+                let pos2 = &system.positions[j];
+                let r = system.cell.distance(pos1, pos2);
+
+                // iterate over the pair potentials
+                for (potential, meta) in potentials.pairs() {
+                    // check cutoff radius
+                    if meta.cutoff < r {
+                        continue;
+                    }
+
+                    // check element pair
+                    let elem1 = &system.elements[i];
+                    let elem2 = &system.elements[j];
+                    if (*elem1, *elem2) != meta.elements {
+                        continue;
+                    }
+
+                    // check restricton
+                    let ok = match meta.restriction {
+                        Restriction::None => true,
+                        Restriction::Intermolecular => &system.molecules[i] != &system.molecules[j],
+                        Restriction::Intramolecular => &system.molecules[i] == &system.molecules[j],
+                    };
+                    if ok {
+                        potential_energy += potential.energy(r);
+                    }
+                }
+            }
+        }
+        potential_energy
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct KineticEnergy;
+
+impl Property for KineticEnergy {
+    type Output = f32;
+
+    fn calculate(&self, system: &System, _: &Potentials) -> Self::Output {
+        let sys_size = system.size();
+        let mut kinetic_energy = 0.0 as f32;
+
+        for i in 0..sys_size {
+            kinetic_energy += 0.5 * system.masses[i] * system.velocities[i].norm_squared();
+        }
+        kinetic_energy
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct TotalEnergy;
+
+impl Property for TotalEnergy {
+    type Output = f32;
+
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+        let kinetic = KineticEnergy.calculate(system, potentials);
+        let potential = PotentialEnergy.calculate(system, potentials);
+        kinetic + potential
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::potential::pair::{Harmonic, PairPotentialMeta};
     use crate::potential::{Potentials, Restriction};
-    use crate::property::{Forces, Property};
+    use crate::property::{Forces, KineticEnergy, PotentialEnergy, Property, TotalEnergy};
     use crate::system::{cell::Cell, element::Element, System};
+    use approx::*;
     use nalgebra::Vector3;
 
     fn get_pair_system() -> System {
@@ -104,8 +184,6 @@ mod tests {
 
     #[test]
     fn forces() {
-        use approx::*;
-
         // define the system
         let sys = get_pair_system();
 
@@ -125,5 +203,22 @@ mod tests {
         assert_relative_eq!(forces[1][0], target_force, epsilon = 1e-4);
         assert_relative_eq!(forces[1][1], 0.0);
         assert_relative_eq!(forces[1][2], 0.0);
+    }
+
+    #[test]
+    fn energy() {
+        // define the system
+        let sys = get_pair_system();
+
+        // define the potentials
+        let pots = get_pair_potentials();
+
+        // calculate the energies
+        let kinetic = KineticEnergy.calculate(&sys, &pots);
+        let potential = PotentialEnergy.calculate(&sys, &pots);
+        let total = TotalEnergy.calculate(&sys, &pots);
+
+        assert_eq!(kinetic + potential, total);
+        assert_relative_eq!(kinetic, 0.0007483);
     }
 }
