@@ -3,6 +3,8 @@ pub enum Element {
     H,
     He,
     Li,
+    F,
+    Ar,
 }
 
 impl Element {
@@ -11,8 +13,8 @@ impl Element {
             Element::H => 1.008,
             Element::He => 4.0026,
             Element::Li => 6.94,
+            Element::F => 18.998,
+            Element::Ar => 39.948,
         }
     }
 }
-
-// TODO: implement TryFrom &str

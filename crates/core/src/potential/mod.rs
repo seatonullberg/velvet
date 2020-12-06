@@ -1,11 +1,11 @@
 pub mod pair;
 
-use crate::potential::pair::{PairPotentialEnum, PairPotentialMeta};
+use crate::potential::pair::{PairPotential, PairPotentialMeta};
 
-pub trait Potential: Clone + Copy + Send + Sync {}
+pub trait Potential: Send + Sync {}
 
 pub struct Potentials {
-    pair: Vec<(PairPotentialEnum, PairPotentialMeta)>,
+    pairs: Vec<(Box<dyn PairPotential>, PairPotentialMeta)>,
     // --bond--
     // --angle--
     // --dihedral--
@@ -14,15 +14,15 @@ pub struct Potentials {
 
 impl Potentials {
     pub fn new() -> Potentials {
-        Potentials { pair: Vec::new() }
+        Potentials { pairs: Vec::new() }
     }
 
-    pub fn pairs(&self) -> impl Iterator<Item = &(PairPotentialEnum, PairPotentialMeta)> {
-        self.pair.iter()
+    pub fn pairs(&self) -> impl Iterator<Item = &(Box<dyn PairPotential>, PairPotentialMeta)> {
+        self.pairs.iter()
     }
 
-    pub fn add_pair(&mut self, potential: PairPotentialEnum, meta: PairPotentialMeta) {
-        self.pair.push((potential, meta))
+    pub fn add_pair(&mut self, potential: Box<dyn PairPotential>, meta: PairPotentialMeta) {
+        self.pairs.push((potential, meta))
     }
 }
 

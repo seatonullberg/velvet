@@ -146,6 +146,7 @@ impl Cell {
 #[cfg(test)]
 mod tests {
     use crate::system::cell::Cell;
+    use approx::*;
     use nalgebra::Vector3;
 
     #[test]
@@ -154,13 +155,13 @@ mod tests {
         assert_eq!(cell.a_vector(), Vector3::new(3.0, 0.0, 0.0));
         assert_eq!(cell.b_vector()[2], 0.0);
 
-        assert!(f32::abs(cell.a() - 3.0) < 1e-5);
-        assert!(f32::abs(cell.b() - 4.0) < 1e-5);
-        assert!(f32::abs(cell.c() - 5.0) < 1e-5);
+        assert_relative_eq!(cell.a(), 3.0);
+        assert_relative_eq!(cell.b(), 4.0);
+        assert_relative_eq!(cell.c(), 5.0);
 
-        assert!(f32::abs(cell.alpha() - 80.0) < 1e-5);
-        assert!(f32::abs(cell.beta() - 90.0) < 1e-5);
-        assert!(f32::abs(cell.gamma() - 110.0) < 1e-5);
+        assert_relative_eq!(cell.alpha(), 80.0);
+        assert_relative_eq!(cell.beta(), 90.0);
+        assert_relative_eq!(cell.gamma(), 110.0);
     }
 
     #[test]
@@ -170,7 +171,7 @@ mod tests {
 
         for test in &tests {
             let res = cell.cartesian(&cell.fractional(test));
-            assert!(f32::abs((test - &res).norm()) < 1e-5)
+            assert_relative_eq!((test - &res).norm(), 0.0, epsilon = 1e-5);
         }
     }
 
@@ -180,7 +181,7 @@ mod tests {
         let mut v = Vector3::new(1.0, 1.5, 6.0);
         cell.wrap_vector(&mut v);
         let res = Vector3::new(1.0, 1.5, 1.0);
-        assert!(f32::abs((v - res).norm()) < 1e-5);
+        assert_relative_eq!((v - &res).norm(), 0.0, epsilon = 1e-5);
     }
 
     #[test]
@@ -189,7 +190,7 @@ mod tests {
         let mut v = Vector3::new(1.0, 1.5, 6.0);
         cell.vector_image(&mut v);
         let res = Vector3::new(1.0, 1.5, 1.0);
-        assert!(f32::abs((v - res).norm()) < 1e-5);
+        assert_relative_eq!((v - &res).norm(), 0.0, epsilon = 1e-5);
     }
 
     #[test]
@@ -197,7 +198,7 @@ mod tests {
         let cell = Cell::new(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
         let v1 = Vector3::new(0.0, 0.0, 0.0);
         let v2 = Vector3::new(1.0, 2.0, 6.0);
-        assert_eq!(cell.distance(&v1, &v2), f32::sqrt(6.0));
+        assert_relative_eq!(cell.distance(&v1, &v2), f32::sqrt(6.0));
     }
 
     #[test]
@@ -206,11 +207,11 @@ mod tests {
         let a = Vector3::new(1.0, 0.0, 0.0);
         let b = Vector3::new(0.0, 0.0, 0.0);
         let c = Vector3::new(0.0, 1.0, 0.0);
-        assert_eq!(cell.angle(&a, &b, &c), std::f32::consts::PI / 2.0);
+        assert_relative_eq!(cell.angle(&a, &b, &c), std::f32::consts::PI / 2.0);
         let a = Vector3::new(1.0, 0.0, 0.0);
         let b = Vector3::new(0.0, 0.0, 0.0);
         let c = Vector3::new(f32::cos(1.877), f32::sin(1.877), 0.0);
-        assert_eq!(cell.angle(&a, &b, &c), 1.877);
+        assert_relative_eq!(cell.angle(&a, &b, &c), 1.877);
     }
 
     #[test]
@@ -229,11 +230,11 @@ mod tests {
         let v2 = Vector3::new(1.0, 0.0, 0.0);
         let v3 = Vector3::new(1.0, 1.0, 0.0);
         let v4 = Vector3::new(2.0, 1.0, 0.0);
-        assert_eq!(cell.dihedral(&v1, &v2, &v3, &v4), std::f32::consts::PI);
+        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), std::f32::consts::PI);
         let v1 = Vector3::new(1.241, 0.444, 0.349);
         let v2 = Vector3::new(-0.011, -0.441, 0.333);
         let v3 = Vector3::new(-1.176, 0.296, -0.332);
         let v4 = Vector3::new(-1.396, 1.211, 0.219);
-        assert_eq!(cell.dihedral(&v1, &v2, &v3, &v4), -1.045379);
+        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), -1.045379);
     }
 }
