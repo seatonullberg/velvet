@@ -1,0 +1,13 @@
+(
+    pairs: [
+        ({
+            "type": "LennardJones",
+            "epsilon": 1,
+            "sigma": 3.4,
+        }, (
+            elements: (Ar, Ar),
+            cutoff: 8.5,
+            restriction: None,
+        )),
+    ],
+)
