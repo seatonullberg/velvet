@@ -1,9 +1,12 @@
 //! Pairwise interatomic potentials.
 
+use serde::{Deserialize, Serialize};
+
 use crate::potential::{Potential, Restriction};
 use crate::system::element::Element;
 
 /// Shared behavior for pair potentials.
+#[typetag::serde(tag = "type")]
 pub trait PairPotential: Potential {
     /// Returns the potential energy of an atom in a pair separated by a distance `r`.
     fn energy(&self, r: f32) -> f32;
@@ -12,7 +15,7 @@ pub trait PairPotential: Potential {
 }
 
 /// Pair potential meta data.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct PairPotentialMeta {
     /// Applicable elements.
     pub elements: (Element, Element),
@@ -40,7 +43,7 @@ impl PairPotentialMeta {
 /// Lennard-Jones style pair potential.
 ///
 /// TODO: Include energy equation here.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct LennardJones {
     epsilon: f32,
     sigma: f32,
@@ -55,6 +58,7 @@ impl LennardJones {
 
 impl Potential for LennardJones {}
 
+#[typetag::serde]
 impl PairPotential for LennardJones {
     fn energy(&self, r: f32) -> f32 {
         let term = (self.sigma / r).powi(6);
@@ -71,7 +75,7 @@ impl PairPotential for LennardJones {
 /// Harmonic style pair potential.
 ///
 /// TODO: Include energy equation here.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Harmonic {
     k: f32,
     x0: f32,
@@ -86,6 +90,7 @@ impl Harmonic {
 
 impl Potential for Harmonic {}
 
+#[typetag::serde]
 impl PairPotential for Harmonic {
     fn energy(&self, r: f32) -> f32 {
         let dr = r - self.x0;
@@ -100,7 +105,7 @@ impl PairPotential for Harmonic {
 /// Mie style pair potential.
 ///
 /// TODO: Insert energy equation here.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Mie {
     epsilon: f32,
     sigma: f32,
@@ -122,6 +127,7 @@ impl Mie {
 
 impl Potential for Mie {}
 
+#[typetag::serde]
 impl PairPotential for Mie {
     fn energy(&self, r: f32) -> f32 {
         let term_a = (self.sigma / r).powf(self.gamma_r);
@@ -143,7 +149,7 @@ impl PairPotential for Mie {
 /// Morse style pair potential.
 ///
 /// Include energy equation here.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Morse {
     a: f32,
     d_e: f32,
@@ -159,6 +165,7 @@ impl Morse {
 
 impl Potential for Morse {}
 
+#[typetag::serde]
 impl PairPotential for Morse {
     fn energy(&self, r: f32) -> f32 {
         let term_a = f32::exp(-2.0 * self.a * (r - self.r_e));

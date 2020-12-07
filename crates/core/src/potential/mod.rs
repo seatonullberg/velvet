@@ -2,12 +2,15 @@
 
 pub mod pair;
 
+use serde::{Deserialize, Serialize};
+
 use crate::potential::pair::{PairPotential, PairPotentialMeta};
 
 /// Base trait for all potentials.
 pub trait Potential: Send + Sync {}
 
 /// Container type to hold instances of each potential in the system.
+#[derive(Serialize, Deserialize)]
 pub struct Potentials {
     pairs: Vec<(Box<dyn PairPotential>, PairPotentialMeta)>,
     // --bond--
@@ -34,7 +37,7 @@ impl Potentials {
 }
 
 /// Restrictions which can be applied to any potential.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Restriction {
     /// No restrictions.
     None,

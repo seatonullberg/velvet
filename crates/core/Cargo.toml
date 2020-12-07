@@ -10,6 +10,7 @@ edition = "2018"
 [dependencies]
 nalgebra = {version = "0.23", features = ["serde-serialize"]}
 serde = {version = "1.0", features = ["derive"]}
+typetag = "0.1.6"
 
 [dev-dependencies]
 approx = "0.4"

@@ -67,18 +67,7 @@ impl Integrator for VelocityVerlet {
 #[cfg(test)]
 mod tests {
     use crate::integrate::{Integrator, VelocityVerlet};
-    use crate::potential::pair::{LennardJones, PairPotentialMeta};
-    use crate::potential::{Potentials, Restriction};
-    use crate::system::element::Element;
-    use crate::load_test_system;
-
-    fn get_pair_potentials() -> Potentials {
-        let mut pots = Potentials::new();
-        let potential = Box::new(LennardJones::new(1.0, 3.4));
-        let meta = PairPotentialMeta::new((Element::Ar, Element::Ar), 8.5, Restriction::None);
-        pots.add_pair(potential, meta);
-        pots
-    }
+    use crate::{load_test_system, load_test_potentials};
 
     #[test]
     fn velocity_verlet() {
@@ -86,7 +75,7 @@ mod tests {
         let mut sys = load_test_system!("argon");
 
         // define the potentials
-        let pots = get_pair_potentials();
+        let pots = load_test_potentials!("argon");
 
         // define the integrator
         let mut vv = VelocityVerlet::new(1.0);

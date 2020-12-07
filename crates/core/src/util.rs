@@ -12,3 +12,18 @@ macro_rules! load_test_system {
         sys
     }};
 }
+
+/// Loads the specified test potentials into a Potentials object.
+#[macro_export]
+macro_rules! load_test_potentials {
+    ($filename:literal) => {{
+        let path = format!(
+            "{}/../../resources/test/{}.velvet.pot",
+            env!("CARGO_MANIFEST_DIR"),
+            $filename
+        );
+        let f = std::fs::File::open(&path).expect("failed to open test file");
+        let pots: crate::potential::Potentials = ron::de::from_reader(f).unwrap();
+        pots
+    }};
+}

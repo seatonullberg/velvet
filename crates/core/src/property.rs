@@ -167,22 +167,11 @@ impl Property for Temperature {
 
 #[cfg(test)]
 mod tests {
-    use crate::load_test_system;
-    use crate::potential::pair::{Harmonic, PairPotentialMeta};
-    use crate::potential::{Potentials, Restriction};
     use crate::property::{Forces, KineticEnergy, PotentialEnergy, Property, TotalEnergy};
-    use crate::system::element::Element;
+    use crate::{load_test_potentials, load_test_system};
     use approx::*;
 
     use super::Temperature;
-
-    fn get_pair_potentials() -> Potentials {
-        let mut pots = Potentials::new();
-        let potential = Box::new(Harmonic::new(300.0, 1.2));
-        let meta = PairPotentialMeta::new((Element::F, Element::F), 5.0, Restriction::None);
-        pots.add_pair(potential, meta);
-        pots
-    }
 
     #[test]
     fn forces() {
@@ -190,7 +179,7 @@ mod tests {
         let sys = load_test_system!("fluorine");
 
         // define the potentials
-        let pots = get_pair_potentials();
+        let pots = load_test_potentials!("fluorine");
 
         // calculate the forces
         let forces = Forces.calculate(&sys, &pots);
@@ -213,7 +202,7 @@ mod tests {
         let sys = load_test_system!("fluorine");
 
         // define the potentials
-        let pots = get_pair_potentials();
+        let pots = load_test_potentials!("fluorine");
 
         // calculate the energies
         let kinetic = KineticEnergy.calculate(&sys, &pots);
@@ -230,20 +219,7 @@ mod tests {
         let sys = load_test_system!("fluorine");
 
         // define the potentials
-        let pots = get_pair_potentials();
-
-        // calculate the temperature
-        let temperature = Temperature.calculate(&sys, &pots);
-        assert_relative_eq!(temperature, 300.0, epsilon = 1e-2);
-    }
-
-    #[test]
-    fn temperature_from_file() {
-        // define the system
-        let sys = load_test_system!("fluorine");
-
-        // define the potentials
-        let pots = get_pair_potentials();
+        let pots = load_test_potentials!("fluorine");
 
         // calculate the temperature
         let temperature = Temperature.calculate(&sys, &pots);
