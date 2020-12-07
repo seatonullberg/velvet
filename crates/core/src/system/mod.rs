@@ -1,3 +1,5 @@
+//! Data structures to hold physical information about the simulation environment.
+
 pub mod cell;
 pub mod element;
 
@@ -6,6 +8,7 @@ use nalgebra::Vector3;
 use crate::system::cell::Cell;
 use crate::system::element::Element;
 
+/// Collection of atomic properties and structural information.
 #[derive(Clone, Debug)]
 pub struct System {
     /// Number of atoms in the system.
@@ -36,6 +39,7 @@ pub struct System {
 }
 
 impl System {
+    /// Returns a new `System` containing `size` atoms.
     pub fn new(size: usize) -> System {
         System {
             size,

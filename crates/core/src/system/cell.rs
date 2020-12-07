@@ -1,5 +1,8 @@
+//! Bounding box of the simulation environment.
+
 use nalgebra::{Matrix3, Vector3};
 
+/// Matrix representation of a 3D bounding box.
 #[derive(Clone, Debug)]
 pub struct Cell {
     matrix: Matrix3<f32>,
@@ -7,6 +10,7 @@ pub struct Cell {
 }
 
 impl Cell {
+    /// Returns a new `Cell` from triclinig crystallographic parameters.
     pub fn new(a: f32, b: f32, c: f32, alpha: f32, beta: f32, gamma: f32) -> Cell {
         let cos_alpha = alpha.to_radians().cos();
         let cos_beta = beta.to_radians().cos();
@@ -25,36 +29,43 @@ impl Cell {
         Cell { matrix, inv_matrix }
     }
 
+    /// Returns the magnitude of the 'a' vector.
     pub fn a(&self) -> f32 {
         self.a_vector().norm()
     }
 
+    /// Returns the magnitude of the 'b' vector.
     pub fn b(&self) -> f32 {
         self.b_vector().norm()
     }
 
+    /// Returns the magnitude of the 'c' vector.
     pub fn c(&self) -> f32 {
         self.c_vector().norm()
     }
 
+    /// Return the angle between 'b' and 'c' in degrees.
     pub fn alpha(&self) -> f32 {
         let b = self.b_vector();
         let c = self.c_vector();
         b.angle(&c).to_degrees()
     }
 
+    /// Returns the angle between 'a' and 'c' in degrees.
     pub fn beta(&self) -> f32 {
         let a = self.a_vector();
         let c = self.c_vector();
         a.angle(&c).to_degrees()
     }
 
+    /// Returns the angle between 'a' and 'b' in degrees.
     pub fn gamma(&self) -> f32 {
         let a = self.a_vector();
         let b = self.b_vector();
         a.angle(&b).to_degrees()
     }
 
+    /// Returns the 'a' vector.
     pub fn a_vector(&self) -> Vector3<f32> {
         Vector3::new(
             self.matrix[(0, 0)],
@@ -63,6 +74,7 @@ impl Cell {
         )
     }
 
+    /// Returns the 'b' vector.
     pub fn b_vector(&self) -> Vector3<f32> {
         Vector3::new(
             self.matrix[(0, 1)],
@@ -71,6 +83,7 @@ impl Cell {
         )
     }
 
+    /// Returns the 'c' vector.
     pub fn c_vector(&self) -> Vector3<f32> {
         Vector3::new(
             self.matrix[(0, 2)],
@@ -79,14 +92,17 @@ impl Cell {
         )
     }
 
+    /// Converts a cartesian position to a fractional position.
     pub fn fractional(&self, cartesian: &Vector3<f32>) -> Vector3<f32> {
         self.inv_matrix * cartesian
     }
 
+    /// Converts a fractional position to a cartesian position.
     pub fn cartesian(&self, fractional: &Vector3<f32>) -> Vector3<f32> {
         self.matrix * fractional
     }
 
+    /// Wraps a position vector into the cell obeying periodic boundary conditions.
     pub fn wrap_vector(&self, vector: &mut Vector3<f32>) {
         let mut fractional = self.fractional(vector);
         fractional[0] -= f32::floor(fractional[0]);
@@ -95,6 +111,7 @@ impl Cell {
         *vector = self.cartesian(&fractional);
     }
 
+    /// Finds the image of a position vector in the cell obeying periodic boundary conditions.
     pub fn vector_image(&self, vector: &mut Vector3<f32>) {
         let mut fractional = self.fractional(vector);
         fractional[0] -= f32::round(fractional[0]);
@@ -103,18 +120,21 @@ impl Cell {
         *vector = self.cartesian(&fractional);
     }
 
+    /// Returns the unit vector path between `v1` and `v2` obeying periodic boundary conditions.
     pub fn direction(&self, v1: &Vector3<f32>, v2: &Vector3<f32>) -> Vector3<f32> {
         let mut d = v2 - v1;
         self.vector_image(&mut d);
         d.normalize()
     }
 
+    /// Returns the distance between `v1` and `v2` obeying periodic boundary conditions.
     pub fn distance(&self, v1: &Vector3<f32>, v2: &Vector3<f32>) -> f32 {
         let mut d = v2 - v1;
         self.vector_image(&mut d);
         d.norm()
     }
 
+    /// Returns the angle between `v1`, `v2` and `v3` obeying periodic boundary conditions.
     pub fn angle(&self, v1: &Vector3<f32>, v2: &Vector3<f32>, v3: &Vector3<f32>) -> f32 {
         let mut v12 = v1 - v2;
         self.vector_image(&mut v12);
@@ -123,6 +143,7 @@ impl Cell {
         f32::acos(v12.dot(&v32) / (v12.norm() * v32.norm()))
     }
 
+    /// Returns the dihedral angle between `v1`, `v2`, `v3`, and `v4`.
     pub fn dihedral(
         &self,
         v1: &Vector3<f32>,

@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Changed
+
+* Cargo workspace layout.
+
+### Added
+
+* LennardJones, Mie, Morse, and Harmonic interatomic pair potentials.
+* Velocity Verlet integration algorithm.
+* System properties for potential, kinetic, and total energy.
+* System property for force acting on every atom.
+
 ## [0.1.0] - 2020-07-19
 
 Initial release only available on [crates.io](https://crates.io/crates/velvet/0.1.0).

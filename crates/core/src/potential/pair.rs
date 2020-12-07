@@ -1,8 +1,13 @@
+//! Pairwise interatomic potentials.
+
 use crate::potential::{Potential, Restriction};
 use crate::system::element::Element;
 
+/// Shared behavior for pair potentials.
 pub trait PairPotential: Potential {
+    /// Returns the potential energy of an atom in a pair separated by a distance `r`.
     fn energy(&self, r: f32) -> f32;
+    /// Returns the magnitude of the force acting on an atom separated from another by a distance `r`.
     fn force(&self, r: f32) -> f32;
 }
 
@@ -18,6 +23,7 @@ pub struct PairPotentialMeta {
 }
 
 impl PairPotentialMeta {
+    /// Returns a new `PairPotentialMeta`.
     pub fn new(
         elements: (Element, Element),
         cutoff: f32,
@@ -31,6 +37,9 @@ impl PairPotentialMeta {
     }
 }
 
+/// Lennard-Jones style pair potential.
+///
+/// TODO: Include energy equation here.
 #[derive(Clone, Copy, Debug)]
 pub struct LennardJones {
     epsilon: f32,
@@ -38,6 +47,7 @@ pub struct LennardJones {
 }
 
 impl LennardJones {
+    /// Returns a new `LennardJones`.
     pub fn new(epsilon: f32, sigma: f32) -> LennardJones {
         LennardJones { epsilon, sigma }
     }
@@ -58,6 +68,9 @@ impl PairPotential for LennardJones {
     }
 }
 
+/// Harmonic style pair potential.
+///
+/// TODO: Include energy equation here.
 #[derive(Clone, Copy, Debug)]
 pub struct Harmonic {
     k: f32,
@@ -65,6 +78,7 @@ pub struct Harmonic {
 }
 
 impl Harmonic {
+    /// Returns a new `Harmonic`.
     pub fn new(k: f32, x0: f32) -> Harmonic {
         Harmonic { k, x0 }
     }
@@ -83,6 +97,9 @@ impl PairPotential for Harmonic {
     }
 }
 
+/// Mie style pair potential.
+///
+/// TODO: Insert energy equation here.
 #[derive(Clone, Copy, Debug)]
 pub struct Mie {
     epsilon: f32,
@@ -92,6 +109,7 @@ pub struct Mie {
 }
 
 impl Mie {
+    /// Returns a new `Mie`.
     pub fn new(epsilon: f32, sigma: f32, gamma_a: f32, gamma_r: f32) -> Mie {
         Mie {
             epsilon,
@@ -122,6 +140,9 @@ impl PairPotential for Mie {
     }
 }
 
+/// Morse style pair potential.
+///
+/// Include energy equation here.
 #[derive(Clone, Copy, Debug)]
 pub struct Morse {
     a: f32,
@@ -130,6 +151,7 @@ pub struct Morse {
 }
 
 impl Morse {
+    /// Returns a new `Morse`.
     pub fn new(a: f32, d_e: f32, r_e: f32) -> Morse {
         Morse { a, d_e, r_e }
     }
