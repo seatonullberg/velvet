@@ -1,9 +1,10 @@
 //! Bounding box of the simulation environment.
 
 use nalgebra::{Matrix3, Vector3};
+use serde::{Deserialize, Serialize};
 
 /// Matrix representation of a 3D bounding box.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Cell {
     matrix: Matrix3<f32>,
     inv_matrix: Matrix3<f32>,

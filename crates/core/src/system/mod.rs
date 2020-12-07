@@ -4,12 +4,13 @@ pub mod cell;
 pub mod element;
 
 use nalgebra::Vector3;
+use serde::{Deserialize, Serialize};
 
 use crate::system::cell::Cell;
 use crate::system::element::Element;
 
 /// Collection of atomic properties and structural information.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct System {
     /// Number of atoms in the system.
     size: usize,

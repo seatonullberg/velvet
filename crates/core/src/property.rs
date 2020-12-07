@@ -158,7 +158,7 @@ impl Property for Temperature {
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
         let kinetic = KineticEnergy.calculate(system, potentials);
-        // NOTE: Calculating DOF this way is a potentially nasty bug if future 
+        // NOTE: Calculating DOF this way is a potentially nasty bug if future
         // support is added for degrees of freedom beyond just 3D particles.
         let dof = (system.size() * 3) as f32;
         2.0 * kinetic / (dof * BOLTZMANN)
@@ -167,39 +167,14 @@ impl Property for Temperature {
 
 #[cfg(test)]
 mod tests {
+    use crate::load_test_system;
     use crate::potential::pair::{Harmonic, PairPotentialMeta};
     use crate::potential::{Potentials, Restriction};
     use crate::property::{Forces, KineticEnergy, PotentialEnergy, Property, TotalEnergy};
-    use crate::system::{cell::Cell, element::Element, System};
+    use crate::system::element::Element;
     use approx::*;
-    use nalgebra::Vector3;
 
     use super::Temperature;
-
-    fn get_pair_system() -> System {
-        let size = 2 as usize;
-        let fluorine = Element::F;
-        let mut sys = System::new(size);
-        sys.cell = Cell::new(10.0, 10.0, 10.0, 90.0, 90.0, 90.0);
-        sys.elements = vec![fluorine, fluorine];
-        sys.molecules = vec![0 as usize, 0 as usize];
-        sys.positions = vec![Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.3, 0.0, 0.0)];
-        sys.velocities = vec![
-            Vector3::new(
-                -0.007225222699367925,
-                -0.002405756495275919,
-                0.0026065109398392215,
-            ),
-            Vector3::new(
-                0.001179633958023287,
-                0.003525262341736351,
-                -0.0004132774783154952,
-            ),
-        ];
-        sys.masses = vec![fluorine.mass(), fluorine.mass()];
-        sys.charges = vec![0.0, 0.0];
-        sys
-    }
 
     fn get_pair_potentials() -> Potentials {
         let mut pots = Potentials::new();
@@ -212,7 +187,7 @@ mod tests {
     #[test]
     fn forces() {
         // define the system
-        let sys = get_pair_system();
+        let sys = load_test_system!("fluorine");
 
         // define the potentials
         let pots = get_pair_potentials();
@@ -235,7 +210,7 @@ mod tests {
     #[test]
     fn energy() {
         // define the system
-        let sys = get_pair_system();
+        let sys = load_test_system!("fluorine");
 
         // define the potentials
         let pots = get_pair_potentials();
@@ -252,7 +227,20 @@ mod tests {
     #[test]
     fn temperature() {
         // define the system
-        let sys = get_pair_system();
+        let sys = load_test_system!("fluorine");
+
+        // define the potentials
+        let pots = get_pair_potentials();
+
+        // calculate the temperature
+        let temperature = Temperature.calculate(&sys, &pots);
+        assert_relative_eq!(temperature, 300.0, epsilon = 1e-2);
+    }
+
+    #[test]
+    fn temperature_from_file() {
+        // define the system
+        let sys = load_test_system!("fluorine");
 
         // define the potentials
         let pots = get_pair_potentials();

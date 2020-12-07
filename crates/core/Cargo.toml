@@ -8,5 +8,9 @@ repository = "https://github.com/seatonullberg/velvet"
 edition = "2018"
 
 [dependencies]
+nalgebra = {version = "0.23", features = ["serde-serialize"]}
+serde = {version = "1.0", features = ["derive"]}
+
+[dev-dependencies]
 approx = "0.4"
-nalgebra = "0.23"
+ron = "0.6"

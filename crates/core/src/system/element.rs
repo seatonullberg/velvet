@@ -1,7 +1,9 @@
 //! Elemental properties.
 
+use serde::{Deserialize, Serialize};
+
 /// Every element on the periodic table.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Element {
     /// Hydrogen
     H,

@@ -69,33 +69,8 @@ mod tests {
     use crate::integrate::{Integrator, VelocityVerlet};
     use crate::potential::pair::{LennardJones, PairPotentialMeta};
     use crate::potential::{Potentials, Restriction};
-    use crate::system::{cell::Cell, element::Element, System};
-    use nalgebra::Vector3;
-
-    fn get_pair_system() -> System {
-        let size = 2 as usize;
-        let argon = Element::Ar;
-        let mut sys = System::new(size);
-        sys.cell = Cell::new(17.0, 17.0, 17.0, 90.0, 90.0, 90.0);
-        sys.elements = vec![argon, argon];
-        sys.molecules = vec![0 as usize, 0 as usize];
-        sys.positions = vec![Vector3::new(0.0, 0.0, 0.0), Vector3::new(3.4, 3.4, 3.4)];
-        sys.velocities = vec![
-            Vector3::new(
-                -0.007225222699367925,
-                -0.002405756495275919,
-                0.0026065109398392215,
-            ),
-            Vector3::new(
-                0.001179633958023287,
-                0.003525262341736351,
-                -0.0004132774783154952,
-            ),
-        ];
-        sys.masses = vec![argon.mass(), argon.mass()];
-        sys.charges = vec![0.0, 0.0];
-        sys
-    }
+    use crate::system::element::Element;
+    use crate::load_test_system;
 
     fn get_pair_potentials() -> Potentials {
         let mut pots = Potentials::new();
@@ -108,7 +83,7 @@ mod tests {
     #[test]
     fn velocity_verlet() {
         // define the system
-        let mut sys = get_pair_system();
+        let mut sys = load_test_system!("argon");
 
         // define the potentials
         let pots = get_pair_potentials();
