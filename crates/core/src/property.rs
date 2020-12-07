@@ -2,6 +2,7 @@
 
 use nalgebra::Vector3;
 
+use crate::consts::BOLTZMANN;
 use crate::potential::{Potentials, Restriction};
 use crate::system::System;
 
@@ -148,6 +149,22 @@ impl Property for TotalEnergy {
     }
 }
 
+/// Instantaneous temperature of the system.
+#[derive(Clone, Copy, Debug)]
+pub struct Temperature;
+
+impl Property for Temperature {
+    type Output = f32;
+
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+        let kinetic = KineticEnergy.calculate(system, potentials);
+        // NOTE: Calculating DOF this way is a potentially nasty bug if future 
+        // support is added for degrees of freedom beyond just 3D particles.
+        let dof = (system.size() * 3) as f32;
+        2.0 * kinetic / (dof * BOLTZMANN)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::potential::pair::{Harmonic, PairPotentialMeta};
@@ -156,6 +173,8 @@ mod tests {
     use crate::system::{cell::Cell, element::Element, System};
     use approx::*;
     use nalgebra::Vector3;
+
+    use super::Temperature;
 
     fn get_pair_system() -> System {
         let size = 2 as usize;
@@ -228,5 +247,18 @@ mod tests {
 
         assert_eq!(kinetic + potential, total);
         assert_relative_eq!(kinetic, 0.0007483);
+    }
+
+    #[test]
+    fn temperature() {
+        // define the system
+        let sys = get_pair_system();
+
+        // define the potentials
+        let pots = get_pair_potentials();
+
+        // calculate the temperature
+        let temperature = Temperature.calculate(&sys, &pots);
+        assert_relative_eq!(temperature, 300.0, epsilon = 1e-2);
     }
 }
