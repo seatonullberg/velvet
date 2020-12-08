@@ -1,5 +1,5 @@
 # :alembic: Velvet
-![Crates.io](https://img.shields.io/crates/v/velvet)
+[![Crates.io](https://img.shields.io/crates/v/velvet)](https://crates.io/crates/velvet)
 ![Crates.io](https://img.shields.io/crates/l/velvet)
 ![Crates.io](https://img.shields.io/crates/d/velvet)
 
