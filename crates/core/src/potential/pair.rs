@@ -56,6 +56,7 @@ impl LennardJones {
     }
 }
 
+#[typetag::serde]
 impl Potential for LennardJones {}
 
 #[typetag::serde]
@@ -88,6 +89,7 @@ impl Harmonic {
     }
 }
 
+#[typetag::serde]
 impl Potential for Harmonic {}
 
 #[typetag::serde]
@@ -125,6 +127,7 @@ impl Mie {
     }
 }
 
+#[typetag::serde]
 impl Potential for Mie {}
 
 #[typetag::serde]
@@ -163,6 +166,7 @@ impl Morse {
     }
 }
 
+#[typetag::serde]
 impl Potential for Morse {}
 
 #[typetag::serde]

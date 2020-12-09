@@ -49,8 +49,7 @@ impl Integrator for VelocityVerlet {
         }
 
         // calculate forces
-        let forces = Forces;
-        let forces = forces.calculate(system, potentials);
+        let forces = Forces.calculate(system, potentials);
 
         // update accelerations at t + dt
         for i in 0..sys_size {
@@ -67,7 +66,7 @@ impl Integrator for VelocityVerlet {
 #[cfg(test)]
 mod tests {
     use crate::integrate::{Integrator, VelocityVerlet};
-    use crate::{load_test_system, load_test_potentials};
+    use crate::{load_test_potentials, load_test_system};
 
     #[test]
     fn velocity_verlet() {
