@@ -1,17 +1,16 @@
 //! Algorithms to control the temperature of a simulation.
 
-use crate::potentials::Potentials;
-use crate::properties::{Property, Temperature};
+use crate::properties::{IntrinsicProperty, Temperature};
 use crate::system::System;
 
 /// An algorithm used to control simulation temperature.
 pub trait Thermostat {
     /// Prepare the thermostat to run.
-    fn setup(&mut self, _: &System, _: &Potentials) {}
+    fn setup(&mut self, _: &System) {}
     /// Fires before the integration step.
-    fn pre_integrate(&mut self, _: &mut System, _: &Potentials) {}
+    fn pre_integrate(&mut self, _: &mut System) {}
     /// Fires after the integration step.
-    fn post_integrate(&mut self, _: &mut System, _: &Potentials) {}
+    fn post_integrate(&mut self, _: &mut System) {}
 }
 
 /// Berendsen weak coupling thermostat.
@@ -31,8 +30,8 @@ impl Berendsen {
 }
 
 impl Thermostat for Berendsen {
-    fn post_integrate(&mut self, system: &mut System, potentials: &Potentials) {
-        let temperature = Temperature.calculate(system, potentials);
+    fn post_integrate(&mut self, system: &mut System) {
+        let temperature = Temperature.calculate_intrinsic(system);
         let factor = f32::sqrt(1.0 + (self.target / temperature - 1.0) / self.tau);
         system.velocities = system
             .velocities
@@ -69,7 +68,7 @@ mod tests {
         // run the integration with a thermostat
         for _ in 0..5000 {
             vv.integrate(&mut sys, &pots);
-            berendsen.post_integrate(&mut sys, &pots);
+            berendsen.post_integrate(&mut sys);
         }
 
         // check that the simulation was stable

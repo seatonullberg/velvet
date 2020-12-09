@@ -14,6 +14,22 @@ pub trait Property {
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output;
 }
 
+/// Calculates a system-wide property without using the applied potentials.
+pub trait IntrinsicProperty {
+    /// The property's return type.
+    type Output;
+    /// Returns a physical property of the system.
+    fn calculate_intrinsic(&self, system: &System) -> Self::Output;
+}
+
+impl<T: IntrinsicProperty> Property for T {
+    type Output = T::Output;
+
+    fn calculate(&self, system: &System, _: &Potentials) -> Self::Output {
+        <T as IntrinsicProperty>::calculate_intrinsic(&self, system)
+    }
+}
+
 /// Force acting on each atom in the system.
 #[derive(Clone, Copy, Debug)]
 pub struct Forces;
@@ -121,10 +137,10 @@ impl Property for PotentialEnergy {
 #[derive(Clone, Copy, Debug)]
 pub struct KineticEnergy;
 
-impl Property for KineticEnergy {
+impl IntrinsicProperty for KineticEnergy {
     type Output = f32;
 
-    fn calculate(&self, system: &System, _: &Potentials) -> Self::Output {
+    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Output {
         let sys_size = system.size();
         let mut kinetic_energy = 0.0 as f32;
 
@@ -153,11 +169,11 @@ impl Property for TotalEnergy {
 #[derive(Clone, Copy, Debug)]
 pub struct Temperature;
 
-impl Property for Temperature {
+impl IntrinsicProperty for Temperature {
     type Output = f32;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
-        let kinetic = KineticEnergy.calculate(system, potentials);
+    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Output {
+        let kinetic = KineticEnergy.calculate_intrinsic(system);
         // NOTE: Calculating DOF this way is a potentially nasty bug if future
         // support is added for degrees of freedom beyond just 3D particles.
         let dof = (system.size() * 3) as f32;
@@ -167,7 +183,10 @@ impl Property for Temperature {
 
 #[cfg(test)]
 mod tests {
-    use super::{Forces, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy};
+    use super::{
+        Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature,
+        TotalEnergy,
+    };
     use crate::{load_test_potentials, load_test_system};
     use approx::*;
 
@@ -203,7 +222,7 @@ mod tests {
         let pots = load_test_potentials!("fluorine");
 
         // calculate the energies
-        let kinetic = KineticEnergy.calculate(&sys, &pots);
+        let kinetic = KineticEnergy.calculate_intrinsic(&sys);
         let potential = PotentialEnergy.calculate(&sys, &pots);
         let total = TotalEnergy.calculate(&sys, &pots);
 
@@ -216,11 +235,8 @@ mod tests {
         // define the system
         let sys = load_test_system!("fluorine");
 
-        // define the potentials
-        let pots = load_test_potentials!("fluorine");
-
         // calculate the temperature
-        let temperature = Temperature.calculate(&sys, &pots);
+        let temperature = Temperature.calculate_intrinsic(&sys);
         assert_relative_eq!(temperature, 300.0, epsilon = 1e-2);
     }
 }
