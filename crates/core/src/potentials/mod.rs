@@ -4,7 +4,7 @@ pub mod pair;
 
 use serde::{Deserialize, Serialize};
 
-use crate::potential::pair::{PairPotential, PairPotentialMeta};
+use crate::potentials::pair::{PairPotential, PairPotentialMeta};
 
 /// Base trait for all potentials.
 #[typetag::serde(tag = "type")]

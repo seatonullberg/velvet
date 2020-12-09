@@ -2,8 +2,8 @@
 
 use nalgebra::Vector3;
 
-use crate::potential::Potentials;
-use crate::property::{Forces, Property};
+use crate::potentials::Potentials;
+use crate::properties::{Forces, Property};
 use crate::system::System;
 
 /// A numerical integration algorithm.
@@ -65,7 +65,7 @@ impl Integrator for VelocityVerlet {
 
 #[cfg(test)]
 mod tests {
-    use crate::integrate::{Integrator, VelocityVerlet};
+    use super::{Integrator, VelocityVerlet};
     use crate::{load_test_potentials, load_test_system};
 
     #[test]

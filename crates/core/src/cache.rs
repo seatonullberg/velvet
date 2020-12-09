@@ -2,8 +2,10 @@
 
 use nalgebra::Vector3;
 
-use crate::potential::Potentials;
-use crate::property::{Forces, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy};
+use crate::potentials::Potentials;
+use crate::properties::{
+    Forces, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy,
+};
 use crate::system::System;
 
 /// Cached physical properties of the system.

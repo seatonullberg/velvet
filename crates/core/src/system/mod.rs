@@ -1,13 +1,13 @@
 //! Data structures to hold physical information about the simulation environment.
 
 pub mod cell;
-pub mod element;
+pub mod elements;
 
 use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
 use crate::system::cell::Cell;
-use crate::system::element::Element;
+use crate::system::elements::Element;
 
 /// Collection of atomic properties and structural information.
 #[derive(Clone, Debug, Serialize, Deserialize)]

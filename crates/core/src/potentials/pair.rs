@@ -2,8 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::potential::{Potential, Restriction};
-use crate::system::element::Element;
+use crate::potentials::{Potential, Restriction};
+use crate::system::elements::Element;
 
 /// Shared behavior for pair potentials.
 #[typetag::serde(tag = "type")]
@@ -186,7 +186,7 @@ impl PairPotential for Morse {
 
 #[cfg(test)]
 mod tests {
-    use crate::potential::pair::{Harmonic, LennardJones, Mie, Morse, PairPotential};
+    use super::{Harmonic, LennardJones, Mie, Morse, PairPotential};
     use approx::*;
 
     #[test]

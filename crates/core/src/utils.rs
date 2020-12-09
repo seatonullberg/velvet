@@ -23,7 +23,7 @@ macro_rules! load_test_potentials {
             $filename
         );
         let f = std::fs::File::open(&path).expect("failed to open test file");
-        let pots: crate::potential::Potentials = ron::de::from_reader(f).unwrap();
+        let pots: crate::potentials::Potentials = ron::de::from_reader(f).unwrap();
         pots
     }};
 }

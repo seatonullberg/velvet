@@ -2,8 +2,8 @@
 
 use nalgebra::Vector3;
 
-use crate::consts::BOLTZMANN;
-use crate::potential::{Potentials, Restriction};
+use crate::constants::BOLTZMANN;
+use crate::potentials::{Potentials, Restriction};
 use crate::system::System;
 
 /// Calculates a system-wide property.
@@ -167,11 +167,9 @@ impl Property for Temperature {
 
 #[cfg(test)]
 mod tests {
-    use crate::property::{Forces, KineticEnergy, PotentialEnergy, Property, TotalEnergy};
+    use super::{Forces, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy};
     use crate::{load_test_potentials, load_test_system};
     use approx::*;
-
-    use super::Temperature;
 
     #[test]
     fn forces() {

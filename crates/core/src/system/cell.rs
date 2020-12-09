@@ -167,7 +167,7 @@ impl Cell {
 
 #[cfg(test)]
 mod tests {
-    use crate::system::cell::Cell;
+    use super::Cell;
     use approx::*;
     use nalgebra::Vector3;
 
