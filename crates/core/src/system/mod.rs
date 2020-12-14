@@ -37,9 +37,16 @@ pub struct System {
     pub dihedrals: Vec<Vec<(usize, usize, usize, usize)>>,
 }
 
+impl System {
+    /// Returns the number of atoms in the system.
+    pub fn size(&self) -> usize {
+        self.size
+    }
+}
+
 pub struct SystemBuilder {
     size: usize,
-    cell: Cell,
+    cell: Option<Cell>,
     elements: Option<Vec<Element>>,
     molecules: Option<Vec<usize>>,
     positions: Option<Vec<Vector3<f32>>>,
@@ -51,10 +58,10 @@ pub struct SystemBuilder {
 }
 
 impl SystemBuilder {
-    pub fn new(size: usize, cell: Cell) -> SystemBuilder {
+    pub fn new(size: usize) -> SystemBuilder {
         SystemBuilder {
             size,
-            cell,
+            cell: None,
             elements: None,
             molecules: None,
             positions: None,
@@ -66,63 +73,83 @@ impl SystemBuilder {
         }
     }
 
-    pub fn with_elements(&mut self, elements: Vec<Element>) {
+    pub fn with_cell(&mut self, cell: Cell) -> &mut SystemBuilder {
+        self.cell = Some(cell);
+        self
+    }
+
+    pub fn with_elements(&mut self, elements: Vec<Element>) -> &mut SystemBuilder {
         assert!(elements.len() == self.size);
-        self.elements = Some(elements)
+        self.elements = Some(elements);
+        self
     }
 
-    pub fn with_molecules(&mut self, molecules: Vec<usize>) {
+    pub fn with_molecules(&mut self, molecules: Vec<usize>) -> &mut SystemBuilder {
         assert!(molecules.len() == self.size);
-        self.molecules = Some(molecules)
+        self.molecules = Some(molecules);
+        self
     }
 
-    pub fn with_positions(&mut self, positions: Vec<Vector3<f32>>) {
+    pub fn with_positions(&mut self, positions: Vec<Vector3<f32>>) -> &mut SystemBuilder {
         assert!(positions.len() == self.size);
-        self.positions = Some(positions)
+        self.positions = Some(positions);
+        self
     }
 
-    pub fn with_velocities(&mut self, velocities: Vec<Vector3<f32>>) {
+    pub fn with_velocities(&mut self, velocities: Vec<Vector3<f32>>) -> &mut SystemBuilder {
         assert!(velocities.len() == self.size);
-        self.velocities = Some(velocities)
+        self.velocities = Some(velocities);
+        self
     }
 
-    pub fn with_charges(&mut self, charges: Vec<f32>) {
+    pub fn with_charges(&mut self, charges: Vec<f32>) -> &mut SystemBuilder {
         assert!(charges.len() == self.size);
-        self.charges = Some(charges)
+        self.charges = Some(charges);
+        self
     }
 
-    pub fn with_bonds(&mut self, bonds: Vec<Vec<(usize, usize)>>) {
-        self.bonds = Some(bonds)
+    pub fn with_bonds(&mut self, bonds: Vec<Vec<(usize, usize)>>) -> &mut SystemBuilder {
+        self.bonds = Some(bonds);
+        self
     }
 
-    pub fn with_angles(&mut self, angles: Vec<Vec<(usize, usize, usize)>>) {
-        self.angles = Some(angles)
+    pub fn with_angles(&mut self, angles: Vec<Vec<(usize, usize, usize)>>) -> &mut SystemBuilder {
+        self.angles = Some(angles);
+        self
     }
 
-    pub fn with_dihedrals(&mut self, dihedrals: Vec<Vec<(usize, usize, usize, usize)>>) {
-        self.dihedrals = Some(dihedrals)
+    pub fn with_dihedrals(
+        &mut self,
+        dihedrals: Vec<Vec<(usize, usize, usize, usize)>>,
+    ) -> &mut SystemBuilder {
+        self.dihedrals = Some(dihedrals);
+        self
     }
 
     pub fn finish(self) -> System {
+        let cell = match self.cell {
+            Some(c) => c,
+            None => panic!("System requires `cell` attribute"),
+        };
         let elements = match self.elements {
             Some(e) => e,
-            None => Vec::new(),
+            None => panic!("System requires `elements` attribute"),
         };
         let molecules = match self.molecules {
             Some(m) => m,
-            None => Vec::new(),
+            None => vec![0 as usize; self.size],
         };
         let positions = match self.positions {
             Some(p) => p,
-            None => Vec::new(),
+            None => panic!("System requires `positions` attribute"),
         };
         let velocities = match self.velocities {
             Some(v) => v,
-            None => Vec::new(),
+            None => vec![Vector3::new(0.0, 0.0, 0.0); self.size],
         };
         let charges = match self.charges {
             Some(c) => c,
-            None => Vec::new(),
+            None => vec![0.0; self.size],
         };
         let bonds = match self.bonds {
             Some(b) => b,
@@ -138,7 +165,7 @@ impl SystemBuilder {
         };
         System {
             size: self.size,
-            cell: self.cell,
+            cell,
             elements,
             molecules,
             positions,
@@ -148,12 +175,5 @@ impl SystemBuilder {
             angles,
             dihedrals,
         }
-    }
-}
-
-impl System {
-    /// Returns the number of atoms in the system.
-    pub fn size(&self) -> usize {
-        self.size
     }
 }

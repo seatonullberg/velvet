@@ -4,8 +4,7 @@ use serde::{Deserialize, Serialize};
 use strum_macros::EnumString;
 
 /// Every element on the periodic table.
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
-#[derive(EnumString)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize, EnumString)]
 pub enum Element {
     /// Hydrogen
     H,
@@ -31,8 +30,8 @@ impl Element {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
     use super::Element;
+    use std::str::FromStr;
 
     #[test]
     fn from_str() {
