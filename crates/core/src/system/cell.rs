@@ -12,7 +12,7 @@ pub struct Cell {
 
 impl Cell {
     /// Returns a new `Cell` from triclinic crystallographic parameters.
-    pub fn new(a: f32, b: f32, c: f32, alpha: f32, beta: f32, gamma: f32) -> Cell {
+    pub fn triclinic(a: f32, b: f32, c: f32, alpha: f32, beta: f32, gamma: f32) -> Cell {
         let cos_alpha = alpha.to_radians().cos();
         let cos_beta = beta.to_radians().cos();
         let (sin_gamma, cos_gamma) = gamma.to_radians().sin_cos();
@@ -27,6 +27,11 @@ impl Cell {
         let matrix = Matrix3::new(a, b_x, c_x, 0.0, b_y, c_y, 0.0, 0.0, c_z);
         let inv_matrix = matrix.try_inverse().unwrap();
 
+        Cell { matrix, inv_matrix }
+    }
+
+    pub fn from_matrix(matrix: Matrix3<f32>) -> Cell {
+        let inv_matrix = matrix.try_inverse().unwrap();
         Cell { matrix, inv_matrix }
     }
 
@@ -173,7 +178,7 @@ mod tests {
 
     #[test]
     fn new() {
-        let cell = Cell::new(3.0, 4.0, 5.0, 80.0, 90.0, 110.0);
+        let cell = Cell::triclinic(3.0, 4.0, 5.0, 80.0, 90.0, 110.0);
         assert_eq!(cell.a_vector(), Vector3::new(3.0, 0.0, 0.0));
         assert_eq!(cell.b_vector()[2], 0.0);
 
@@ -188,7 +193,7 @@ mod tests {
 
     #[test]
     fn fractional_cartesian() {
-        let cell = Cell::new(5.0, 6.0, 3.6, 90.0, 53.0, 77.0);
+        let cell = Cell::triclinic(5.0, 6.0, 3.6, 90.0, 53.0, 77.0);
         let tests = vec![Vector3::new(0.0, 10.0, 4.0), Vector3::new(-5.0, 12.0, 4.9)];
 
         for test in &tests {
@@ -199,7 +204,7 @@ mod tests {
 
     #[test]
     fn wrap_vector() {
-        let cell = Cell::new(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
+        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
         let mut v = Vector3::new(1.0, 1.5, 6.0);
         cell.wrap_vector(&mut v);
         let res = Vector3::new(1.0, 1.5, 1.0);
@@ -208,7 +213,7 @@ mod tests {
 
     #[test]
     fn vector_image() {
-        let cell = Cell::new(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
+        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
         let mut v = Vector3::new(1.0, 1.5, 6.0);
         cell.vector_image(&mut v);
         let res = Vector3::new(1.0, 1.5, 1.0);
@@ -217,7 +222,7 @@ mod tests {
 
     #[test]
     fn distance() {
-        let cell = Cell::new(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
+        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
         let v1 = Vector3::new(0.0, 0.0, 0.0);
         let v2 = Vector3::new(1.0, 2.0, 6.0);
         assert_relative_eq!(cell.distance(&v1, &v2), f32::sqrt(6.0));
@@ -225,7 +230,7 @@ mod tests {
 
     #[test]
     fn angle() {
-        let cell = Cell::new(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
+        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
         let a = Vector3::new(1.0, 0.0, 0.0);
         let b = Vector3::new(0.0, 0.0, 0.0);
         let c = Vector3::new(0.0, 1.0, 0.0);
@@ -238,7 +243,7 @@ mod tests {
 
     #[test]
     fn direction() {
-        let cell = Cell::new(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
+        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
         let v1 = Vector3::new(0.0, 0.0, 0.0);
         let v2 = Vector3::new(1.0, 2.0, 6.0);
         let res = cell.direction(&v1, &v2);
@@ -247,7 +252,7 @@ mod tests {
 
     #[test]
     fn dihedral() {
-        let cell = Cell::new(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
+        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
         let v1 = Vector3::new(0.0, 0.0, 0.0);
         let v2 = Vector3::new(1.0, 0.0, 0.0);
         let v3 = Vector3::new(1.0, 1.0, 0.0);
