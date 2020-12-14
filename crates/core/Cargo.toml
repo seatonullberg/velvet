@@ -23,13 +23,16 @@ criterion = "0.3"
 velvet-convert = { path = "../convert" }
 
 [[bench]]
-name = "integrators"
+name = "integrator-benchmarks"
+path = "benches/integrators.rs"
 harness = false
 
 [[bench]]
-name = "thermostats"
+name = "thermostat-benchmarks"
+path = "benches/thermostats.rs"
 harness = false
 
 [[bench]]
-name = "properties"
+name = "property-benchmarks"
+path = "benches/properties.rs"
 harness = false
