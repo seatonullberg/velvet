@@ -11,7 +11,7 @@ pub struct Cell {
 }
 
 impl Cell {
-    /// Returns a new `Cell` from triclinig crystallographic parameters.
+    /// Returns a new `Cell` from triclinic crystallographic parameters.
     pub fn new(a: f32, b: f32, c: f32, alpha: f32, beta: f32, gamma: f32) -> Cell {
         let cos_alpha = alpha.to_radians().cos();
         let cos_beta = beta.to_radians().cos();
