@@ -11,12 +11,25 @@ edition = "2018"
 nalgebra = {version = "0.23", features = ["serde-serialize"]}
 rand = "0.7"
 rand_distr = "0.3"
+ron = "0.6"
 serde = {version = "1.0", features = ["derive"]}
 strum = "0.20"
 strum_macros = "0.20"
 typetag = "0.1.6"
-vasp-poscar = "0.3.2"
 
 [dev-dependencies]
 approx = "0.4"
-ron = "0.6"
+criterion = "0.3"
+velvet-convert = { path = "../convert" }
+
+[[bench]]
+name = "integrators"
+harness = false
+
+[[bench]]
+name = "thermostats"
+harness = false
+
+[[bench]]
+name = "properties"
+harness = false

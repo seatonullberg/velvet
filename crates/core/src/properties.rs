@@ -187,16 +187,16 @@ mod tests {
         Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature,
         TotalEnergy,
     };
-    use crate::{load_test_potentials, load_test_system};
+    use crate::utils::{load_test_potentials, load_test_system};
     use approx::*;
 
     #[test]
     fn forces() {
         // define the system
-        let sys = load_test_system!("fluorine");
+        let sys = load_test_system("fluorine");
 
         // define the potentials
-        let pots = load_test_potentials!("fluorine");
+        let pots = load_test_potentials("fluorine");
 
         // calculate the forces
         let forces = Forces.calculate(&sys, &pots);
@@ -216,10 +216,10 @@ mod tests {
     #[test]
     fn energy() {
         // define the system
-        let sys = load_test_system!("fluorine");
+        let sys = load_test_system("fluorine");
 
         // define the potentials
-        let pots = load_test_potentials!("fluorine");
+        let pots = load_test_potentials("fluorine");
 
         // calculate the energies
         let kinetic = KineticEnergy.calculate_intrinsic(&sys);
@@ -233,7 +233,7 @@ mod tests {
     #[test]
     fn temperature() {
         // define the system
-        let sys = load_test_system!("fluorine");
+        let sys = load_test_system("fluorine");
 
         // calculate the temperature
         let temperature = Temperature.calculate_intrinsic(&sys);

@@ -48,15 +48,14 @@ fn scale(system: &mut System, target: f32) {
 #[cfg(test)]
 mod tests {
     use super::{Boltzmann, VelocityDistribution};
-    use crate::convert::poscar::load_poscar;
     use crate::properties::{IntrinsicProperty, Temperature};
-    use crate::test_path;
+    use crate::utils::load_test_system;
     use approx::*;
 
     #[test]
     fn boltzmann() {
         // define the system
-        let mut sys = load_poscar(test_path!("argon.poscar"));
+        let mut sys = load_test_system("argon");
 
         // define the velocity distribution
         let target = 1000 as f32;

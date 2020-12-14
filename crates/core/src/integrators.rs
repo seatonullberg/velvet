@@ -66,15 +66,15 @@ impl Integrator for VelocityVerlet {
 #[cfg(test)]
 mod tests {
     use super::{Integrator, VelocityVerlet};
-    use crate::{load_test_potentials, load_test_system};
+    use crate::utils::{load_test_potentials, load_test_system};
 
     #[test]
     fn velocity_verlet() {
         // define the system
-        let mut sys = load_test_system!("argon");
+        let mut sys = load_test_system("argon");
 
         // define the potentials
-        let pots = load_test_potentials!("argon");
+        let pots = load_test_potentials("argon");
 
         // define the integrator
         let mut vv = VelocityVerlet::new(1.0);

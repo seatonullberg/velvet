@@ -46,16 +46,16 @@ mod tests {
     use super::{Berendsen, Thermostat};
     use crate::integrators::{Integrator, VelocityVerlet};
     use crate::properties::{Property, Temperature};
-    use crate::{load_test_potentials, load_test_system};
+    use crate::utils::{load_test_potentials, load_test_system};
     use approx::*;
 
     #[test]
     fn berendsen() {
         // define the system
-        let mut sys = load_test_system!("argon");
+        let mut sys = load_test_system("argon");
 
         // define the potentials
-        let pots = load_test_potentials!("argon");
+        let pots = load_test_potentials("argon");
 
         // define the integrator
         let mut vv = VelocityVerlet::new(1.0);
