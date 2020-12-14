@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use velvet_convert::poscar::load_poscar;
+use velvet_convert::load_poscar;
 use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::utils::{load_test_potentials, test_path};
 

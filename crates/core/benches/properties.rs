@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use velvet_convert::poscar::load_poscar;
+use velvet_convert::load_poscar;
 use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::properties::{
     Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature,
