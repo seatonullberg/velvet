@@ -2,6 +2,9 @@
 name = "velvet-convert"
 version = "0.1.0"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+description = "Convert external file formats into Velvet data structures."
+license = "MIT"
+repository = "https://github.com/seatonullberg/velvet"
 edition = "2018"
 
 [dependencies]
