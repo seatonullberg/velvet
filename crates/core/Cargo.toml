@@ -12,6 +12,8 @@ nalgebra = {version = "0.23", features = ["serde-serialize"]}
 rand = "0.7"
 rand_distr = "0.3"
 serde = {version = "1.0", features = ["derive"]}
+strum = "0.20"
+strum_macros = "0.20"
 typetag = "0.1.6"
 
 [dev-dependencies]

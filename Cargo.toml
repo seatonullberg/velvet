@@ -19,6 +19,7 @@ categories = [
 [workspace]
 members = [
     "crates/app",
+    "crates/convert",
     "crates/core",
 ]
 
