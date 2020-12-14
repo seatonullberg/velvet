@@ -6,9 +6,9 @@ use std::str::FromStr;
 use nalgebra::{Matrix3, Vector3};
 use vasp_poscar::Poscar;
 
-use velvet_core::system::cell::Cell;
-use velvet_core::system::elements::Element;
-use velvet_core::system::{System, SystemBuilder};
+use crate::system::cell::Cell;
+use crate::system::elements::Element;
+use crate::system::{System, SystemBuilder};
 
 pub fn load_poscar<P>(path: P) -> System
 where

@@ -15,6 +15,7 @@ serde = {version = "1.0", features = ["derive"]}
 strum = "0.20"
 strum_macros = "0.20"
 typetag = "0.1.6"
+vasp-poscar = "0.3.2"
 
 [dev-dependencies]
 approx = "0.4"

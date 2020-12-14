@@ -48,14 +48,15 @@ fn scale(system: &mut System, target: f32) {
 #[cfg(test)]
 mod tests {
     use super::{Boltzmann, VelocityDistribution};
-    use crate::load_test_system;
+    use crate::test_path;
+    use crate::convert::poscar::load_poscar;
     use crate::properties::{IntrinsicProperty, Temperature};
     use approx::*;
 
     #[test]
     fn boltzmann() {
         // define the system
-        let mut sys = load_test_system!("argon");
+        let mut sys = load_poscar(test_path!("argon.poscar"));
 
         // define the velocity distribution
         let target = 1000 as f32;
@@ -66,6 +67,6 @@ mod tests {
 
         // check the result
         let res = Temperature.calculate_intrinsic(&sys);
-        assert_relative_eq!(res, target);
+        assert_relative_eq!(res, target, epsilon = 1e-3);
     }
 }

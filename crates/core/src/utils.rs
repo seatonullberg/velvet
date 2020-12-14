@@ -27,3 +27,14 @@ macro_rules! load_test_potentials {
         pots
     }};
 }
+
+#[macro_export]
+macro_rules! test_path {
+    ($filename:literal) => {{
+        format!(
+            "{}/../../resources/test/{}",
+            env!("CARGO_MANIFEST_DIR"),
+            $filename
+        )
+    }};
+}
