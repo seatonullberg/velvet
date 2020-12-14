@@ -77,15 +77,11 @@ where
 #[cfg(test)]
 mod tests {
     use super::load_poscar;
+    use crate::test_path;
 
     #[test]
     fn argon() {
-        // TODO: replace this
-        let path = format!(
-            "{}/../../resources/test/argon.poscar",
-            env!("CARGO_MANIFEST_DIR"),
-        );
-        let sys = load_poscar(path);
+        let sys = load_poscar(test_path!("argon.poscar"));
         assert_eq!(sys.size(), 108);
     }
 }

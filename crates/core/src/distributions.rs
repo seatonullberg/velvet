@@ -48,9 +48,9 @@ fn scale(system: &mut System, target: f32) {
 #[cfg(test)]
 mod tests {
     use super::{Boltzmann, VelocityDistribution};
-    use crate::test_path;
     use crate::convert::poscar::load_poscar;
     use crate::properties::{IntrinsicProperty, Temperature};
+    use crate::test_path;
     use approx::*;
 
     #[test]
