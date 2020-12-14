@@ -26,8 +26,6 @@ pub struct System {
     pub positions: Vec<Vector3<f32>>,
     /// Velocity of each atom in the system.
     pub velocities: Vec<Vector3<f32>>,
-    /// Mass of each atom in the system.
-    pub masses: Vec<f32>,
     /// Electronic charge of each atom in the system.
     pub charges: Vec<f32>,
 
@@ -39,24 +37,121 @@ pub struct System {
     pub dihedrals: Vec<Vec<(usize, usize, usize, usize)>>,
 }
 
-impl System {
-    /// Returns a new `System` containing `size` atoms.
-    pub fn new(size: usize) -> System {
-        System {
+pub struct SystemBuilder {
+    size: usize,
+    cell: Cell,
+    elements: Option<Vec<Element>>,
+    molecules: Option<Vec<usize>>,
+    positions: Option<Vec<Vector3<f32>>>,
+    velocities: Option<Vec<Vector3<f32>>>,
+    charges: Option<Vec<f32>>,
+    bonds: Option<Vec<Vec<(usize, usize)>>>,
+    angles: Option<Vec<Vec<(usize, usize, usize)>>>,
+    dihedrals: Option<Vec<Vec<(usize, usize, usize, usize)>>>,
+}
+
+impl SystemBuilder {
+    pub fn new(size: usize, cell: Cell) -> SystemBuilder {
+        SystemBuilder {
             size,
-            cell: Cell::new(1.0, 1.0, 1.0, 90.0, 90.0, 90.0),
-            elements: Vec::with_capacity(size),
-            molecules: Vec::with_capacity(size),
-            positions: Vec::with_capacity(size),
-            velocities: Vec::with_capacity(size),
-            masses: Vec::with_capacity(size),
-            charges: Vec::with_capacity(size),
-            bonds: Vec::new(),
-            angles: Vec::new(),
-            dihedrals: Vec::new(),
+            cell,
+            elements: None,
+            molecules: None,
+            positions: None,
+            velocities: None,
+            charges: None,
+            bonds: None,
+            angles: None,
+            dihedrals: None,
         }
     }
 
+    pub fn with_elements(&mut self, elements: Vec<Element>) {
+        assert!(elements.len() == self.size);
+        self.elements = Some(elements)
+    }
+
+    pub fn with_molecules(&mut self, molecules: Vec<usize>) {
+        assert!(molecules.len() == self.size);
+        self.molecules = Some(molecules)
+    }
+
+    pub fn with_positions(&mut self, positions: Vec<Vector3<f32>>) {
+        assert!(positions.len() == self.size);
+        self.positions = Some(positions)
+    }
+
+    pub fn with_velocities(&mut self, velocities: Vec<Vector3<f32>>) {
+        assert!(velocities.len() == self.size);
+        self.velocities = Some(velocities)
+    }
+
+    pub fn with_charges(&mut self, charges: Vec<f32>) {
+        assert!(charges.len() == self.size);
+        self.charges = Some(charges)
+    }
+
+    pub fn with_bonds(&mut self, bonds: Vec<Vec<(usize, usize)>>) {
+        self.bonds = Some(bonds)
+    }
+
+    pub fn with_angles(&mut self, angles: Vec<Vec<(usize, usize, usize)>>) {
+        self.angles = Some(angles)
+    }
+
+    pub fn with_dihedrals(&mut self, dihedrals: Vec<Vec<(usize, usize, usize, usize)>>) {
+        self.dihedrals = Some(dihedrals)
+    }
+
+    pub fn finish(self) -> System {
+        let elements = match self.elements {
+            Some(e) => e,
+            None => Vec::new(),
+        };
+        let molecules = match self.molecules {
+            Some(m) => m,
+            None => Vec::new(),
+        };
+        let positions = match self.positions {
+            Some(p) => p,
+            None => Vec::new(),
+        };
+        let velocities = match self.velocities {
+            Some(v) => v,
+            None => Vec::new(),
+        };
+        let charges = match self.charges {
+            Some(c) => c,
+            None => Vec::new(),
+        };
+        let bonds = match self.bonds {
+            Some(b) => b,
+            None => Vec::new(),
+        };
+        let angles = match self.angles {
+            Some(a) => a,
+            None => Vec::new(),
+        };
+        let dihedrals = match self.dihedrals {
+            Some(d) => d,
+            None => Vec::new(),
+        };
+        System {
+            size: self.size,
+            cell: self.cell,
+            elements,
+            molecules,
+            positions,
+            velocities,
+            charges,
+            bonds,
+            angles,
+            dihedrals,
+        }
+    }
+}
+
+impl System {
     /// Returns the number of atoms in the system.
     pub fn size(&self) -> usize {
         self.size

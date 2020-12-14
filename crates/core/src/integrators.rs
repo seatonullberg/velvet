@@ -53,7 +53,7 @@ impl Integrator for VelocityVerlet {
 
         // update accelerations at t + dt
         for i in 0..sys_size {
-            self.accelerations[i] = forces[i] / system.masses[i];
+            self.accelerations[i] = forces[i] / system.elements[i].mass();
         }
 
         // update velocities at t + dt

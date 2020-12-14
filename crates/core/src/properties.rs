@@ -145,7 +145,7 @@ impl IntrinsicProperty for KineticEnergy {
         let mut kinetic_energy = 0.0 as f32;
 
         for i in 0..sys_size {
-            kinetic_energy += 0.5 * system.masses[i] * system.velocities[i].norm_squared();
+            kinetic_energy += 0.5 * system.elements[i].mass() * system.velocities[i].norm_squared();
         }
         kinetic_energy
     }

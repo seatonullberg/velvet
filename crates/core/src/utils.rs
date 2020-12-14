@@ -3,7 +3,7 @@
 macro_rules! load_test_system {
     ($filename:literal) => {{
         let path = format!(
-            "{}/../../resources/test/{}.velvet.sys",
+            "{}/../../resources/test/{}.sys.velvet",
             env!("CARGO_MANIFEST_DIR"),
             $filename
         );
@@ -18,7 +18,7 @@ macro_rules! load_test_system {
 macro_rules! load_test_potentials {
     ($filename:literal) => {{
         let path = format!(
-            "{}/../../resources/test/{}.velvet.pot",
+            "{}/../../resources/test/{}.pot.velvet",
             env!("CARGO_MANIFEST_DIR"),
             $filename
         );

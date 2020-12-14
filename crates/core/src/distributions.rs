@@ -24,7 +24,7 @@ impl Boltzmann {
 impl VelocityDistribution for Boltzmann {
     fn apply(&self, system: &mut System) {
         for i in 0..system.size() {
-            let inv_mass = 1.0 / &system.masses[i];
+            let inv_mass = 1.0 / &system.elements[i].mass();
             let x = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
             let y = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
             let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
