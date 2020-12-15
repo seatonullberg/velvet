@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["cell","Bounding box of the simulation environment."],["elements","Elemental properties."]],"struct":[["System","Collection of atomic properties and bonding information."],["SystemBuilder","Helper struct to build complex `System` objects."]]});

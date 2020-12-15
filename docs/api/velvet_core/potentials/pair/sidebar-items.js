@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Harmonic","Harmonic style pair potential."],["LennardJones","Lennard-Jones style pair potential."],["Mie","Mie style pair potential."],["Morse","Morse style pair potential."],["PairPotentialMeta","Pair potential meta data."]],"trait":[["PairPotential","Shared behavior for pair potentials."]]});

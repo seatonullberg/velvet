@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Berendsen","Berendsen weak coupling thermostat."],["NoseHoover",""]],"trait":[["Thermostat","An algorithm used to control simulation temperature."]]});
