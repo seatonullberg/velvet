@@ -15,8 +15,6 @@ pub trait Integrator {
 }
 
 /// Velocity Verlet integration algorithm.
-///
-/// Include equations here.
 #[derive(Clone, Debug)]
 pub struct VelocityVerlet {
     timestep: f32,
@@ -24,7 +22,11 @@ pub struct VelocityVerlet {
 }
 
 impl VelocityVerlet {
-    /// Returns a new `VelocityVerlet`.
+    /// Returns a new velocity verlet algorithm.
+    ///
+    /// # Arguments
+    ///
+    /// * `timestep` - Timestep duration
     pub fn new(timestep: f32) -> VelocityVerlet {
         VelocityVerlet {
             timestep,

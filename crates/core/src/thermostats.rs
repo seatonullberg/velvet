@@ -15,15 +15,17 @@ pub trait Thermostat {
 
 /// Berendsen weak coupling thermostat.
 pub struct Berendsen {
-    /// Target temperature.
     target: f32,
-    /// Timestep of the thermostat expressed as a multiplicative factor
-    /// of the integrator's timestep.
     tau: f32,
 }
 
 impl Berendsen {
-    /// Returns a new `BerendsenThermostat`.
+    /// Returns a new Berendsen style thermostat.
+    ///
+    /// # Arguments
+    ///
+    /// * `target` - Target temperature (Kelvin)
+    /// * `tau` - Timestep of the thermostat expressed as a multiple of the integrator's timestep
     pub fn new(target: f32, tau: f32) -> Berendsen {
         Berendsen { target, tau }
     }

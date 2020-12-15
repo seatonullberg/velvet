@@ -11,7 +11,16 @@ pub struct Cell {
 }
 
 impl Cell {
-    /// Returns a new `Cell` from triclinic crystallographic parameters.
+    /// Returns a new cell initialized from triclinic lattice parameters.
+    ///
+    /// # Arguments
+    ///
+    /// * `a` - Length of the `a` vector
+    /// * `b` - Length of the `b` vector
+    /// * `c` - Length of the `c` vector
+    /// * `alpha` - Angle betwen the `b` and `c` vectors (degrees)
+    /// * `beta` - Angle between the `a` and `c` vectors (degrees)
+    /// * `gamma` - Angle between the `a` and `b` vectors (degrees)
     pub fn triclinic(a: f32, b: f32, c: f32, alpha: f32, beta: f32, gamma: f32) -> Cell {
         let cos_alpha = alpha.to_radians().cos();
         let cos_beta = beta.to_radians().cos();
@@ -30,6 +39,7 @@ impl Cell {
         Cell { matrix, inv_matrix }
     }
 
+    /// Returns a new cell initialized from a 3x3 matrix.
     pub fn from_matrix(matrix: Matrix3<f32>) -> Cell {
         let inv_matrix = matrix.try_inverse().unwrap();
         Cell { matrix, inv_matrix }

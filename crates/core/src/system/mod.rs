@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::system::cell::Cell;
 use crate::system::elements::Element;
 
-/// Collection of atomic properties and structural information.
+/// Collection of atomic properties and bonding information.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct System {
     /// Number of atoms in the system.
@@ -44,6 +44,7 @@ impl System {
     }
 }
 
+/// Helper struct to build complex `System` objects.
 pub struct SystemBuilder {
     size: usize,
     cell: Option<Cell>,
@@ -58,6 +59,11 @@ pub struct SystemBuilder {
 }
 
 impl SystemBuilder {
+    /// Returns a new system builder.
+    ///
+    /// # Arguments
+    ///
+    /// * `size` - The number of atoms in the system
     pub fn new(size: usize) -> SystemBuilder {
         SystemBuilder {
             size,
@@ -73,51 +79,60 @@ impl SystemBuilder {
         }
     }
 
+    /// Sets the system cell.
     pub fn with_cell(&mut self, cell: Cell) -> &mut SystemBuilder {
         self.cell = Some(cell);
         self
     }
 
+    /// Sets the element of each atom in the system.
     pub fn with_elements(&mut self, elements: Vec<Element>) -> &mut SystemBuilder {
         assert!(elements.len() == self.size);
         self.elements = Some(elements);
         self
     }
 
+    /// Sets the molecule of each atom in the system.
     pub fn with_molecules(&mut self, molecules: Vec<usize>) -> &mut SystemBuilder {
         assert!(molecules.len() == self.size);
         self.molecules = Some(molecules);
         self
     }
 
+    /// Sets the position of each atom in the system.
     pub fn with_positions(&mut self, positions: Vec<Vector3<f32>>) -> &mut SystemBuilder {
         assert!(positions.len() == self.size);
         self.positions = Some(positions);
         self
     }
 
+    /// Sets the velocity of each atom in the system.
     pub fn with_velocities(&mut self, velocities: Vec<Vector3<f32>>) -> &mut SystemBuilder {
         assert!(velocities.len() == self.size);
         self.velocities = Some(velocities);
         self
     }
 
+    /// Sets the charge of each atom in the system.
     pub fn with_charges(&mut self, charges: Vec<f32>) -> &mut SystemBuilder {
         assert!(charges.len() == self.size);
         self.charges = Some(charges);
         self
     }
 
+    /// Sets the pairwise bonds in the system.
     pub fn with_bonds(&mut self, bonds: Vec<Vec<(usize, usize)>>) -> &mut SystemBuilder {
         self.bonds = Some(bonds);
         self
     }
 
+    /// Sets the angle triplets in the system.
     pub fn with_angles(&mut self, angles: Vec<Vec<(usize, usize, usize)>>) -> &mut SystemBuilder {
         self.angles = Some(angles);
         self
     }
 
+    /// Sets the dihedral quadruplets in the system.
     pub fn with_dihedrals(
         &mut self,
         dihedrals: Vec<Vec<(usize, usize, usize, usize)>>,
@@ -126,6 +141,7 @@ impl SystemBuilder {
         self
     }
 
+    /// Finalizes the build and returns an initialized system.
     pub fn finish(self) -> System {
         let cell = match self.cell {
             Some(c) => c,

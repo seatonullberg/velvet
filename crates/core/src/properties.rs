@@ -18,7 +18,7 @@ pub trait Property {
 pub trait IntrinsicProperty {
     /// The property's return type.
     type Output;
-    /// Returns a physical property of the system.
+    /// Returns a physical property of the system without accessing the associated potentials.
     fn calculate_intrinsic(&self, system: &System) -> Self::Output;
 }
 

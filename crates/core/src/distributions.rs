@@ -1,3 +1,5 @@
+//! Statistical distribution algorithms.
+
 use nalgebra::Vector3;
 use rand_distr::{Distribution, Normal};
 
@@ -5,16 +7,24 @@ use crate::constants::BOLTZMANN;
 use crate::properties::{IntrinsicProperty, Temperature};
 use crate::system::System;
 
+/// Shared behavior for algorithms that can initialize a velocity distribution.
 pub trait VelocityDistribution {
+    /// Applies the distribution to a system.
     fn apply(&self, system: &mut System);
 }
 
+/// Maxwell Boltzmann style velocity distribution.
 pub struct Boltzmann {
     target: f32,
     distr: Normal<f32>,
 }
 
 impl Boltzmann {
+    /// Returns a new Boltzmann velocity distribution.
+    ///
+    /// # Arguments
+    ///
+    /// * `target` - Target temperature (Kelvin)
     pub fn new(target: f32) -> Boltzmann {
         let distr = Normal::new(0.0, f32::sqrt(BOLTZMANN * target)).unwrap();
         Boltzmann { target, distr }
@@ -34,7 +44,7 @@ impl VelocityDistribution for Boltzmann {
     }
 }
 
-// scale all velocities in system to the target value
+/// Scale all velocities in system to the target value.
 fn scale(system: &mut System, target: f32) {
     let temperature = Temperature.calculate_intrinsic(system);
     let factor = f32::sqrt(target / temperature);

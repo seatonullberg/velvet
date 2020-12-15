@@ -1,6 +1,6 @@
 //! Core feature library for the Velvet simulation engine.
 
-pub mod cache;
+#[warn(missing_docs)]
 pub mod constants;
 pub mod distributions;
 pub mod integrators;
