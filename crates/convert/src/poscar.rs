@@ -19,7 +19,7 @@ use velvet_core::system::{System, SystemBuilder};
 ///
 /// ```
 /// use velvet_core::system::System;
-/// use velvet_convert::load_poscar; 
+/// use velvet_convert::load_poscar;
 ///
 /// let system = load_poscar("\
 ///     Cubic BN
@@ -30,7 +30,7 @@ use velvet_core::system::{System, SystemBuilder};
 ///     B N
 ///     1 1
 ///     Direct
-///     0.00 0.00 0.00 
+///     0.00 0.00 0.00
 ///     0.25 0.25 0.25
 ///     ".as_bytes());
 ///
