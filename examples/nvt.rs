@@ -1,5 +1,5 @@
-//! This example executes a simulation of 108 Ar atoms in the NVE ensemble.
-//! After sucessful completion, a figure is generated at `nve.png` which plots the total energy at each timestep.
+//! This example executes a simulation of 108 Ar atoms in the NVT ensemble.
+//! After sucessful completion, a figure is generated at `nvt.png` which plots the total energy at each timestep.
 
 extern crate pretty_env_logger;
 #[macro_use]
@@ -12,16 +12,17 @@ use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::potentials::pair::{LennardJones, PairPotentialMeta};
 use velvet_core::potentials::{Potentials, Restriction};
-use velvet_core::properties::{Property, TotalEnergy};
+use velvet_core::properties::{Property, Temperature};
 use velvet_core::system::elements::Element;
+use velvet_core::thermostats::{Thermostat, NoseHoover};
 
 static TIMESTEPS: u64 = 250000;
 static PLOT_INTERVAL: u64 = 10;
-static FILENAME: &'static str = "assets/nve.png";
+static FILENAME: &'static str = "assets/nvt.png";
 
 fn main() {
     pretty_env_logger::init();
-    info!("Starting a NVE simulation of Ar gas...");
+    info!("Starting a NVT simulation of Ar gas...");
 
     // Load the Ar gas system directly from a POSCAR formatted file.
     let mut system = load_poscar("resources/test/argon.poscar");
@@ -49,17 +50,23 @@ fn main() {
     let mut velocity_verlet = VelocityVerlet::new(1.0);
     velocity_verlet.setup(&system, &potentials);
 
+    // Define a Nose-Hoover thermostat
+    let mut nose_hoover = NoseHoover::new(300 as f32, 1.5, 1.0);
+    nose_hoover.setup(&system);
+
     // Setup a progress bar to track the simulation.
     let progress = get_progress_bar(TIMESTEPS);
 
-    let mut energy_results: Vec<(u64, f64)> =
+    let mut temperature_results: Vec<(u64, f64)> =
         Vec::with_capacity((TIMESTEPS / PLOT_INTERVAL) as usize);
 
     // Integrate for N timesteps.
     for i in 0..TIMESTEPS {
+        nose_hoover.pre_integrate(&mut system);
         velocity_verlet.integrate(&mut system, &potentials);
+        nose_hoover.post_integrate(&mut system);
         if i % PLOT_INTERVAL == 0 {
-            energy_results.push((i, TotalEnergy.calculate(&system, &potentials) as f64));
+            temperature_results.push((i, Temperature.calculate(&system, &potentials) as f64));
         }
         progress.inc(1);
     }
@@ -69,7 +76,7 @@ fn main() {
     info!("Simulation completed successfully.");
 
     // Plot the energy results
-    plot_results(energy_results);
+    plot_results(temperature_results);
 
     info!("Generated summary figure: `{}`", FILENAME);
 }
@@ -92,14 +99,14 @@ fn plot_results(data: Vec<(u64, f64)>) {
         .set_label_area_size(LabelAreaPosition::Bottom, 50)
         .margin(10)
         .margin_right(30)
-        .build_cartesian_2d(0..TIMESTEPS, -250.6..-250.5)
+        .build_cartesian_2d(0..TIMESTEPS, 275.0..325.0)
         .unwrap();
 
     chart
         .configure_mesh()
         .x_desc("Timestep")
         .x_label_style(("sans-serif", 18))
-        .y_desc("Total Energy (kJ/mol)")
+        .y_desc("Temperature (K)")
         .y_label_style(("sans-serif", 18))
         .draw()
         .unwrap();
