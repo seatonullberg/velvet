@@ -72,28 +72,18 @@ impl Thermostat for NoseHoover {
     }
 
     fn pre_integrate(&mut self, system: &mut System) {
-        //println!("pre temperature: {:?}", self.temperature);
         let dt = self.timestep;
         let psidot = self.freq.powi(2) * ((self.temperature / self.target) - 1.0);
-        //println!("pre psidot: {:?}", psidot);
         self.psi += psidot * (dt / 2.0);
-        //println!("pre psi: {:?}", self.psi);
         self.factor = f32::exp(-self.psi * (dt / 2.0));
-        //println!("pre factor: {:?}", self.factor);
         system.velocities = system.velocities.iter().map(|&x| x * self.factor).collect();
-        //println!("pre velocities: {:?}\n", system.velocities);
     }
 
     fn post_integrate(&mut self, system: &mut System) {
         let dt = self.timestep;
-        //system.velocities = system.velocities.iter().map(|&x| x * self.factor).collect();
-        //println!("post velocities: {:?}", system.velocities);
         self.temperature = Temperature.calculate_intrinsic(system);
-        //println!("post temperature: {:?}", self.temperature);
         let psidot = self.freq.powi(2) * ((self.temperature / self.target) - 1.0);
-        //println!("post psidot: {:?}", psidot);
         self.psi += psidot * (dt / 2.0);
-        //println!("post psi: {:?}\n", self.psi);
     }
 }
 

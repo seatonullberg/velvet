@@ -14,7 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Berendsen thermostat.
+* Benchmark test suite.
+* NVE and NVT examples.
+* Berendsen and Nose-Hoover thermostats.
 * Boltzmann initial velocity distribution.
 * LennardJones, Mie, Morse, and Harmonic interatomic pair potentials.
 * Velocity Verlet integration algorithm.

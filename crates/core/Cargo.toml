@@ -28,11 +28,11 @@ path = "benches/integrators.rs"
 harness = false
 
 [[bench]]
-name = "thermostat-benchmarks"
-path = "benches/thermostats.rs"
+name = "property-benchmarks"
+path = "benches/properties.rs"
 harness = false
 
 [[bench]]
-name = "property-benchmarks"
-path = "benches/properties.rs"
+name = "thermostat-benchmarks"
+path = "benches/thermostats.rs"
 harness = false
