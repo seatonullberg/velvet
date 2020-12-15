@@ -1,10 +1,14 @@
 use criterion::{criterion_group, criterion_main, Criterion};
+use std::fs::File;
+use std::io::BufReader;
 use velvet_convert::load_poscar;
 use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::utils::{load_test_potentials, test_path};
 
 pub fn velocity_verlet_benchmark(c: &mut Criterion) {
-    let mut sys = load_poscar(test_path("argon.poscar"));
+    let file = File::open(test_path("argon.poscar")).unwrap();
+    let reader = BufReader::new(file);
+    let mut sys = load_poscar(reader);
     let pots = load_test_potentials("argon");
 
     let mut vv = VelocityVerlet::new(1.0);

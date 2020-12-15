@@ -4,8 +4,13 @@ use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::thermostats::{Berendsen, NoseHoover, Thermostat};
 use velvet_core::utils::{load_test_potentials, test_path};
 
+use std::fs::File;
+use std::io::BufReader;
+
 pub fn berendsen_benchmark(c: &mut Criterion) {
-    let mut sys = load_poscar(test_path("argon.poscar"));
+    let file = File::open(test_path("argon.poscar")).unwrap();
+    let reader = BufReader::new(file);
+    let mut sys = load_poscar(reader);
     let pots = load_test_potentials("argon");
 
     let mut vv = VelocityVerlet::new(1.0);
@@ -25,7 +30,9 @@ pub fn berendsen_benchmark(c: &mut Criterion) {
 }
 
 pub fn nose_hoover_benchmark(c: &mut Criterion) {
-    let mut sys = load_poscar(test_path("argon.poscar"));
+    let file = File::open(test_path("argon.poscar")).unwrap();
+    let reader = BufReader::new(file);
+    let mut sys = load_poscar(reader);
     let pots = load_test_potentials("argon");
 
     let mut vv = VelocityVerlet::new(1.0);

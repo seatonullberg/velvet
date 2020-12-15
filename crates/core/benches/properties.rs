@@ -6,14 +6,21 @@ use velvet_core::properties::{
 };
 use velvet_core::utils::{load_test_potentials, test_path};
 
+use std::fs::File;
+use std::io::BufReader;
+
 pub fn forces_benchmark(c: &mut Criterion) {
-    let sys = load_poscar(test_path("argon.poscar"));
+    let file = File::open(test_path("argon.poscar")).unwrap();
+    let reader = BufReader::new(file);
+    let sys = load_poscar(reader);
     let pots = load_test_potentials("argon");
     c.bench_function("forces argon", |b| b.iter(|| Forces.calculate(&sys, &pots)));
 }
 
 pub fn potential_energy_benchmark(c: &mut Criterion) {
-    let sys = load_poscar(test_path("argon.poscar"));
+    let file = File::open(test_path("argon.poscar")).unwrap();
+    let reader = BufReader::new(file);
+    let sys = load_poscar(reader);
     let pots = load_test_potentials("argon");
     c.bench_function("potential energy argon", |b| {
         b.iter(|| PotentialEnergy.calculate(&sys, &pots))
@@ -21,7 +28,9 @@ pub fn potential_energy_benchmark(c: &mut Criterion) {
 }
 
 pub fn kinetic_energy_benchmark(c: &mut Criterion) {
-    let sys = load_poscar(test_path("argon.poscar"));
+    let file = File::open(test_path("argon.poscar")).unwrap();
+    let reader = BufReader::new(file);
+    let sys = load_poscar(reader);
     let pots = load_test_potentials("argon");
     c.bench_function("kinetic energy argon", |b| {
         b.iter(|| KineticEnergy.calculate(&sys, &pots))
@@ -29,7 +38,9 @@ pub fn kinetic_energy_benchmark(c: &mut Criterion) {
 }
 
 pub fn temperature_benchmark(c: &mut Criterion) {
-    let mut sys = load_poscar(test_path("argon.poscar"));
+    let file = File::open(test_path("argon.poscar")).unwrap();
+    let reader = BufReader::new(file);
+    let mut sys = load_poscar(reader);
     let boltz = Boltzmann::new(1000 as f32);
     boltz.apply(&mut sys);
     c.bench_function("temperature argon", |b| {
