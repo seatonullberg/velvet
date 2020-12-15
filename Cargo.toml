@@ -26,3 +26,11 @@ members = [
 [[bin]]
 name = "velvet"
 path = "crates/app/src/main.rs"
+
+[dev-dependencies]
+indicatif = "0.15"
+log = "0.4"
+plotters = "0.3.0"
+pretty_env_logger = "0.4"
+velvet-convert = { path = "crates/convert" }
+velvet-core = { path = "crates/core" }
