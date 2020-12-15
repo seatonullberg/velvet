@@ -1,9 +1,12 @@
 //! Pairwise interatomic potentials.
 
-use crate::potential::{Potential, Restriction};
-use crate::system::element::Element;
+use serde::{Deserialize, Serialize};
+
+use crate::potentials::{Potential, Restriction};
+use crate::system::elements::Element;
 
 /// Shared behavior for pair potentials.
+#[typetag::serde(tag = "type")]
 pub trait PairPotential: Potential {
     /// Returns the potential energy of an atom in a pair separated by a distance `r`.
     fn energy(&self, r: f32) -> f32;
@@ -12,13 +15,13 @@ pub trait PairPotential: Potential {
 }
 
 /// Pair potential meta data.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct PairPotentialMeta {
-    /// Applicable elements.
+    /// Element pair which the potential applies to.
     pub elements: (Element, Element),
     /// Cutoff radius.
     pub cutoff: f32,
-    /// Limitation to the applicability.
+    /// Restriction on the potential's applicability.
     pub restriction: Restriction,
 }
 
@@ -38,23 +41,28 @@ impl PairPotentialMeta {
 }
 
 /// Lennard-Jones style pair potential.
-///
-/// TODO: Include energy equation here.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct LennardJones {
     epsilon: f32,
     sigma: f32,
 }
 
 impl LennardJones {
-    /// Returns a new `LennardJones`.
+    /// Returns a new Lennard-Jones style pair potential.
+    ///
+    /// # Arguments
+    ///
+    /// * `epsilon` - Depth of the potential well
+    /// * `sigma` - Distance at which the pair potential energy is zero
     pub fn new(epsilon: f32, sigma: f32) -> LennardJones {
         LennardJones { epsilon, sigma }
     }
 }
 
+#[typetag::serde]
 impl Potential for LennardJones {}
 
+#[typetag::serde]
 impl PairPotential for LennardJones {
     fn energy(&self, r: f32) -> f32 {
         let term = (self.sigma / r).powi(6);
@@ -69,23 +77,28 @@ impl PairPotential for LennardJones {
 }
 
 /// Harmonic style pair potential.
-///
-/// TODO: Include energy equation here.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Harmonic {
     k: f32,
     x0: f32,
 }
 
 impl Harmonic {
-    /// Returns a new `Harmonic`.
+    /// Returns a new Harmonic style pair potential.
+    ///
+    /// # Arguments
+    ///
+    /// * `k` - Spring constant
+    /// * `x0` - Equilibrium displacement distance
     pub fn new(k: f32, x0: f32) -> Harmonic {
         Harmonic { k, x0 }
     }
 }
 
+#[typetag::serde]
 impl Potential for Harmonic {}
 
+#[typetag::serde]
 impl PairPotential for Harmonic {
     fn energy(&self, r: f32) -> f32 {
         let dr = r - self.x0;
@@ -98,9 +111,7 @@ impl PairPotential for Harmonic {
 }
 
 /// Mie style pair potential.
-///
-/// TODO: Insert energy equation here.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Mie {
     epsilon: f32,
     sigma: f32,
@@ -109,7 +120,14 @@ pub struct Mie {
 }
 
 impl Mie {
-    /// Returns a new `Mie`.
+    /// Returns a new Mie style pair potential.
+    ///
+    /// # Arguments
+    ///
+    /// * `epsilon` - Depth of the potential well
+    /// * `sigma` - Distance at which the pair potential energy is zero
+    /// * `gamma_a` - Exponent on the attractive term
+    /// * `gamma_r` - Exponent on the repulsive term
     pub fn new(epsilon: f32, sigma: f32, gamma_a: f32, gamma_r: f32) -> Mie {
         Mie {
             epsilon,
@@ -120,8 +138,10 @@ impl Mie {
     }
 }
 
+#[typetag::serde]
 impl Potential for Mie {}
 
+#[typetag::serde]
 impl PairPotential for Mie {
     fn energy(&self, r: f32) -> f32 {
         let term_a = (self.sigma / r).powf(self.gamma_r);
@@ -141,9 +161,7 @@ impl PairPotential for Mie {
 }
 
 /// Morse style pair potential.
-///
-/// Include energy equation here.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Morse {
     a: f32,
     d_e: f32,
@@ -151,14 +169,22 @@ pub struct Morse {
 }
 
 impl Morse {
-    /// Returns a new `Morse`.
+    /// Returns a new Morse style pair potential.
+    ///
+    /// # Arguments
+    ///
+    /// * `a` - Width of the potential well
+    /// * `d_e` - Depth of the potential well
+    /// * `r_e` - Equilibrium bond distance
     pub fn new(a: f32, d_e: f32, r_e: f32) -> Morse {
         Morse { a, d_e, r_e }
     }
 }
 
+#[typetag::serde]
 impl Potential for Morse {}
 
+#[typetag::serde]
 impl PairPotential for Morse {
     fn energy(&self, r: f32) -> f32 {
         let term_a = f32::exp(-2.0 * self.a * (r - self.r_e));
@@ -175,7 +201,7 @@ impl PairPotential for Morse {
 
 #[cfg(test)]
 mod tests {
-    use crate::potential::pair::{Harmonic, LennardJones, Mie, Morse, PairPotential};
+    use super::{Harmonic, LennardJones, Mie, Morse, PairPotential};
     use approx::*;
 
     #[test]

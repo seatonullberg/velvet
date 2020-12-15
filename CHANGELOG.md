@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Berendsen thermostat.
+* Boltzmann initial velocity distribution.
 * LennardJones, Mie, Morse, and Harmonic interatomic pair potentials.
 * Velocity Verlet integration algorithm.
 * System properties for potential, kinetic, and total energy.

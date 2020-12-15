@@ -2,7 +2,8 @@
 
 use nalgebra::Vector3;
 
-use crate::potential::{Potentials, Restriction};
+use crate::constants::BOLTZMANN;
+use crate::potentials::{Potentials, Restriction};
 use crate::system::System;
 
 /// Calculates a system-wide property.
@@ -11,6 +12,22 @@ pub trait Property {
     type Output;
     /// Returns a physical property of the system.
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output;
+}
+
+/// Calculates a system-wide property without using the applied potentials.
+pub trait IntrinsicProperty {
+    /// The property's return type.
+    type Output;
+    /// Returns a physical property of the system without accessing the associated potentials.
+    fn calculate_intrinsic(&self, system: &System) -> Self::Output;
+}
+
+impl<T: IntrinsicProperty> Property for T {
+    type Output = T::Output;
+
+    fn calculate(&self, system: &System, _: &Potentials) -> Self::Output {
+        <T as IntrinsicProperty>::calculate_intrinsic(&self, system)
+    }
 }
 
 /// Force acting on each atom in the system.
@@ -120,15 +137,15 @@ impl Property for PotentialEnergy {
 #[derive(Clone, Copy, Debug)]
 pub struct KineticEnergy;
 
-impl Property for KineticEnergy {
+impl IntrinsicProperty for KineticEnergy {
     type Output = f32;
 
-    fn calculate(&self, system: &System, _: &Potentials) -> Self::Output {
+    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Output {
         let sys_size = system.size();
         let mut kinetic_energy = 0.0 as f32;
 
         for i in 0..sys_size {
-            kinetic_energy += 0.5 * system.masses[i] * system.velocities[i].norm_squared();
+            kinetic_energy += 0.5 * system.elements[i].mass() * system.velocities[i].norm_squared();
         }
         kinetic_energy
     }
@@ -148,55 +165,38 @@ impl Property for TotalEnergy {
     }
 }
 
+/// Instantaneous temperature of the system.
+#[derive(Clone, Copy, Debug)]
+pub struct Temperature;
+
+impl IntrinsicProperty for Temperature {
+    type Output = f32;
+
+    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Output {
+        let kinetic = KineticEnergy.calculate_intrinsic(system);
+        // NOTE: Calculating DOF this way is a potentially nasty bug if future
+        // support is added for degrees of freedom beyond just 3D particles.
+        let dof = (system.size() * 3) as f32;
+        2.0 * kinetic / (dof * BOLTZMANN)
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::potential::pair::{Harmonic, PairPotentialMeta};
-    use crate::potential::{Potentials, Restriction};
-    use crate::property::{Forces, KineticEnergy, PotentialEnergy, Property, TotalEnergy};
-    use crate::system::{cell::Cell, element::Element, System};
+    use super::{
+        Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature,
+        TotalEnergy,
+    };
+    use crate::utils::{load_test_potentials, load_test_system};
     use approx::*;
-    use nalgebra::Vector3;
-
-    fn get_pair_system() -> System {
-        let size = 2 as usize;
-        let fluorine = Element::F;
-        let mut sys = System::new(size);
-        sys.cell = Cell::new(10.0, 10.0, 10.0, 90.0, 90.0, 90.0);
-        sys.elements = vec![fluorine, fluorine];
-        sys.molecules = vec![0 as usize, 0 as usize];
-        sys.positions = vec![Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.3, 0.0, 0.0)];
-        sys.velocities = vec![
-            Vector3::new(
-                -0.007225222699367925,
-                -0.002405756495275919,
-                0.0026065109398392215,
-            ),
-            Vector3::new(
-                0.001179633958023287,
-                0.003525262341736351,
-                -0.0004132774783154952,
-            ),
-        ];
-        sys.masses = vec![fluorine.mass(), fluorine.mass()];
-        sys.charges = vec![0.0, 0.0];
-        sys
-    }
-
-    fn get_pair_potentials() -> Potentials {
-        let mut pots = Potentials::new();
-        let potential = Box::new(Harmonic::new(300.0, 1.2));
-        let meta = PairPotentialMeta::new((Element::F, Element::F), 5.0, Restriction::None);
-        pots.add_pair(potential, meta);
-        pots
-    }
 
     #[test]
     fn forces() {
         // define the system
-        let sys = get_pair_system();
+        let sys = load_test_system("fluorine");
 
         // define the potentials
-        let pots = get_pair_potentials();
+        let pots = load_test_potentials("fluorine");
 
         // calculate the forces
         let forces = Forces.calculate(&sys, &pots);
@@ -216,17 +216,27 @@ mod tests {
     #[test]
     fn energy() {
         // define the system
-        let sys = get_pair_system();
+        let sys = load_test_system("fluorine");
 
         // define the potentials
-        let pots = get_pair_potentials();
+        let pots = load_test_potentials("fluorine");
 
         // calculate the energies
-        let kinetic = KineticEnergy.calculate(&sys, &pots);
+        let kinetic = KineticEnergy.calculate_intrinsic(&sys);
         let potential = PotentialEnergy.calculate(&sys, &pots);
         let total = TotalEnergy.calculate(&sys, &pots);
 
         assert_eq!(kinetic + potential, total);
         assert_relative_eq!(kinetic, 0.0007483);
+    }
+
+    #[test]
+    fn temperature() {
+        // define the system
+        let sys = load_test_system("fluorine");
+
+        // calculate the temperature
+        let temperature = Temperature.calculate_intrinsic(&sys);
+        assert_relative_eq!(temperature, 300.0, epsilon = 1e-2);
     }
 }

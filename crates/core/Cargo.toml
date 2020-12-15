@@ -1,6 +1,6 @@
 [package]
 name = "velvet-core"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Core feature library for the Velvet simulation engine."
 license = "MIT"
@@ -8,5 +8,31 @@ repository = "https://github.com/seatonullberg/velvet"
 edition = "2018"
 
 [dependencies]
+nalgebra = {version = "0.23", features = ["serde-serialize"]}
+rand = "0.7"
+rand_distr = "0.3"
+ron = "0.6"
+serde = {version = "1.0", features = ["derive"]}
+strum = "0.20"
+strum_macros = "0.20"
+typetag = "0.1.6"
+
+[dev-dependencies]
 approx = "0.4"
-nalgebra = "0.23"
+criterion = "0.3"
+velvet-convert = { path = "../convert" }
+
+[[bench]]
+name = "integrator-benchmarks"
+path = "benches/integrators.rs"
+harness = false
+
+[[bench]]
+name = "thermostat-benchmarks"
+path = "benches/thermostats.rs"
+harness = false
+
+[[bench]]
+name = "property-benchmarks"
+path = "benches/properties.rs"
+harness = false
