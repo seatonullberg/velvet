@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["load_poscar","Returns a `System` object initialized from POSCAR formatted data."]]});

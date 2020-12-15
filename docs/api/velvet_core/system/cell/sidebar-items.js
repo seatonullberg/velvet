@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Cell","Matrix representation of a 3D bounding box."]]});

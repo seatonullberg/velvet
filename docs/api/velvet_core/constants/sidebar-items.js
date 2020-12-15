@@ -1,0 +1,1 @@
+initSidebarItems({"static":[["BOLTZMANN","Boltzmann constant."]]});
