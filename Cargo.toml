@@ -1,11 +1,11 @@
 [package]
 name = "velvet"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 edition = "2018"
+repository = "https://github.com/seatonullberg/velvet"
 description = "An experimental molecular dynamics engine with a focus on user-friendliness and extensibility."
 license = "MIT"
-readme = "README.md"
 keywords = [
     "chemistry",
     "materials-science",
@@ -23,14 +23,6 @@ members = [
     "crates/convert",
     "crates/core",
 ]
-
-[lib]
-name = "velvet"
-path = "src/lib.rs"
-
-# [[bin]]
-# name = "velvet"
-# path = "crates/app/src/main.rs"
 
 [dependencies]
 velvet-convert = { path = "crates/convert", version = "0.1.0" }
