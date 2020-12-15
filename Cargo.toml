@@ -1,6 +1,6 @@
 [package]
 name = "velvet"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 edition = "2018"
 description = "An experimental molecular dynamics engine with a focus on user-friendliness and extensibility."
@@ -24,14 +24,20 @@ members = [
     "crates/core",
 ]
 
+[lib]
+name = "velvet"
+path = "src/lib.rs"
+
 [[bin]]
 name = "velvet"
 path = "crates/app/src/main.rs"
+
+[dependencies]
+velvet-convert = { path = "crates/convert", version = "0.1.0" }
+velvet-core = { path = "crates/core", version = "0.2.0" }
 
 [dev-dependencies]
 indicatif = "0.15"
 log = "0.4"
 plotters = "0.3.0"
 pretty_env_logger = "0.4"
-velvet-convert = { path = "crates/convert" }
-velvet-core = { path = "crates/core" }
