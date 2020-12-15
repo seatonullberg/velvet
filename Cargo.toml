@@ -28,9 +28,9 @@ members = [
 name = "velvet"
 path = "src/lib.rs"
 
-[[bin]]
-name = "velvet"
-path = "crates/app/src/main.rs"
+# [[bin]]
+# name = "velvet"
+# path = "crates/app/src/main.rs"
 
 [dependencies]
 velvet-convert = { path = "crates/convert", version = "0.1.0" }
