@@ -10,6 +10,10 @@ pub enum Element {
     H,
     /// Helium
     He,
+    /// Boron
+    B,
+    /// Nitrogen
+    N,
     /// Fluorine
     F,
     /// Argon
@@ -22,6 +26,8 @@ impl Element {
         match self {
             Element::H => 1.008,
             Element::He => 4.0026,
+            Element::B => 10.811,
+            Element::N => 14.0067,
             Element::F => 18.998,
             Element::Ar => 39.948,
         }

@@ -5,8 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2020-12-15
 
-## [Unreleased]
+### Fixed
+
+* crates.io repository link and documentation.
+
+## [0.2.0] - 2020-12-15
 
 ### Changed
 
@@ -20,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Boltzmann initial velocity distribution.
 * LennardJones, Mie, Morse, and Harmonic interatomic pair potentials.
 * Velocity Verlet integration algorithm.
+* System property for instantaneous temperature.
 * System properties for potential, kinetic, and total energy.
 * System property for force acting on every atom.
 

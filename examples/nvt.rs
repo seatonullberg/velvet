@@ -7,14 +7,17 @@ extern crate log;
 use indicatif::{ProgressBar, ProgressStyle};
 use plotters::prelude::*;
 
-use velvet_convert::load_poscar;
-use velvet_core::distributions::{Boltzmann, VelocityDistribution};
-use velvet_core::integrators::{Integrator, VelocityVerlet};
-use velvet_core::potentials::pair::{LennardJones, PairPotentialMeta};
-use velvet_core::potentials::{Potentials, Restriction};
-use velvet_core::properties::{Property, Temperature};
-use velvet_core::system::elements::Element;
-use velvet_core::thermostats::{Thermostat, NoseHoover};
+use std::fs::File;
+use std::io::BufReader;
+
+use velvet::convert::load_poscar;
+use velvet::core::distributions::{Boltzmann, VelocityDistribution};
+use velvet::core::integrators::{Integrator, VelocityVerlet};
+use velvet::core::potentials::pair::{LennardJones, PairPotentialMeta};
+use velvet::core::potentials::{Potentials, Restriction};
+use velvet::core::properties::{Property, Temperature};
+use velvet::core::system::elements::Element;
+use velvet::core::thermostats::{NoseHoover, Thermostat};
 
 static TIMESTEPS: u64 = 250000;
 static PLOT_INTERVAL: u64 = 10;
@@ -25,7 +28,9 @@ fn main() {
     info!("Starting a NVT simulation of Ar gas...");
 
     // Load the Ar gas system directly from a POSCAR formatted file.
-    let mut system = load_poscar("resources/test/argon.poscar");
+    let file = File::open("resources/test/argon.poscar").unwrap();
+    let reader = BufReader::new(file);
+    let mut system = load_poscar(reader);
 
     // Setup an initial velocity distribution with a target temperature
     let boltz = Boltzmann::new(300 as f32);
@@ -111,5 +116,7 @@ fn plot_results(data: Vec<(u64, f64)>) {
         .draw()
         .unwrap();
 
-    chart.draw_series(LineSeries::new(data.into_iter(), &BLUE)).unwrap();
+    chart
+        .draw_series(LineSeries::new(data.into_iter(), &BLUE))
+        .unwrap();
 }

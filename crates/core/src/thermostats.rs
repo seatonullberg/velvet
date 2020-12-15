@@ -61,12 +61,18 @@ impl NoseHoover {
     /// * `freq` - Damping frequency
     /// * `timestep` - Simulation timestep
     pub fn new(target: f32, freq: f32, timestep: f32) -> NoseHoover {
-        NoseHoover { target, freq, timestep, psi: 0 as f32, factor: 0 as f32, temperature: 0 as f32 }
+        NoseHoover {
+            target,
+            freq,
+            timestep,
+            psi: 0 as f32,
+            factor: 0 as f32,
+            temperature: 0 as f32,
+        }
     }
 }
 
 impl Thermostat for NoseHoover {
-
     fn setup(&mut self, system: &System) {
         self.temperature = Temperature.calculate_intrinsic(system);
     }
@@ -89,10 +95,13 @@ impl Thermostat for NoseHoover {
 
 #[cfg(test)]
 mod tests {
-    use super::{Berendsen, Thermostat, NoseHoover};
-    use crate::{distributions::{Boltzmann, VelocityDistribution}, integrators::{Integrator, VelocityVerlet}};
+    use super::{Berendsen, NoseHoover, Thermostat};
     use crate::properties::{Property, Temperature};
     use crate::utils::{load_test_potentials, load_test_system};
+    use crate::{
+        distributions::{Boltzmann, VelocityDistribution},
+        integrators::{Integrator, VelocityVerlet},
+    };
     use approx::*;
 
     #[test]
