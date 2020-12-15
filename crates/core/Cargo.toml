@@ -4,6 +4,7 @@ version = "0.2.0"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Core feature library for the Velvet simulation engine."
 license = "MIT"
+readme = "README.md"
 repository = "https://github.com/seatonullberg/velvet"
 edition = "2018"
 
@@ -28,11 +29,11 @@ path = "benches/integrators.rs"
 harness = false
 
 [[bench]]
-name = "thermostat-benchmarks"
-path = "benches/thermostats.rs"
+name = "property-benchmarks"
+path = "benches/properties.rs"
 harness = false
 
 [[bench]]
-name = "property-benchmarks"
-path = "benches/properties.rs"
+name = "thermostat-benchmarks"
+path = "benches/thermostats.rs"
 harness = false
