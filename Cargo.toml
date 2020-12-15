@@ -5,6 +5,7 @@ authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 edition = "2018"
 description = "An experimental molecular dynamics engine with a focus on user-friendliness and extensibility."
 license = "MIT"
+readme = "README.md"
 keywords = [
     "chemistry",
     "materials-science",
