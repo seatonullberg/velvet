@@ -4,6 +4,7 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use std::fs::File;
 use std::io::BufReader;
 use velvet_convert::load_poscar;
+use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::potentials::Potentials;
 
@@ -11,6 +12,10 @@ pub fn velocity_verlet_benchmark(c: &mut Criterion) {
     let file = File::open(common::test_resources_path("argon.poscar")).unwrap();
     let reader = BufReader::new(file);
     let mut sys = load_poscar(reader);
+
+    let target = 100 as f32;
+    let boltz = Boltzmann::new(target);
+    boltz.apply(&mut sys);
 
     // load potentials
     let path = common::test_resources_path("argon.pot.velvet");
@@ -20,7 +25,7 @@ pub fn velocity_verlet_benchmark(c: &mut Criterion) {
     let mut vv = VelocityVerlet::new(1.0);
     vv.setup(&sys, &pots);
 
-    c.bench_function("velocity verlet argon", |b| {
+    c.bench_function("velocity_verlet", |b| {
         b.iter(|| vv.integrate(&mut sys, &pots))
     });
 }

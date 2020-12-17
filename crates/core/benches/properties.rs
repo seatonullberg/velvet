@@ -20,7 +20,7 @@ pub fn forces_benchmark(c: &mut Criterion) {
     let file = File::open(&path).unwrap();
     let pots: Potentials = ron::de::from_reader(file).unwrap();
 
-    c.bench_function("forces argon", |b| b.iter(|| Forces.calculate(&sys, &pots)));
+    c.bench_function("forces", |b| b.iter(|| Forces.calculate(&sys, &pots)));
 }
 
 pub fn potential_energy_benchmark(c: &mut Criterion) {
@@ -33,7 +33,7 @@ pub fn potential_energy_benchmark(c: &mut Criterion) {
     let file = File::open(&path).unwrap();
     let pots: Potentials = ron::de::from_reader(file).unwrap();
 
-    c.bench_function("potential energy argon", |b| {
+    c.bench_function("potential_energy", |b| {
         b.iter(|| PotentialEnergy.calculate(&sys, &pots))
     });
 }
@@ -48,7 +48,7 @@ pub fn kinetic_energy_benchmark(c: &mut Criterion) {
     let file = File::open(&path).unwrap();
     let pots: Potentials = ron::de::from_reader(file).unwrap();
 
-    c.bench_function("kinetic energy argon", |b| {
+    c.bench_function("kinetic_energy", |b| {
         b.iter(|| KineticEnergy.calculate(&sys, &pots))
     });
 }
@@ -59,7 +59,7 @@ pub fn temperature_benchmark(c: &mut Criterion) {
     let mut sys = load_poscar(reader);
     let boltz = Boltzmann::new(1000 as f32);
     boltz.apply(&mut sys);
-    c.bench_function("temperature argon", |b| {
+    c.bench_function("temperature", |b| {
         b.iter(|| Temperature.calculate_intrinsic(&sys))
     });
 }
