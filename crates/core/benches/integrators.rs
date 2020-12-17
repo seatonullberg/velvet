@@ -7,7 +7,6 @@ use velvet_convert::load_poscar;
 use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::potentials::Potentials;
 
-
 pub fn velocity_verlet_benchmark(c: &mut Criterion) {
     let file = File::open(common::test_resources_path("argon.poscar")).unwrap();
     let reader = BufReader::new(file);

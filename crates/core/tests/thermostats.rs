@@ -4,12 +4,12 @@ use approx::*;
 
 use std::fs::File;
 
-use velvet_core::thermostats::{Thermostat, Berendsen, NoseHoover};
-use velvet_core::properties::{IntrinsicProperty, Temperature};
-use velvet_core::distributions::{VelocityDistribution, Boltzmann};
+use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::integrators::{Integrator, VelocityVerlet};
-use velvet_core::system::System;
 use velvet_core::potentials::Potentials;
+use velvet_core::properties::{IntrinsicProperty, Temperature};
+use velvet_core::system::System;
+use velvet_core::thermostats::{Berendsen, NoseHoover, Thermostat};
 
 #[test]
 fn berendsen() {
@@ -26,7 +26,7 @@ fn berendsen() {
     let path = common::test_resources_path("argon.pot.velvet");
     let file = File::open(&path).unwrap();
     let potentials: Potentials = ron::de::from_reader(file).unwrap();
-    
+
     let timestep = 1.0;
     let mut velocity_verlet = VelocityVerlet::new(timestep);
     velocity_verlet.setup(&system, &potentials);
@@ -40,7 +40,11 @@ fn berendsen() {
         berendsen.post_integrate(&mut system);
     }
 
-    assert_relative_eq!(Temperature.calculate_intrinsic(&system), target, epsilon = 1e-4);
+    assert_relative_eq!(
+        Temperature.calculate_intrinsic(&system),
+        target,
+        epsilon = 1e-4
+    );
 }
 
 #[test]
@@ -53,7 +57,7 @@ fn nose_hoover() {
     let target = 100 as f32;
     let boltz = Boltzmann::new(target);
     boltz.apply(&mut system);
-    
+
     // load potentials
     let path = common::test_resources_path("argon.pot.velvet");
     let file = File::open(&path).unwrap();
@@ -72,5 +76,9 @@ fn nose_hoover() {
         nose_hoover.post_integrate(&mut system);
     }
 
-    assert_relative_eq!(Temperature.calculate_intrinsic(&system), target, epsilon = 100.0);
+    assert_relative_eq!(
+        Temperature.calculate_intrinsic(&system),
+        target,
+        epsilon = 100.0
+    );
 }

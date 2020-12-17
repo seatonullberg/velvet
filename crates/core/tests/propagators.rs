@@ -4,13 +4,13 @@ use approx::*;
 
 use std::fs::File;
 
-use velvet_core::distributions::{VelocityDistribution, Boltzmann};
+use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::integrators::VelocityVerlet;
-use velvet_core::properties::{IntrinsicProperty, Temperature};
-use velvet_core::thermostats::Berendsen;
-use velvet_core::propagators::{MolecularDynamics, Propagator};
-use velvet_core::system::System;
 use velvet_core::potentials::Potentials;
+use velvet_core::propagators::{MolecularDynamics, Propagator};
+use velvet_core::properties::{IntrinsicProperty, Temperature};
+use velvet_core::system::System;
+use velvet_core::thermostats::Berendsen;
 
 #[test]
 fn molecular_dynamics() {

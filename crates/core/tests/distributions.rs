@@ -4,9 +4,9 @@ use approx::*;
 
 use std::fs::File;
 
-use velvet_core::system::System;
 use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::properties::{IntrinsicProperty, Temperature};
+use velvet_core::system::System;
 
 #[test]
 fn boltzmann() {

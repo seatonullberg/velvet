@@ -4,8 +4,8 @@ use std::fs::File;
 
 use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::integrators::{Integrator, VelocityVerlet};
-use velvet_core::system::System;
 use velvet_core::potentials::Potentials;
+use velvet_core::system::System;
 
 #[test]
 fn velocity_verlet() {

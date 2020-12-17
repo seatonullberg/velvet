@@ -4,10 +4,11 @@ use approx::*;
 
 use std::fs::File;
 
-use velvet_core::properties::{Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, TotalEnergy, Temperature};
 use velvet_core::potentials::Potentials;
+use velvet_core::properties::{
+    Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy,
+};
 use velvet_core::system::System;
-
 
 #[test]
 fn forces() {
@@ -25,7 +26,7 @@ fn forces() {
 
     let total_force = (forces[0] + forces[1]).norm();
     assert_relative_eq!(total_force, 0.0, epsilon = 1e-4);
-    
+
     let target_force = 30.0;
     assert_relative_eq!(forces[0][0], -target_force, epsilon = 1e-4);
     assert_relative_eq!(forces[1][0], target_force, epsilon = 1e-4);
@@ -60,7 +61,7 @@ fn temperature() {
     let system: System = ron::de::from_reader(file).unwrap();
 
     let temp = Temperature.calculate_intrinsic(&system);
-    
+
     let target_temp = 300.0;
     assert_relative_eq!(temp, target_temp, epsilon = 1e-2);
 }
