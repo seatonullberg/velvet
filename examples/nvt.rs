@@ -67,7 +67,7 @@ fn main() {
     let mut builder = ConfigurationBuilder::new();
     builder.with_output_interval(PLOT_INTERVAL as usize);
     builder.with_output(Box::new(Temperature));
-    builder.with_output_filename("nvt.h5");
+    builder.with_output_filename("nvt.h5".to_string());
     let config = builder.finish();
 
     let mut sim = Simulation::new(system, potentials, Box::new(md), config);

@@ -1,12 +1,14 @@
 //! Algorithms to integrate classical equations of motion.
 
 use nalgebra::Vector3;
+use serde::{Deserialize, Serialize};
 
 use crate::potentials::Potentials;
 use crate::properties::{Forces, Property};
 use crate::system::System;
 
 /// A numerical integration algorithm.
+#[typetag::serde(tag = "type")]
 pub trait Integrator: Send + Sync {
     /// Prepare the integrator to run.
     fn setup(&mut self, _: &System, _: &Potentials) {}
@@ -15,7 +17,7 @@ pub trait Integrator: Send + Sync {
 }
 
 /// Velocity Verlet integration algorithm.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct VelocityVerlet {
     timestep: f32,
     accelerations: Vec<Vector3<f32>>,
@@ -35,6 +37,7 @@ impl VelocityVerlet {
     }
 }
 
+#[typetag::serde]
 impl Integrator for VelocityVerlet {
     fn setup(&mut self, system: &System, _: &Potentials) {
         self.accelerations = vec![Vector3::default(); system.size()];

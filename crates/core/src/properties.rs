@@ -1,6 +1,7 @@
 //! Physical properties of the simulated system.
 
 use nalgebra::Vector3;
+use serde::{Serialize, Deserialize};
 
 use crate::constants::BOLTZMANN;
 use crate::potentials::{Potentials, Restriction};
@@ -31,7 +32,7 @@ impl<T: IntrinsicProperty> Property for T {
 }
 
 /// Force acting on each atom in the system.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Forces;
 
 impl Property for Forces {
@@ -84,7 +85,7 @@ impl Property for Forces {
 }
 
 /// Potential energy of the whole system.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct PotentialEnergy;
 
 impl Property for PotentialEnergy {
@@ -134,7 +135,7 @@ impl Property for PotentialEnergy {
 }
 
 /// Kinetic energy of the whole system
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct KineticEnergy;
 
 impl IntrinsicProperty for KineticEnergy {
@@ -152,7 +153,7 @@ impl IntrinsicProperty for KineticEnergy {
 }
 
 /// Total energy of the system.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct TotalEnergy;
 
 impl Property for TotalEnergy {
@@ -166,7 +167,7 @@ impl Property for TotalEnergy {
 }
 
 /// Instantaneous temperature of the system.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Temperature;
 
 impl IntrinsicProperty for Temperature {

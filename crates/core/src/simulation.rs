@@ -1,8 +1,11 @@
+use serde::{Serialize, Deserialize};
+
 use crate::config::Configuration;
 use crate::potentials::Potentials;
 use crate::propagators::Propagator;
 use crate::system::System;
 
+#[derive(Serialize, Deserialize)]
 pub struct Simulation {
     system: System,
     potentials: Potentials,

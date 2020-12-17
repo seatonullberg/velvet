@@ -1,13 +1,17 @@
+use serde::{Deserialize, Serialize};
+
 use crate::potentials::Potentials;
 use crate::properties::{
     Forces, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy,
 };
 use crate::system::System;
 
+#[typetag::serde(tag = "type")]
 pub trait Output {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group);
 }
 
+#[typetag::serde]
 impl Output for Forces {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let forces = self.calculate(system, potentials);
@@ -20,6 +24,7 @@ impl Output for Forces {
     }
 }
 
+#[typetag::serde]
 impl Output for KineticEnergy {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let ke = self.calculate(system, potentials);
@@ -31,6 +36,7 @@ impl Output for KineticEnergy {
     }
 }
 
+#[typetag::serde]
 impl Output for PotentialEnergy {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let pe = self.calculate(system, potentials);
@@ -42,6 +48,7 @@ impl Output for PotentialEnergy {
     }
 }
 
+#[typetag::serde]
 impl Output for TotalEnergy {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let te = self.calculate(system, potentials);
@@ -53,6 +60,7 @@ impl Output for TotalEnergy {
     }
 }
 
+#[typetag::serde]
 impl Output for Temperature {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let temperature = self.calculate(system, potentials);

@@ -1,9 +1,12 @@
 //! Algorithms to control the temperature of a simulation.
 
+use serde::{Deserialize, Serialize};
+
 use crate::properties::{IntrinsicProperty, Temperature};
 use crate::system::System;
 
 /// An algorithm used to control simulation temperature.
+#[typetag::serde(tag = "type")]
 pub trait Thermostat: Send + Sync {
     /// Prepare the thermostat to run.
     fn setup(&mut self, _: &System) {}
@@ -14,11 +17,14 @@ pub trait Thermostat: Send + Sync {
 }
 
 /// Placeholder thermostat algorithm which applies no temperature controls.
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NullThermostat;
 
+#[typetag::serde]
 impl Thermostat for NullThermostat {}
 
 /// Berendsen weak coupling thermostat.
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Berendsen {
     target: f32,
     tau: f32,
@@ -36,6 +42,7 @@ impl Berendsen {
     }
 }
 
+#[typetag::serde]
 impl Thermostat for Berendsen {
     fn post_integrate(&mut self, system: &mut System) {
         let temperature = Temperature.calculate_intrinsic(system);
@@ -48,6 +55,7 @@ impl Thermostat for Berendsen {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NoseHoover {
     target: f32,
     freq: f32,
@@ -77,6 +85,7 @@ impl NoseHoover {
     }
 }
 
+#[typetag::serde]
 impl Thermostat for NoseHoover {
     fn setup(&mut self, system: &System) {
         self.temperature = Temperature.calculate_intrinsic(system);

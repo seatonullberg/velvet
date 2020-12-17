@@ -1,10 +1,13 @@
+use serde::{Serialize, Deserialize};
+
 use crate::outputs::Output;
 
+#[derive(Serialize, Deserialize)]
 pub struct Configuration {
     threads: usize,
     outputs: Vec<Box<dyn Output>>,
     output_interval: usize,
-    output_filename: &'static str,
+    output_filename: String,
 }
 
 impl Configuration {
@@ -20,8 +23,8 @@ impl Configuration {
         self.output_interval
     }
 
-    pub fn output_filename(&self) -> &'static str {
-        self.output_filename
+    pub fn output_filename(&self) -> String {
+        self.output_filename.clone()
     }
 }
 
@@ -31,7 +34,7 @@ impl Default for Configuration {
             threads: 1,
             outputs: Vec::new(),
             output_interval: 1,
-            output_filename: "velvet.h5",
+            output_filename: "velvet.h5".to_string(),
         }
     }
 }
@@ -40,7 +43,7 @@ pub struct ConfigurationBuilder {
     threads: Option<usize>,
     outputs: Vec<Box<dyn Output>>,
     output_interval: Option<usize>,
-    output_filename: Option<&'static str>,
+    output_filename: Option<String>,
 }
 
 impl ConfigurationBuilder {
@@ -68,7 +71,7 @@ impl ConfigurationBuilder {
         self
     }
 
-    pub fn with_output_filename(&mut self, filename: &'static str) -> &mut ConfigurationBuilder {
+    pub fn with_output_filename(&mut self, filename: String) -> &mut ConfigurationBuilder {
         self.output_filename = Some(filename);
         self
     }
@@ -88,7 +91,7 @@ impl ConfigurationBuilder {
 
         let output_filename = match self.output_filename {
             Some(filename) => filename,
-            None => "velvet.h5",
+            None => "velvet.h5".to_string(),
         };
 
         Configuration {
