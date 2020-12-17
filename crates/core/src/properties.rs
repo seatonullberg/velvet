@@ -9,23 +9,23 @@ use crate::system::System;
 /// Calculates a system-wide property.
 pub trait Property {
     /// The property's return type.
-    type Output;
+    type Res;
     /// Returns a physical property of the system.
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output;
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res;
 }
 
 /// Calculates a system-wide property without using the applied potentials.
 pub trait IntrinsicProperty {
     /// The property's return type.
-    type Output;
+    type Res;
     /// Returns a physical property of the system without accessing the associated potentials.
-    fn calculate_intrinsic(&self, system: &System) -> Self::Output;
+    fn calculate_intrinsic(&self, system: &System) -> Self::Res;
 }
 
 impl<T: IntrinsicProperty> Property for T {
-    type Output = T::Output;
+    type Res = T::Res;
 
-    fn calculate(&self, system: &System, _: &Potentials) -> Self::Output {
+    fn calculate(&self, system: &System, _: &Potentials) -> Self::Res {
         <T as IntrinsicProperty>::calculate_intrinsic(&self, system)
     }
 }
@@ -35,9 +35,9 @@ impl<T: IntrinsicProperty> Property for T {
 pub struct Forces;
 
 impl Property for Forces {
-    type Output = Vec<Vector3<f32>>;
+    type Res = Vec<Vector3<f32>>;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let sys_size = system.size();
         let mut forces: Vec<Vector3<f32>> = vec![Vector3::new(0.0, 0.0, 0.0); sys_size];
 
@@ -88,9 +88,9 @@ impl Property for Forces {
 pub struct PotentialEnergy;
 
 impl Property for PotentialEnergy {
-    type Output = f32;
+    type Res = f32;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let sys_size = system.size();
         let mut potential_energy: f32 = 0.0 as f32;
 
@@ -138,9 +138,9 @@ impl Property for PotentialEnergy {
 pub struct KineticEnergy;
 
 impl IntrinsicProperty for KineticEnergy {
-    type Output = f32;
+    type Res = f32;
 
-    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Output {
+    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let sys_size = system.size();
         let mut kinetic_energy = 0.0 as f32;
 
@@ -156,9 +156,9 @@ impl IntrinsicProperty for KineticEnergy {
 pub struct TotalEnergy;
 
 impl Property for TotalEnergy {
-    type Output = f32;
+    type Res = f32;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let kinetic = KineticEnergy.calculate(system, potentials);
         let potential = PotentialEnergy.calculate(system, potentials);
         kinetic + potential
@@ -170,9 +170,9 @@ impl Property for TotalEnergy {
 pub struct Temperature;
 
 impl IntrinsicProperty for Temperature {
-    type Output = f32;
+    type Res = f32;
 
-    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Output {
+    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic = KineticEnergy.calculate_intrinsic(system);
         // NOTE: Calculating DOF this way is a potentially nasty bug if future
         // support is added for degrees of freedom beyond just 3D particles.

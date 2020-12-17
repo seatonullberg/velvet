@@ -42,6 +42,6 @@ fn molecular_dynamics() {
     assert_relative_eq!(
         Temperature.calculate_intrinsic(&system),
         target,
-        epsilon = 1e-5,
+        epsilon = 1e-4,
     );
 }
