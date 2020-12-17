@@ -29,6 +29,7 @@ velvet-convert = { path = "crates/convert", version = "0.1.0" }
 velvet-core = { path = "crates/core", version = "0.2.1" }
 
 [dev-dependencies]
+hdf5 = "0.7"
 indicatif = "0.15"
 log = "0.4"
 plotters = "0.3.0"

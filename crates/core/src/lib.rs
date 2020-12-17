@@ -1,6 +1,7 @@
 //! Core feature library for the Velvet simulation engine.
 
 #[warn(missing_docs)]
+pub mod config;
 pub mod constants;
 pub mod distributions;
 pub mod integrators;
@@ -8,6 +9,7 @@ pub mod outputs;
 pub mod potentials;
 pub mod propagators;
 pub mod properties;
+pub mod simulation;
 pub mod system;
 pub mod thermostats;
 
