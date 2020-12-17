@@ -9,8 +9,9 @@ edition = "2018"
 
 [dependencies]
 nalgebra = {version = "0.23", features = ["serde-serialize"]}
-rand = "0.7"
+rand = {version = "0.7", features = ["serde1"] }
 rand_distr = "0.3"
+rayon = "1.5"
 ron = "0.6"
 serde = {version = "1.0", features = ["derive"]}
 strum = "0.20"

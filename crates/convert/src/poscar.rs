@@ -105,11 +105,11 @@ mod tests {
     use super::load_poscar;
     use std::fs::File;
     use std::io::BufReader;
-    use velvet_core::utils::test_path;
+    use crate::test_resources_path;
 
     #[test]
     fn argon() {
-        let file = File::open(test_path("argon.poscar")).unwrap();
+        let file = File::open(test_resources_path("argon.poscar")).unwrap();
         let reader = BufReader::new(file);
         let sys = load_poscar(reader);
         assert_eq!(sys.size(), 108);

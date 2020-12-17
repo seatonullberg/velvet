@@ -7,7 +7,7 @@ use crate::properties::{Forces, Property};
 use crate::system::System;
 
 /// A numerical integration algorithm.
-pub trait Integrator {
+pub trait Integrator: Send + Sync {
     /// Prepare the integrator to run.
     fn setup(&mut self, _: &System, _: &Potentials) {}
     /// Integrates one time step.
@@ -62,30 +62,5 @@ impl Integrator for VelocityVerlet {
         for i in 0..sys_size {
             system.velocities[i] += 0.5 * dt * self.accelerations[i];
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{Integrator, VelocityVerlet};
-    use crate::utils::{load_test_potentials, load_test_system};
-
-    #[test]
-    fn velocity_verlet() {
-        // define the system
-        let mut sys = load_test_system("argon");
-
-        // define the potentials
-        let pots = load_test_potentials("argon");
-
-        // define the integrator
-        let mut vv = VelocityVerlet::new(1.0);
-        vv.setup(&sys, &pots);
-        for _ in 0..5000 {
-            vv.integrate(&mut sys, &pots)
-        }
-
-        // check that the simulation was stable
-        assert!(sys.velocities[0].norm() < 0.1);
     }
 }

@@ -4,7 +4,7 @@ use crate::properties::{IntrinsicProperty, Temperature};
 use crate::system::System;
 
 /// An algorithm used to control simulation temperature.
-pub trait Thermostat {
+pub trait Thermostat: Send + Sync {
     /// Prepare the thermostat to run.
     fn setup(&mut self, _: &System) {}
     /// Fires before the integration step.
@@ -90,74 +90,5 @@ impl Thermostat for NoseHoover {
         self.temperature = Temperature.calculate_intrinsic(system);
         let psidot = self.freq.powi(2) * ((self.temperature / self.target) - 1.0);
         self.psi += psidot * (dt / 2.0);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{Berendsen, NoseHoover, Thermostat};
-    use crate::properties::{Property, Temperature};
-    use crate::utils::{load_test_potentials, load_test_system};
-    use crate::{
-        distributions::{Boltzmann, VelocityDistribution},
-        integrators::{Integrator, VelocityVerlet},
-    };
-    use approx::*;
-
-    #[test]
-    fn berendsen() {
-        // define the system
-        let mut sys = load_test_system("argon");
-
-        // define the potentials
-        let pots = load_test_potentials("argon");
-
-        // define the integrator
-        let mut vv = VelocityVerlet::new(1.0);
-        vv.setup(&sys, &pots);
-
-        // define the thermostat
-        let target = 1000 as f32;
-        let mut berendsen = Berendsen::new(target, 2.0);
-
-        // run the integration with a thermostat
-        for _ in 0..5000 {
-            vv.integrate(&mut sys, &pots);
-            berendsen.post_integrate(&mut sys);
-        }
-
-        // check that the simulation was stable
-        assert_relative_eq!(Temperature.calculate(&sys, &pots), target, epsilon = 1e-5);
-    }
-
-    #[test]
-    fn nose_hoover() {
-        // define the system
-        let mut sys = load_test_system("argon");
-
-        let boltz = Boltzmann::new(100 as f32);
-        boltz.apply(&mut sys);
-
-        // define the potentials
-        let pots = load_test_potentials("argon");
-
-        // define the integrator
-        let mut vv = VelocityVerlet::new(1.0);
-        vv.setup(&sys, &pots);
-
-        // define the thermostat
-        let target = 300 as f32;
-        let mut nose = NoseHoover::new(target, 1.0 + 1e-2, 1.0);
-        nose.setup(&sys);
-
-        // run the integration with a thermostat
-        for _ in 0..5000 {
-            nose.pre_integrate(&mut sys);
-            vv.integrate(&mut sys, &pots);
-            nose.post_integrate(&mut sys);
-        }
-
-        // check that the simulation was stable
-        assert_relative_eq!(Temperature.calculate(&sys, &pots), target, epsilon = 100.0);
     }
 }
