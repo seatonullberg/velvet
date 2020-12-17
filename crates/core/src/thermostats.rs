@@ -13,6 +13,11 @@ pub trait Thermostat: Send + Sync {
     fn post_integrate(&mut self, _: &mut System) {}
 }
 
+/// Placeholder thermostat algorithm which applies no temperature controls.
+pub struct NullThermostat;
+
+impl Thermostat for NullThermostat {}
+
 /// Berendsen weak coupling thermostat.
 pub struct Berendsen {
     target: f32,
