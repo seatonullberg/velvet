@@ -8,6 +8,7 @@ repository = "https://github.com/seatonullberg/velvet"
 edition = "2018"
 
 [dependencies]
+hdf5 = "0.7"
 nalgebra = {version = "0.23", features = ["serde-serialize"]}
 rand = {version = "0.7", features = ["serde1"] }
 rand_distr = "0.3"

@@ -4,6 +4,7 @@
 pub mod constants;
 pub mod distributions;
 pub mod integrators;
+pub mod outputs;
 pub mod potentials;
 pub mod propagators;
 pub mod properties;
