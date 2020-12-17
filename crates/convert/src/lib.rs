@@ -3,6 +3,7 @@
 mod poscar;
 pub use poscar::load_poscar;
 
+#[allow(dead_code)]
 fn test_resources_path(filename: &str) -> String {
     format!(
         "{}/../../resources/test/{}",

@@ -1,6 +1,6 @@
 [package]
 name = "velvet-convert"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Convert external file formats into Velvet data structures."
 license = "MIT"

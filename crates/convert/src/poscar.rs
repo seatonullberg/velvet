@@ -57,7 +57,7 @@ where
         vecs[2][0] as f32,
         vecs[0][1] as f32,
         vecs[1][1] as f32,
-        vecs[1][1] as f32,
+        vecs[2][1] as f32,
         vecs[0][2] as f32,
         vecs[1][2] as f32,
         vecs[2][2] as f32,
@@ -112,6 +112,16 @@ mod tests {
         let file = File::open(test_resources_path("argon.poscar")).unwrap();
         let reader = BufReader::new(file);
         let sys = load_poscar(reader);
+        
+        println!("{:?}", sys.cell);
+
+        let a0 = 21.152895;
         assert_eq!(sys.size(), 108);
+        assert_eq!(sys.cell.a(), a0);
+        assert_eq!(sys.cell.b(), a0);
+        assert_eq!(sys.cell.c(), a0);
+        assert_eq!(sys.cell.alpha(), 90.0);
+        assert_eq!(sys.cell.beta(), 90.0);
+        assert_eq!(sys.cell.gamma(), 90.0);
     }
 }

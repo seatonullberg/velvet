@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub static ITERATIONS: usize = 5000;
 
 pub fn test_resources_path(filename: &str) -> String {
