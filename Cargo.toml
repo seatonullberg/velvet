@@ -19,7 +19,7 @@ categories = [
 
 [workspace]
 members = [
-    "crates/app",
+    "crates/cli",
     "crates/convert",
     "crates/core",
 ]
