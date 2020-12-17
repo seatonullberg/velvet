@@ -38,3 +38,8 @@ harness = false
 name = "thermostat-benchmarks"
 path = "benches/thermostats.rs"
 harness = false
+
+[[bench]]
+name = "pair-potential-benchmarks"
+path = "benches/potentials/pair.rs"
+harness = false

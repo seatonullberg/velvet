@@ -112,7 +112,7 @@ mod tests {
         let file = File::open(test_resources_path("argon.poscar")).unwrap();
         let reader = BufReader::new(file);
         let sys = load_poscar(reader);
-        
+
         println!("{:?}", sys.cell);
 
         let a0 = 21.152895;
