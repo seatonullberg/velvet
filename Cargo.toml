@@ -22,6 +22,7 @@ members = [
     "crates/cli",
     "crates/convert",
     "crates/core",
+    "crates/test-utils",
 ]
 
 [dependencies]

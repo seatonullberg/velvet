@@ -1,5 +1,3 @@
-mod common;
-
 use approx::*;
 
 use std::fs::File;
@@ -8,16 +6,17 @@ use velvet_core::outputs::Output;
 use velvet_core::potentials::Potentials;
 use velvet_core::properties::{Forces, KineticEnergy, PotentialEnergy, Temperature, TotalEnergy};
 use velvet_core::system::System;
+use test_utils::test_resources_path;
 
 #[test]
 fn forces() {
     // load system
-    let path = common::test_resources_path("fluorine.sys.velvet");
+    let path = test_resources_path("fluorine.sys.velvet");
     let file = File::open(&path).unwrap();
     let system: System = ron::de::from_reader(file).unwrap();
 
     // load potentials
-    let path = common::test_resources_path("fluorine.pot.velvet");
+    let path = test_resources_path("fluorine.pot.velvet");
     let file = File::open(&path).unwrap();
     let potentials: Potentials = ron::de::from_reader(file).unwrap();
 
@@ -42,12 +41,12 @@ fn forces() {
 #[test]
 fn energy() {
     // load system
-    let path = common::test_resources_path("fluorine.sys.velvet");
+    let path = test_resources_path("fluorine.sys.velvet");
     let file = File::open(&path).unwrap();
     let system: System = ron::de::from_reader(file).unwrap();
 
     // load potentials
-    let path = common::test_resources_path("fluorine.pot.velvet");
+    let path = test_resources_path("fluorine.pot.velvet");
     let file = File::open(&path).unwrap();
     let potentials: Potentials = ron::de::from_reader(file).unwrap();
 
@@ -78,12 +77,12 @@ fn energy() {
 #[test]
 fn temperature() {
     // load system
-    let path = common::test_resources_path("fluorine.sys.velvet");
+    let path = test_resources_path("fluorine.sys.velvet");
     let file = File::open(&path).unwrap();
     let system: System = ron::de::from_reader(file).unwrap();
 
     // load potentials
-    let path = common::test_resources_path("fluorine.pot.velvet");
+    let path = test_resources_path("fluorine.pot.velvet");
     let file = File::open(&path).unwrap();
     let potentials: Potentials = ron::de::from_reader(file).unwrap();
 

@@ -1,5 +1,3 @@
-mod common;
-
 use approx::*;
 
 use std::fs::File;
@@ -10,11 +8,14 @@ use velvet_core::potentials::Potentials;
 use velvet_core::properties::{IntrinsicProperty, Temperature};
 use velvet_core::system::System;
 use velvet_core::thermostats::{Berendsen, NoseHoover, Thermostat};
+use test_utils::test_resources_path;
+
+static ITERATIONS: usize = 5000;
 
 #[test]
 fn berendsen() {
     // load system
-    let path = common::test_resources_path("argon.sys.velvet");
+    let path = test_resources_path("argon.sys.velvet");
     let file = File::open(&path).unwrap();
     let mut system: System = ron::de::from_reader(file).unwrap();
 
@@ -23,7 +24,7 @@ fn berendsen() {
     boltz.apply(&mut system);
 
     // load potentials
-    let path = common::test_resources_path("argon.pot.velvet");
+    let path = test_resources_path("argon.pot.velvet");
     let file = File::open(&path).unwrap();
     let potentials: Potentials = ron::de::from_reader(file).unwrap();
 
@@ -34,7 +35,7 @@ fn berendsen() {
     let mut berendsen = Berendsen::new(target, tau);
     berendsen.setup(&system);
 
-    for _ in 0..common::ITERATIONS {
+    for _ in 0..ITERATIONS {
         berendsen.pre_integrate(&mut system);
         velocity_verlet.integrate(&mut system, &potentials);
         berendsen.post_integrate(&mut system);
@@ -50,7 +51,7 @@ fn berendsen() {
 #[test]
 fn nose_hoover() {
     // load system
-    let path = common::test_resources_path("argon.sys.velvet");
+    let path = test_resources_path("argon.sys.velvet");
     let file = File::open(&path).unwrap();
     let mut system: System = ron::de::from_reader(file).unwrap();
 
@@ -59,7 +60,7 @@ fn nose_hoover() {
     boltz.apply(&mut system);
 
     // load potentials
-    let path = common::test_resources_path("argon.pot.velvet");
+    let path = test_resources_path("argon.pot.velvet");
     let file = File::open(&path).unwrap();
     let potentials: Potentials = ron::de::from_reader(file).unwrap();
 
@@ -70,7 +71,7 @@ fn nose_hoover() {
     let mut nose_hoover = NoseHoover::new(target, freq, timestep);
     nose_hoover.setup(&system);
 
-    for _ in 0..common::ITERATIONS {
+    for _ in 0..ITERATIONS {
         nose_hoover.pre_integrate(&mut system);
         velocity_verlet.integrate(&mut system, &potentials);
         nose_hoover.post_integrate(&mut system);

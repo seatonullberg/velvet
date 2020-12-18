@@ -1,5 +1,3 @@
-mod common;
-
 use approx::*;
 
 use std::fs::File;
@@ -11,11 +9,14 @@ use velvet_core::propagators::{MolecularDynamics, Propagator};
 use velvet_core::properties::{IntrinsicProperty, Temperature};
 use velvet_core::system::System;
 use velvet_core::thermostats::Berendsen;
+use test_utils::test_resources_path;
+
+static ITERATIONS: usize = 5000;
 
 #[test]
 fn molecular_dynamics() {
     // load system
-    let path = common::test_resources_path("argon.sys.velvet");
+    let path = test_resources_path("argon.sys.velvet");
     let file = File::open(&path).unwrap();
     let mut system: System = ron::de::from_reader(file).unwrap();
 
@@ -24,7 +25,7 @@ fn molecular_dynamics() {
     boltz.apply(&mut system);
 
     // load potentials
-    let path = common::test_resources_path("argon.pot.velvet");
+    let path = test_resources_path("argon.pot.velvet");
     let file = File::open(&path).unwrap();
     let potentials: Potentials = ron::de::from_reader(file).unwrap();
 
@@ -35,7 +36,7 @@ fn molecular_dynamics() {
     let mut md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(berendsen));
     md.setup(&mut system, &potentials);
 
-    for _ in 0..common::ITERATIONS {
+    for _ in 0..ITERATIONS {
         md.propagate(&mut system, &potentials);
     }
 

@@ -24,6 +24,7 @@ typetag = "0.1.6"
 approx = "0.4"
 criterion = "0.3"
 ron = "0.6"
+test-utils = { path = "../test-utils" }
 velvet-convert = { path = "../convert", version = "0.1.1" }
 
 [[bench]]
