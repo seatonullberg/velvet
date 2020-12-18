@@ -1,6 +1,6 @@
 [package]
 name = "velvet-core"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Core feature library for the Velvet simulation engine."
 license = "MIT"

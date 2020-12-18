@@ -1,7 +1,10 @@
 //! Convert external file formats into Velvet data structures.
 
-mod poscar;
-pub use poscar::load_poscar;
+pub mod poscar;
+
+pub mod prelude {
+    pub use super::poscar::*;
+}
 
 #[allow(dead_code)]
 fn test_resources_path(filename: &str) -> String {

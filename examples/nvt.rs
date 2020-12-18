@@ -9,17 +9,7 @@ use plotters::prelude::*;
 use std::fs::File;
 use std::io::BufReader;
 
-use velvet::convert::load_poscar;
-use velvet::core::distributions::{Boltzmann, VelocityDistribution};
-use velvet::core::integrators::VelocityVerlet;
-use velvet::core::potentials::pair::{LennardJones, PairPotentialMeta};
-use velvet::core::potentials::{Potentials, Restriction};
-use velvet::core::properties::Temperature;
-use velvet::core::system::elements::Element;
-use velvet::core::thermostats::NoseHoover;
-use velvet_core::config::ConfigurationBuilder;
-use velvet_core::propagators::MolecularDynamics;
-use velvet_core::simulation::Simulation;
+use velvet::prelude::*;
 
 static TIMESTEPS: u64 = 250000;
 static PLOT_INTERVAL: u64 = 50;
@@ -39,36 +29,29 @@ fn main() {
 
     // Define a Lennard-Jones style pair potential.
     let lj = LennardJones::new(1.0, 3.4);
-
-    // Define some metadata about the potential.
-    // - The element pair which it applies to.
-    // - The cutoff radius.
-    // - Any additional restrictions (intermolecular/intramolecular...)
     let meta = PairPotentialMeta::new((Element::Ar, Element::Ar), 8.5, Restriction::None);
 
-    // Initialize a collection of potentials and add the previously defined pair potential with metadata.
-    let mut potentials = Potentials::new();
-    potentials.add_pair(Box::new(lj), meta);
+    // Initialize a collection of potentials.
+    let potentials = PotentialsBuilder::new().with_pair(Box::new(lj), meta).finish();
 
-    // Define a velocity Verlet style integrator.
+    // Initialize a velocity Verlet style integrator.
     let velocity_verlet = VelocityVerlet::new(1.0);
 
-    // Define a Nose-Hoover thermostat
+    // Initialize a Nose-Hoover thermostat.
     let nose_hoover = NoseHoover::new(300 as f32, 1.5, 1.0);
 
-    // Build molecular dynamics propagator from components.
-    // Use a Nose-Hoover style thermostat to simulate the NVT ensemble.
+    // Run MD with a thermostst to simulate the NVT ensemble.
     let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
 
-    // Build a configuration.
-    let mut builder = ConfigurationBuilder::default();
-    builder.with_output_interval(PLOT_INTERVAL as usize);
-    builder.with_output(Box::new(Temperature));
-    builder.with_output_filename("nvt.h5".to_string());
-    let config = builder.finish();
+    // Initialize a configuration.
+    let config = ConfigurationBuilder::new()
+        .with_output_interval(PLOT_INTERVAL as usize)
+        .with_output(Box::new(Temperature))
+        .with_output_filename("nvt.h5".to_string())
+        .finish();
 
+    // Run the simulation
     let mut sim = Simulation::new(system, potentials, Box::new(md), config);
-
     sim.run(TIMESTEPS as usize);
 
     // read results file

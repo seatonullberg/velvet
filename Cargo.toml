@@ -25,8 +25,8 @@ members = [
 ]
 
 [dependencies]
-velvet-convert = { path = "crates/convert", version = "0.1.0" }
-velvet-core = { path = "crates/core", version = "0.2.1" }
+velvet-convert = { path = "crates/convert", version = "0.1.2" }
+velvet-core = { path = "crates/core", version = "0.3.0" }
 
 [dev-dependencies]
 hdf5 = "0.7"

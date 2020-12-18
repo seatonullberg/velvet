@@ -44,7 +44,7 @@ impl System {
     }
 }
 
-/// Helper struct to build complex `System` objects.
+/// Constructor for the `System` type.
 pub struct SystemBuilder {
     size: usize,
     cell: Option<Cell>,
@@ -80,63 +80,63 @@ impl SystemBuilder {
     }
 
     /// Sets the system cell.
-    pub fn with_cell(&mut self, cell: Cell) -> &mut SystemBuilder {
+    pub fn with_cell(mut self, cell: Cell) -> SystemBuilder {
         self.cell = Some(cell);
         self
     }
 
     /// Sets the element of each atom in the system.
-    pub fn with_elements(&mut self, elements: Vec<Element>) -> &mut SystemBuilder {
+    pub fn with_elements(mut self, elements: Vec<Element>) -> SystemBuilder {
         assert!(elements.len() == self.size);
         self.elements = Some(elements);
         self
     }
 
     /// Sets the molecule of each atom in the system.
-    pub fn with_molecules(&mut self, molecules: Vec<usize>) -> &mut SystemBuilder {
+    pub fn with_molecules(mut self, molecules: Vec<usize>) -> SystemBuilder {
         assert!(molecules.len() == self.size);
         self.molecules = Some(molecules);
         self
     }
 
     /// Sets the position of each atom in the system.
-    pub fn with_positions(&mut self, positions: Vec<Vector3<f32>>) -> &mut SystemBuilder {
+    pub fn with_positions(mut self, positions: Vec<Vector3<f32>>) -> SystemBuilder {
         assert!(positions.len() == self.size);
         self.positions = Some(positions);
         self
     }
 
     /// Sets the velocity of each atom in the system.
-    pub fn with_velocities(&mut self, velocities: Vec<Vector3<f32>>) -> &mut SystemBuilder {
+    pub fn with_velocities(mut self, velocities: Vec<Vector3<f32>>) -> SystemBuilder {
         assert!(velocities.len() == self.size);
         self.velocities = Some(velocities);
         self
     }
 
     /// Sets the charge of each atom in the system.
-    pub fn with_charges(&mut self, charges: Vec<f32>) -> &mut SystemBuilder {
+    pub fn with_charges(mut self, charges: Vec<f32>) -> SystemBuilder {
         assert!(charges.len() == self.size);
         self.charges = Some(charges);
         self
     }
 
     /// Sets the pairwise bonds in the system.
-    pub fn with_bonds(&mut self, bonds: Vec<Vec<(usize, usize)>>) -> &mut SystemBuilder {
+    pub fn with_bonds(mut self, bonds: Vec<Vec<(usize, usize)>>) -> SystemBuilder {
         self.bonds = Some(bonds);
         self
     }
 
     /// Sets the angle triplets in the system.
-    pub fn with_angles(&mut self, angles: Vec<Vec<(usize, usize, usize)>>) -> &mut SystemBuilder {
+    pub fn with_angles(mut self, angles: Vec<Vec<(usize, usize, usize)>>) -> SystemBuilder {
         self.angles = Some(angles);
         self
     }
 
     /// Sets the dihedral quadruplets in the system.
     pub fn with_dihedrals(
-        &mut self,
+        mut self,
         dihedrals: Vec<Vec<(usize, usize, usize, usize)>>,
-    ) -> &mut SystemBuilder {
+    ) -> SystemBuilder {
         self.dihedrals = Some(dihedrals);
         self
     }

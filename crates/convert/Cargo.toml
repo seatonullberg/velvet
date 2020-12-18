@@ -1,6 +1,6 @@
 [package]
 name = "velvet-convert"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Convert external file formats into Velvet data structures."
 license = "MIT"
@@ -10,4 +10,4 @@ edition = "2018"
 [dependencies]
 nalgebra = "0.23"
 vasp-poscar = "0.3.2"
-velvet-core = { path = "../core", version = "0.2.1" }
+velvet-core = { path = "../core", version = "0.3.0" }
