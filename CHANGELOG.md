@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+* Bug in loading `Cell` from POSCAR data.
+
+### Added
+
+* Additional benchmark tests.
+* HDF5 output support.
+* Round-trip serialization for `Simulation`.
+* User defined `Configuration`.
+* `Propagator` interface.
+* `prelude` module.
+* CLI tool to convert POSCAR data to the internal data format.
+
 ## [0.2.1] - 2020-12-15
 
 ### Fixed
