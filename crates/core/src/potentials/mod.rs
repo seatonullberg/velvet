@@ -20,6 +20,12 @@ pub struct Potentials {
     // --coulomb--
 }
 
+impl Default for Potentials {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Potentials {
     /// Returns an empty collection of potentials.
     pub fn new() -> Potentials {

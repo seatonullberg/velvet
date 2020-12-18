@@ -26,9 +26,6 @@ static PLOT_INTERVAL: u64 = 50;
 static FILENAME: &'static str = "assets/nvt.png";
 
 fn main() {
-    pretty_env_logger::init();
-    info!("Starting a NVT simulation of Ar gas...");
-
     // Load the Ar gas system directly from a POSCAR formatted file.
     let file = File::open("resources/test/argon.poscar").unwrap();
     let reader = BufReader::new(file);
@@ -63,8 +60,8 @@ fn main() {
     // Use a Nose-Hoover style thermostat to simulate the NVT ensemble.
     let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
 
-    // Default configuration
-    let mut builder = ConfigurationBuilder::new();
+    // Build a configuration.
+    let mut builder = ConfigurationBuilder::default();
     builder.with_output_interval(PLOT_INTERVAL as usize);
     builder.with_output(Box::new(Temperature));
     builder.with_output_filename("nvt.h5".to_string());

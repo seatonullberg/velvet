@@ -9,6 +9,10 @@
 //! * `Quantity` - Number of particles
 //! * `Angle` - Radians (rad)
 
+extern crate pretty_env_logger;
+#[macro_use]
+extern crate log;
+
 #[warn(missing_docs)]
 pub mod config;
 pub mod constants;

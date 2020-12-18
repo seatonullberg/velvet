@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::outputs::Output;
 
@@ -44,6 +44,12 @@ pub struct ConfigurationBuilder {
     outputs: Vec<Box<dyn Output>>,
     output_interval: Option<usize>,
     output_filename: Option<String>,
+}
+
+impl Default for ConfigurationBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ConfigurationBuilder {

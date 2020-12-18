@@ -1,7 +1,7 @@
 //! Physical properties of the simulated system.
 
 use nalgebra::Vector3;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::constants::BOLTZMANN;
 use crate::potentials::{Potentials, Restriction};
@@ -68,8 +68,8 @@ impl Property for Forces {
                     // check restricton
                     let ok = match meta.restriction {
                         Restriction::None => true,
-                        Restriction::Intermolecular => &system.molecules[i] != &system.molecules[j],
-                        Restriction::Intramolecular => &system.molecules[i] == &system.molecules[j],
+                        Restriction::Intermolecular => system.molecules[i] != system.molecules[j],
+                        Restriction::Intramolecular => system.molecules[i] == system.molecules[j],
                     };
                     if ok {
                         let dir = &system.cell.direction(pos1, pos2);
@@ -121,8 +121,8 @@ impl Property for PotentialEnergy {
                     // check restricton
                     let ok = match meta.restriction {
                         Restriction::None => true,
-                        Restriction::Intermolecular => &system.molecules[i] != &system.molecules[j],
-                        Restriction::Intramolecular => &system.molecules[i] == &system.molecules[j],
+                        Restriction::Intermolecular => system.molecules[i] != system.molecules[j],
+                        Restriction::Intramolecular => system.molecules[i] == system.molecules[j],
                     };
                     if ok {
                         potential_energy += potential.energy(r);

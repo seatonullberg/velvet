@@ -176,7 +176,7 @@ impl Cell {
 
         let u = v21.cross(&v32);
         let v = v32.cross(&v43);
-        return f32::atan2(v32.norm() * v.dot(&v21), u.dot(&v));
+        f32::atan2(v32.norm() * v.dot(&v21), u.dot(&v))
     }
 }
 

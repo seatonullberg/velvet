@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 use crate::potentials::Potentials;
 use crate::properties::{
     Forces, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy,

@@ -26,9 +26,6 @@ static PLOT_INTERVAL: u64 = 50;
 static FILENAME: &'static str = "assets/nve.png";
 
 fn main() {
-    pretty_env_logger::init();
-    info!("Starting a NVE simulation of Ar gas...");
-
     // Load the Ar gas system directly from a POSCAR formatted file.
     let file = File::open("resources/test/argon.poscar").unwrap();
     let reader = BufReader::new(file);
@@ -58,8 +55,8 @@ fn main() {
     // Run without a thermostat to simulate the NVE ensemble.
     let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(NullThermostat));
 
-    // Default configuration
-    let mut builder = ConfigurationBuilder::new();
+    // Build a configuration.
+    let mut builder = ConfigurationBuilder::default();
     builder.with_output_interval(PLOT_INTERVAL as usize);
     builder.with_output(Box::new(PotentialEnergy));
     builder.with_output_filename("nve.h5".to_string());
