@@ -35,7 +35,7 @@ impl Configuration {
     }
 }
 
-/// Constructor for the `Configuration` type.
+/// Constructor for the [`Configuration`](velvet_core::config::Configuration) type.
 pub struct ConfigurationBuilder {
     threads: Option<usize>,
     outputs: Vec<Box<dyn Output>>,

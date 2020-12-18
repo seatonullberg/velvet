@@ -27,7 +27,7 @@ impl Potentials {
     }
 }
 
-/// Constructor for the `Potentials` type.
+/// Constructor for the [`Potentials`](velvet_core::potentials::Potentials) type.
 pub struct PotentialsBuilder {
     pairs: Vec<(Box<dyn PairPotential>, PairPotentialMeta)>,
 }
@@ -50,7 +50,11 @@ impl PotentialsBuilder {
     ///
     /// * `potential` - Boxed pair potential trait object
     /// * `meta` - Pair potential metadata
-    pub fn with_pair(mut self, potential: Box<dyn PairPotential>, meta: PairPotentialMeta) -> PotentialsBuilder {
+    pub fn with_pair(
+        mut self,
+        potential: Box<dyn PairPotential>,
+        meta: PairPotentialMeta,
+    ) -> PotentialsBuilder {
         self.pairs.push((potential, meta));
         self
     }

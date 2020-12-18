@@ -55,6 +55,7 @@ impl Thermostat for Berendsen {
     }
 }
 
+/// Nose-Hoover style thermostat.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NoseHoover {
     target: f32,

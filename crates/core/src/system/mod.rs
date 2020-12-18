@@ -44,7 +44,7 @@ impl System {
     }
 }
 
-/// Constructor for the `System` type.
+/// Constructor for the [`System`](velvet_core::system::System) type.
 pub struct SystemBuilder {
     size: usize,
     cell: Option<Cell>,

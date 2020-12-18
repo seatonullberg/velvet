@@ -32,7 +32,9 @@ fn main() {
     let meta = PairPotentialMeta::new((Element::Ar, Element::Ar), 8.5, Restriction::None);
 
     // Initialize a collection of potentials.
-    let potentials = PotentialsBuilder::new().with_pair(Box::new(lj), meta).finish();
+    let potentials = PotentialsBuilder::new()
+        .with_pair(Box::new(lj), meta)
+        .finish();
 
     // Initialize a velocity Verlet style integrator.
     let velocity_verlet = VelocityVerlet::new(1.0);
