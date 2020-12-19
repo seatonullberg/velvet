@@ -1,6 +1,6 @@
 [package]
 name = "velvet-core"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Core feature library for the Velvet simulation engine."
 license = "MIT"
@@ -25,7 +25,7 @@ approx = "0.4"
 criterion = "0.3"
 ron = "0.6"
 test-utils = { path = "../test-utils" }
-velvet-convert = { path = "../convert", version = "0.1.1" }
+velvet-convert = { path = "../convert", version = "0.1.2" }
 
 [[bench]]
 name = "integrator-benchmarks"
