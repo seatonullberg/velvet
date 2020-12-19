@@ -1,4 +1,4 @@
-//! Interatomic potentials to evaluate potential energy and forces.
+//! Classical interatomic potential functions.
 
 pub mod pair;
 
@@ -21,14 +21,27 @@ pub struct Potentials {
 }
 
 impl Potentials {
-    /// Returns an empty collection of potentials.
-    pub fn new() -> Potentials {
-        Potentials { pairs: Vec::new() }
-    }
-
-    /// Returns an iterator over each pair potential.
+    /// Returns an iterator over each pair potential in the collection.
     pub fn pairs(&self) -> impl Iterator<Item = &(Box<dyn PairPotential>, PairPotentialMeta)> {
         self.pairs.iter()
+    }
+}
+
+/// Constructor for the [`Potentials`](velvet_core::potentials::Potentials) type.
+pub struct PotentialsBuilder {
+    pairs: Vec<(Box<dyn PairPotential>, PairPotentialMeta)>,
+}
+
+impl Default for PotentialsBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl PotentialsBuilder {
+    /// Returns a new `PotentialsBuilder`.
+    pub fn new() -> PotentialsBuilder {
+        PotentialsBuilder { pairs: Vec::new() }
     }
 
     /// Adds a new pair potential to the collection.
@@ -37,8 +50,18 @@ impl Potentials {
     ///
     /// * `potential` - Boxed pair potential trait object
     /// * `meta` - Pair potential metadata
-    pub fn add_pair(&mut self, potential: Box<dyn PairPotential>, meta: PairPotentialMeta) {
-        self.pairs.push((potential, meta))
+    pub fn with_pair(
+        mut self,
+        potential: Box<dyn PairPotential>,
+        meta: PairPotentialMeta,
+    ) -> PotentialsBuilder {
+        self.pairs.push((potential, meta));
+        self
+    }
+
+    /// Returns an initialized `Potentials`.
+    pub fn finish(self) -> Potentials {
+        Potentials { pairs: self.pairs }
     }
 }
 

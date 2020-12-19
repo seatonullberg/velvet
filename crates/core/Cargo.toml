@@ -1,6 +1,6 @@
 [package]
 name = "velvet-core"
-version = "0.2.1"
+version = "0.3.1"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Core feature library for the Velvet simulation engine."
 license = "MIT"
@@ -8,10 +8,13 @@ repository = "https://github.com/seatonullberg/velvet"
 edition = "2018"
 
 [dependencies]
+hdf5 = "0.7"
+indicatif = "0.15"
+log = "0.4"
 nalgebra = {version = "0.23", features = ["serde-serialize"]}
-rand = "0.7"
+pretty_env_logger = "0.4"
+rand = {version = "0.7", features = ["serde1"] }
 rand_distr = "0.3"
-ron = "0.6"
 serde = {version = "1.0", features = ["derive"]}
 strum = "0.20"
 strum_macros = "0.20"
@@ -20,7 +23,9 @@ typetag = "0.1.6"
 [dev-dependencies]
 approx = "0.4"
 criterion = "0.3"
-velvet-convert = { path = "../convert" }
+ron = "0.6"
+test-utils = { path = "../test-utils" }
+velvet-convert = { path = "../convert", version = "0.1.2" }
 
 [[bench]]
 name = "integrator-benchmarks"
@@ -35,4 +40,9 @@ harness = false
 [[bench]]
 name = "thermostat-benchmarks"
 path = "benches/thermostats.rs"
+harness = false
+
+[[bench]]
+name = "pair-potential-benchmarks"
+path = "benches/potentials/pair.rs"
 harness = false

@@ -8,3 +8,8 @@
 
 pub use velvet_convert as convert;
 pub use velvet_core as core;
+
+pub mod prelude {
+    pub use super::convert::prelude::*;
+    pub use super::core::prelude::*;
+}

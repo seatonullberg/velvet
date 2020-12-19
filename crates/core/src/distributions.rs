@@ -8,12 +8,13 @@ use crate::properties::{IntrinsicProperty, Temperature};
 use crate::system::System;
 
 /// Shared behavior for algorithms that can initialize a velocity distribution.
-pub trait VelocityDistribution {
+pub trait VelocityDistribution: Send + Sync {
     /// Applies the distribution to a system.
     fn apply(&self, system: &mut System);
 }
 
 /// Maxwell Boltzmann style velocity distribution.
+#[derive(Clone, Copy, Debug)]
 pub struct Boltzmann {
     target: f32,
     distr: Normal<f32>,
@@ -53,29 +54,4 @@ fn scale(system: &mut System, target: f32) {
         .iter_mut()
         .map(|&mut x| x * factor)
         .collect();
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{Boltzmann, VelocityDistribution};
-    use crate::properties::{IntrinsicProperty, Temperature};
-    use crate::utils::load_test_system;
-    use approx::*;
-
-    #[test]
-    fn boltzmann() {
-        // define the system
-        let mut sys = load_test_system("argon");
-
-        // define the velocity distribution
-        let target = 1000 as f32;
-        let initial_temperature = Boltzmann::new(target);
-
-        // apply the initial temperature
-        initial_temperature.apply(&mut sys);
-
-        // check the result
-        let res = Temperature.calculate_intrinsic(&sys);
-        assert_relative_eq!(res, target, epsilon = 1e-3);
-    }
 }

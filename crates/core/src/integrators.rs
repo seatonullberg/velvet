@@ -1,13 +1,15 @@
 //! Algorithms to integrate classical equations of motion.
 
 use nalgebra::Vector3;
+use serde::{Deserialize, Serialize};
 
 use crate::potentials::Potentials;
 use crate::properties::{Forces, Property};
 use crate::system::System;
 
 /// A numerical integration algorithm.
-pub trait Integrator {
+#[typetag::serde(tag = "type")]
+pub trait Integrator: Send + Sync {
     /// Prepare the integrator to run.
     fn setup(&mut self, _: &System, _: &Potentials) {}
     /// Integrates one time step.
@@ -15,7 +17,7 @@ pub trait Integrator {
 }
 
 /// Velocity Verlet integration algorithm.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct VelocityVerlet {
     timestep: f32,
     accelerations: Vec<Vector3<f32>>,
@@ -35,6 +37,7 @@ impl VelocityVerlet {
     }
 }
 
+#[typetag::serde]
 impl Integrator for VelocityVerlet {
     fn setup(&mut self, system: &System, _: &Potentials) {
         self.accelerations = vec![Vector3::default(); system.size()];
@@ -62,30 +65,5 @@ impl Integrator for VelocityVerlet {
         for i in 0..sys_size {
             system.velocities[i] += 0.5 * dt * self.accelerations[i];
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{Integrator, VelocityVerlet};
-    use crate::utils::{load_test_potentials, load_test_system};
-
-    #[test]
-    fn velocity_verlet() {
-        // define the system
-        let mut sys = load_test_system("argon");
-
-        // define the potentials
-        let pots = load_test_potentials("argon");
-
-        // define the integrator
-        let mut vv = VelocityVerlet::new(1.0);
-        vv.setup(&sys, &pots);
-        for _ in 0..5000 {
-            vv.integrate(&mut sys, &pots)
-        }
-
-        // check that the simulation was stable
-        assert!(sys.velocities[0].norm() < 0.1);
     }
 }

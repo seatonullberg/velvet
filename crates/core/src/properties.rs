@@ -1,6 +1,7 @@
 //! Physical properties of the simulated system.
 
 use nalgebra::Vector3;
+use serde::{Deserialize, Serialize};
 
 use crate::constants::BOLTZMANN;
 use crate::potentials::{Potentials, Restriction};
@@ -9,35 +10,35 @@ use crate::system::System;
 /// Calculates a system-wide property.
 pub trait Property {
     /// The property's return type.
-    type Output;
+    type Res;
     /// Returns a physical property of the system.
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output;
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res;
 }
 
 /// Calculates a system-wide property without using the applied potentials.
 pub trait IntrinsicProperty {
     /// The property's return type.
-    type Output;
+    type Res;
     /// Returns a physical property of the system without accessing the associated potentials.
-    fn calculate_intrinsic(&self, system: &System) -> Self::Output;
+    fn calculate_intrinsic(&self, system: &System) -> Self::Res;
 }
 
 impl<T: IntrinsicProperty> Property for T {
-    type Output = T::Output;
+    type Res = T::Res;
 
-    fn calculate(&self, system: &System, _: &Potentials) -> Self::Output {
+    fn calculate(&self, system: &System, _: &Potentials) -> Self::Res {
         <T as IntrinsicProperty>::calculate_intrinsic(&self, system)
     }
 }
 
 /// Force acting on each atom in the system.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Forces;
 
 impl Property for Forces {
-    type Output = Vec<Vector3<f32>>;
+    type Res = Vec<Vector3<f32>>;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let sys_size = system.size();
         let mut forces: Vec<Vector3<f32>> = vec![Vector3::new(0.0, 0.0, 0.0); sys_size];
 
@@ -67,8 +68,8 @@ impl Property for Forces {
                     // check restricton
                     let ok = match meta.restriction {
                         Restriction::None => true,
-                        Restriction::Intermolecular => &system.molecules[i] != &system.molecules[j],
-                        Restriction::Intramolecular => &system.molecules[i] == &system.molecules[j],
+                        Restriction::Intermolecular => system.molecules[i] != system.molecules[j],
+                        Restriction::Intramolecular => system.molecules[i] == system.molecules[j],
                     };
                     if ok {
                         let dir = &system.cell.direction(pos1, pos2);
@@ -84,13 +85,13 @@ impl Property for Forces {
 }
 
 /// Potential energy of the whole system.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct PotentialEnergy;
 
 impl Property for PotentialEnergy {
-    type Output = f32;
+    type Res = f32;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let sys_size = system.size();
         let mut potential_energy: f32 = 0.0 as f32;
 
@@ -120,8 +121,8 @@ impl Property for PotentialEnergy {
                     // check restricton
                     let ok = match meta.restriction {
                         Restriction::None => true,
-                        Restriction::Intermolecular => &system.molecules[i] != &system.molecules[j],
-                        Restriction::Intramolecular => &system.molecules[i] == &system.molecules[j],
+                        Restriction::Intermolecular => system.molecules[i] != system.molecules[j],
+                        Restriction::Intramolecular => system.molecules[i] == system.molecules[j],
                     };
                     if ok {
                         potential_energy += potential.energy(r);
@@ -134,13 +135,13 @@ impl Property for PotentialEnergy {
 }
 
 /// Kinetic energy of the whole system
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct KineticEnergy;
 
 impl IntrinsicProperty for KineticEnergy {
-    type Output = f32;
+    type Res = f32;
 
-    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Output {
+    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let sys_size = system.size();
         let mut kinetic_energy = 0.0 as f32;
 
@@ -152,13 +153,13 @@ impl IntrinsicProperty for KineticEnergy {
 }
 
 /// Total energy of the system.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct TotalEnergy;
 
 impl Property for TotalEnergy {
-    type Output = f32;
+    type Res = f32;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Output {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let kinetic = KineticEnergy.calculate(system, potentials);
         let potential = PotentialEnergy.calculate(system, potentials);
         kinetic + potential
@@ -166,77 +167,17 @@ impl Property for TotalEnergy {
 }
 
 /// Instantaneous temperature of the system.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Temperature;
 
 impl IntrinsicProperty for Temperature {
-    type Output = f32;
+    type Res = f32;
 
-    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Output {
+    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic = KineticEnergy.calculate_intrinsic(system);
         // NOTE: Calculating DOF this way is a potentially nasty bug if future
         // support is added for degrees of freedom beyond just 3D particles.
         let dof = (system.size() * 3) as f32;
         2.0 * kinetic / (dof * BOLTZMANN)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{
-        Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature,
-        TotalEnergy,
-    };
-    use crate::utils::{load_test_potentials, load_test_system};
-    use approx::*;
-
-    #[test]
-    fn forces() {
-        // define the system
-        let sys = load_test_system("fluorine");
-
-        // define the potentials
-        let pots = load_test_potentials("fluorine");
-
-        // calculate the forces
-        let forces = Forces.calculate(&sys, &pots);
-        let total_force = forces[0] + forces[1];
-        assert_relative_eq!(total_force.norm(), 0.0);
-
-        let target_force = 30.0 as f32;
-        assert_relative_eq!(forces[0][0], -target_force, epsilon = 1e-4);
-        assert_relative_eq!(forces[0][1], 0.0);
-        assert_relative_eq!(forces[0][2], 0.0);
-
-        assert_relative_eq!(forces[1][0], target_force, epsilon = 1e-4);
-        assert_relative_eq!(forces[1][1], 0.0);
-        assert_relative_eq!(forces[1][2], 0.0);
-    }
-
-    #[test]
-    fn energy() {
-        // define the system
-        let sys = load_test_system("fluorine");
-
-        // define the potentials
-        let pots = load_test_potentials("fluorine");
-
-        // calculate the energies
-        let kinetic = KineticEnergy.calculate_intrinsic(&sys);
-        let potential = PotentialEnergy.calculate(&sys, &pots);
-        let total = TotalEnergy.calculate(&sys, &pots);
-
-        assert_eq!(kinetic + potential, total);
-        assert_relative_eq!(kinetic, 0.0007483);
-    }
-
-    #[test]
-    fn temperature() {
-        // define the system
-        let sys = load_test_system("fluorine");
-
-        // calculate the temperature
-        let temperature = Temperature.calculate_intrinsic(&sys);
-        assert_relative_eq!(temperature, 300.0, epsilon = 1e-2);
     }
 }

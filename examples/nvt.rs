@@ -4,29 +4,18 @@
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
-use indicatif::{ProgressBar, ProgressStyle};
 use plotters::prelude::*;
 
 use std::fs::File;
 use std::io::BufReader;
 
-use velvet::convert::load_poscar;
-use velvet::core::distributions::{Boltzmann, VelocityDistribution};
-use velvet::core::integrators::{Integrator, VelocityVerlet};
-use velvet::core::potentials::pair::{LennardJones, PairPotentialMeta};
-use velvet::core::potentials::{Potentials, Restriction};
-use velvet::core::properties::{Property, Temperature};
-use velvet::core::system::elements::Element;
-use velvet::core::thermostats::{NoseHoover, Thermostat};
+use velvet::prelude::*;
 
 static TIMESTEPS: u64 = 250000;
-static PLOT_INTERVAL: u64 = 10;
+static PLOT_INTERVAL: u64 = 50;
 static FILENAME: &'static str = "assets/nvt.png";
 
 fn main() {
-    pretty_env_logger::init();
-    info!("Starting a NVT simulation of Ar gas...");
-
     // Load the Ar gas system directly from a POSCAR formatted file.
     let file = File::open("resources/test/argon.poscar").unwrap();
     let reader = BufReader::new(file);
@@ -40,59 +29,51 @@ fn main() {
 
     // Define a Lennard-Jones style pair potential.
     let lj = LennardJones::new(1.0, 3.4);
-
-    // Define some metadata about the potential.
-    // - The element pair which it applies to.
-    // - The cutoff radius.
-    // - Any additional restrictions (intermolecular/intramolecular...)
     let meta = PairPotentialMeta::new((Element::Ar, Element::Ar), 8.5, Restriction::None);
 
-    // Initialize a collection of potentials and add the previously defined pair potential with metadata.
-    let mut potentials = Potentials::new();
-    potentials.add_pair(Box::new(lj), meta);
+    // Initialize a collection of potentials.
+    let potentials = PotentialsBuilder::new()
+        .with_pair(Box::new(lj), meta)
+        .finish();
 
-    // Define a velocity Verlet style integrator.
-    let mut velocity_verlet = VelocityVerlet::new(1.0);
-    velocity_verlet.setup(&system, &potentials);
+    // Initialize a velocity Verlet style integrator.
+    let velocity_verlet = VelocityVerlet::new(1.0);
 
-    // Define a Nose-Hoover thermostat
-    let mut nose_hoover = NoseHoover::new(300 as f32, 1.5, 1.0);
-    nose_hoover.setup(&system);
+    // Initialize a Nose-Hoover thermostat.
+    let nose_hoover = NoseHoover::new(300 as f32, 1.5, 1.0);
 
-    // Setup a progress bar to track the simulation.
-    let progress = get_progress_bar(TIMESTEPS);
+    // Run MD with a thermostst to simulate the NVT ensemble.
+    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
 
-    let mut temperature_results: Vec<(u64, f64)> =
-        Vec::with_capacity((TIMESTEPS / PLOT_INTERVAL) as usize);
+    // Initialize a configuration.
+    let config = ConfigurationBuilder::new()
+        .with_output_interval(PLOT_INTERVAL as usize)
+        .with_output(Box::new(Temperature))
+        .with_output_filename("nvt.h5".to_string())
+        .finish();
 
-    // Integrate for N timesteps.
+    // Run the simulation
+    let mut sim = Simulation::new(system, potentials, Box::new(md), config);
+    sim.run(TIMESTEPS as usize);
+
+    // read results file
+    let file = hdf5::File::open("nvt.h5").unwrap();
+    let mut temperatures: Vec<(u64, f64)> =
+        Vec::with_capacity((TIMESTEPS % PLOT_INTERVAL) as usize);
     for i in 0..TIMESTEPS {
-        nose_hoover.pre_integrate(&mut system);
-        velocity_verlet.integrate(&mut system, &potentials);
-        nose_hoover.post_integrate(&mut system);
         if i % PLOT_INTERVAL == 0 {
-            temperature_results.push((i, Temperature.calculate(&system, &potentials) as f64));
+            let temp = file.dataset(&format!("{}/temperature", i)).unwrap();
+            let temp = temp.read_1d::<f32>().unwrap();
+            temperatures.push((i, temp[0] as f64));
         }
-        progress.inc(1);
     }
-
-    progress.finish();
 
     info!("Simulation completed successfully.");
 
     // Plot the energy results
-    plot_results(temperature_results);
+    plot_results(temperatures);
 
     info!("Generated summary figure: `{}`", FILENAME);
-}
-
-fn get_progress_bar(len: u64) -> ProgressBar {
-    let progress = ProgressBar::new(len);
-    progress.set_style(
-        ProgressStyle::default_bar()
-            .template("[{elapsed_precise}] {bar:40.green} {pos:>6}/{len} timesteps"),
-    );
-    progress
 }
 
 fn plot_results(data: Vec<(u64, f64)>) {
@@ -104,7 +85,7 @@ fn plot_results(data: Vec<(u64, f64)>) {
         .set_label_area_size(LabelAreaPosition::Bottom, 50)
         .margin(10)
         .margin_right(30)
-        .build_cartesian_2d(0..TIMESTEPS, 275.0..325.0)
+        .build_cartesian_2d(0..TIMESTEPS, 285.0..320.0)
         .unwrap();
 
     chart

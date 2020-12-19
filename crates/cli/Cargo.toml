@@ -1,0 +1,18 @@
+[package]
+name = "velvet-cli"
+version = "0.1.1"
+authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+description = "Command line tool built on top of the Velvet API"
+license = "MIT"
+repository = "https://github.com/seatonullberg/velvet"
+edition = "2018"
+
+[dependencies]
+clap = "2.33"
+ron = "0.6"
+velvet-convert = { path = "../convert", version = "0.1.2" }
+velvet-core = { path = "../core", version = "0.3.0" }
+
+[[bin]]
+name = "velvet"
+path = "src/main.rs"

@@ -1,4 +1,4 @@
-//! Pairwise interatomic potentials.
+//! Potentials which operate on pairs of atoms.
 
 use serde::{Deserialize, Serialize};
 
