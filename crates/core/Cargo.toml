@@ -1,6 +1,6 @@
 [package]
 name = "velvet-core"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Core feature library for the Velvet simulation engine."
 license = "MIT"
@@ -9,6 +9,7 @@ edition = "2018"
 
 [dependencies]
 hdf5 = "0.7"
+hdf5-sys = "0.7"
 indicatif = "0.15"
 log = "0.4"
 nalgebra = {version = "0.23", features = ["serde-serialize"]}
