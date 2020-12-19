@@ -46,3 +46,6 @@ harness = false
 name = "pair-potential-benchmarks"
 path = "benches/potentials/pair.rs"
 harness = false
+
+[package.metadata.docs.rs]
+features = ["hdf5-sys/static", "hdf5-sys/zlib"]
