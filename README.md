@@ -20,6 +20,10 @@ To build Velvet you will need to have Rust's compiler and package manager instal
 * [rustc](https://doc.rust-lang.org/rustc/what-is-rustc.html) - Compiler for the Rust programming language
 * [Cargo](https://doc.rust-lang.org/cargo/) - Package manager for the Rust programming language
 
+Velvet's standard output format is HDF5 so you will also need a local installation of `libhdf5`. The library can be installed with your package manager or downloaded directly from source [here](https://www.hdfgroup.org/solutions/hdf5/).
+
+* [The HDF Group](https://www.hdfgroup.org/) - Official HDF5 organization
+
 ### Installation
 
 1. Clone the repo
