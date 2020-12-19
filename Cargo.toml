@@ -1,6 +1,6 @@
 [package]
 name = "velvet"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/seatonullberg/velvet"
@@ -27,7 +27,7 @@ members = [
 
 [dependencies]
 velvet-convert = { path = "crates/convert", version = "0.1.2" }
-velvet-core = { path = "crates/core", version = "0.3.1" }
+velvet-core = { path = "crates/core", version = "0.3.3" }
 
 [dev-dependencies]
 hdf5 = "0.7"
