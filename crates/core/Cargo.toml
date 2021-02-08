@@ -26,7 +26,7 @@ approx = "0.4"
 criterion = "0.3"
 ron = "0.6"
 test-utils = { path = "../test-utils" }
-velvet-convert = { path = "../convert", version = "0.1.2" }
+velvet-external-data = { path = "../external-data", version = "0.1.0" }
 
 [[bench]]
 name = "integrator-benchmarks"

@@ -1,4 +1,4 @@
-//! Convert external file formats into Velvet data structures.
+//! Utilities to import and export external data formats.
 
 pub mod poscar;
 

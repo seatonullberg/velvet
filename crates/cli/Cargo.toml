@@ -10,8 +10,8 @@ edition = "2018"
 [dependencies]
 clap = "2.33"
 ron = "0.6"
-velvet-convert = { path = "../convert", version = "0.1.2" }
 velvet-core = { path = "../core", version = "0.3.0" }
+velvet-external-data = { path = "../external-data", version = "0.1.0" }
 
 [[bin]]
 name = "velvet"

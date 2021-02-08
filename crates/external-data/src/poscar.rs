@@ -17,7 +17,7 @@ use velvet_core::prelude::*;
 ///
 /// ```
 /// use velvet_core::system::System;
-/// use velvet_convert::poscar::load_poscar;
+/// use velvet_external_data::poscar::load_poscar;
 ///
 /// let system = load_poscar("\
 ///     Cubic BN

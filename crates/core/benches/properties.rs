@@ -2,12 +2,12 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use std::fs::File;
 use std::io::BufReader;
 use test_utils::test_resources_path;
-use velvet_convert::poscar::load_poscar;
 use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::potentials::Potentials;
 use velvet_core::properties::{
     Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature,
 };
+use velvet_external_data::poscar::load_poscar;
 
 pub fn forces_benchmark(c: &mut Criterion) {
     let file = File::open(test_resources_path("argon.poscar")).unwrap();
