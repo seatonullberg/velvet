@@ -2,12 +2,12 @@ use approx::*;
 
 use std::fs::File;
 
+use test_utils::test_resources_path;
 use velvet_core::potentials::Potentials;
 use velvet_core::properties::{
     Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy,
 };
 use velvet_core::system::System;
-use test_utils::test_resources_path;
 
 #[test]
 fn forces() {

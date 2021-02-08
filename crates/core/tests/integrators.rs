@@ -1,10 +1,10 @@
 use std::fs::File;
 
+use test_utils::test_resources_path;
 use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::potentials::Potentials;
 use velvet_core::system::System;
-use test_utils::test_resources_path;
 
 static ITERATIONS: usize = 5000;
 

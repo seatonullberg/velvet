@@ -2,6 +2,7 @@ use approx::*;
 
 use std::fs::File;
 
+use test_utils::test_resources_path;
 use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::integrators::VelocityVerlet;
 use velvet_core::potentials::Potentials;
@@ -9,7 +10,6 @@ use velvet_core::propagators::{MolecularDynamics, Propagator};
 use velvet_core::properties::{IntrinsicProperty, Temperature};
 use velvet_core::system::System;
 use velvet_core::thermostats::Berendsen;
-use test_utils::test_resources_path;
 
 static ITERATIONS: usize = 5000;
 

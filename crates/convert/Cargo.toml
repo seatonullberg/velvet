@@ -11,3 +11,6 @@ edition = "2018"
 nalgebra = "0.23"
 vasp-poscar = "0.3.2"
 velvet-core = { path = "../core", version = "0.3.0" }
+
+[dev-dependencies]
+test-utils = { path = "../test-utils" }

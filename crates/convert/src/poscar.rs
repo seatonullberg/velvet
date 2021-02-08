@@ -100,9 +100,9 @@ where
 #[cfg(test)]
 mod tests {
     use super::load_poscar;
-    use crate::test_resources_path;
     use std::fs::File;
     use std::io::BufReader;
+    use test_utils::test_resources_path;
 
     #[test]
     fn argon() {
