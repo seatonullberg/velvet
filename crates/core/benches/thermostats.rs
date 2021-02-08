@@ -1,7 +1,7 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use velvet_core::distributions::{Boltzmann, VelocityDistribution};
 use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::thermostats::{Berendsen, NoseHoover, Thermostat};
+use velvet_core::velocity_distributions::{Boltzmann, VelocityDistribution};
 use velvet_external_data::poscar::load_poscar;
 
 use velvet_core::potentials::Potentials;

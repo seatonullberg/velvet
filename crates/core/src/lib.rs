@@ -16,7 +16,6 @@ extern crate log;
 #[warn(missing_docs)]
 pub mod config;
 pub mod constants;
-pub mod distributions;
 pub mod integrators;
 pub mod outputs;
 pub mod potentials;
@@ -25,14 +24,14 @@ pub mod properties;
 pub mod simulation;
 pub mod system;
 pub mod thermostats;
+pub mod velocity_distributions;
 
 pub mod prelude {
     pub use super::config::*;
-    pub use super::distributions::*;
     pub use super::integrators::*;
     pub use super::outputs::*;
     pub use super::potentials::pair::*;
-    pub use super::potentials::{Potential, Potentials, PotentialsBuilder, Restriction};
+    pub use super::potentials::*;
     pub use super::propagators::*;
     pub use super::properties::*;
     pub use super::simulation::*;
@@ -40,4 +39,5 @@ pub mod prelude {
     pub use super::system::elements::*;
     pub use super::system::{System, SystemBuilder};
     pub use super::thermostats::*;
+    pub use super::velocity_distributions::*;
 }

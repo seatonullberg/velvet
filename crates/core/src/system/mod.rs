@@ -142,7 +142,7 @@ impl SystemBuilder {
     }
 
     /// Finalizes the build and returns an initialized system.
-    pub fn finish(self) -> System {
+    pub fn build(self) -> System {
         let cell = match self.cell {
             Some(c) => c,
             None => panic!("System requires `cell` attribute"),

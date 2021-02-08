@@ -4,7 +4,7 @@ use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
 use crate::constants::BOLTZMANN;
-use crate::potentials::{Potentials, Restriction};
+use crate::potentials::Potentials;
 use crate::system::System;
 
 /// Calculates a system-wide property.
@@ -65,18 +65,10 @@ impl Property for Forces {
                         continue;
                     }
 
-                    // check restricton
-                    let ok = match meta.restriction {
-                        Restriction::None => true,
-                        Restriction::Intermolecular => system.molecules[i] != system.molecules[j],
-                        Restriction::Intramolecular => system.molecules[i] == system.molecules[j],
-                    };
-                    if ok {
-                        let dir = &system.cell.direction(pos1, pos2);
-                        let force = potential.force(r) * dir;
-                        forces[i] += force;
-                        forces[j] -= force;
-                    }
+                    let dir = &system.cell.direction(pos1, pos2);
+                    let force = potential.force(r) * dir;
+                    forces[i] += force;
+                    forces[j] -= force;
                 }
             }
         }
@@ -118,15 +110,7 @@ impl Property for PotentialEnergy {
                         continue;
                     }
 
-                    // check restricton
-                    let ok = match meta.restriction {
-                        Restriction::None => true,
-                        Restriction::Intermolecular => system.molecules[i] != system.molecules[j],
-                        Restriction::Intramolecular => system.molecules[i] == system.molecules[j],
-                    };
-                    if ok {
-                        potential_energy += potential.energy(r);
-                    }
+                    potential_energy += potential.energy(r);
                 }
             }
         }

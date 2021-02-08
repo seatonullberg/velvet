@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::potentials::{Potential, Restriction};
+use crate::potentials::Potential;
 use crate::system::elements::Element;
 
 /// Shared behavior for pair potentials.
@@ -14,29 +14,19 @@ pub trait PairPotential: Potential {
     fn force(&self, r: f32) -> f32;
 }
 
-/// Pair potential meta data.
+/// Metadata to define a unique pair type
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-pub struct PairPotentialMeta {
-    /// Element pair which the potential applies to.
-    pub elements: (Element, Element),
+pub struct PairMeta {
     /// Cutoff radius.
     pub cutoff: f32,
-    /// Restriction on the potential's applicability.
-    pub restriction: Restriction,
+    /// Pair of elements.
+    pub elements: (Element, Element),
 }
 
-impl PairPotentialMeta {
-    /// Returns a new `PairPotentialMeta`.
-    pub fn new(
-        elements: (Element, Element),
-        cutoff: f32,
-        restriction: Restriction,
-    ) -> PairPotentialMeta {
-        PairPotentialMeta {
-            elements,
-            cutoff,
-            restriction,
-        }
+impl PairMeta {
+    /// Returns a new `PairMeta`.
+    pub fn new(cutoff: f32, elements: (Element, Element)) -> PairMeta {
+        PairMeta { cutoff, elements }
     }
 }
 

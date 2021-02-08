@@ -94,7 +94,7 @@ where
     };
 
     // Finish building and return the system.
-    builder.finish()
+    builder.build()
 }
 
 #[cfg(test)]
