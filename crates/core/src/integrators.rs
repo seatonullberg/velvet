@@ -45,25 +45,42 @@ impl Integrator for VelocityVerlet {
 
     fn integrate(&mut self, system: &mut System, potentials: &Potentials) {
         let dt = self.timestep;
-        let sys_size = system.size();
 
-        // update velocities at t + dt/2 and positions at t + dt
-        for i in 0..sys_size {
-            system.velocities[i] += 0.5 * dt * self.accelerations[i];
-            system.positions[i] += system.velocities[i] * dt;
-        }
+        // update velocities at t + dt/2
+        system.set_velocities(
+            system
+                .iter_velocities()
+                .zip(self.accelerations.iter())
+                .map(|(&v, &acc)| v + (0.5 * dt * acc))
+                .collect(),
+        );
+
+        // update positions at t + dt
+        system.set_positions(
+            system
+                .iter_positions()
+                .zip(system.iter_velocities())
+                .map(|(&p, &v)| p + (v * dt))
+                .collect(),
+        );
 
         // calculate forces
         let forces = Forces.calculate(system, potentials);
 
         // update accelerations at t + dt
-        for i in 0..sys_size {
-            self.accelerations[i] = forces[i] / system.elements[i].mass();
-        }
+        self.accelerations = forces
+            .iter()
+            .zip(system.iter_elements())
+            .map(|(&f, &elem)| f / elem.mass())
+            .collect();
 
         // update velocities at t + dt
-        for i in 0..sys_size {
-            system.velocities[i] += 0.5 * dt * self.accelerations[i];
-        }
+        system.set_velocities(
+            system
+                .iter_velocities()
+                .zip(self.accelerations.iter())
+                .map(|(&v, &acc)| v + (0.5 * dt * acc))
+                .collect(),
+        );
     }
 }

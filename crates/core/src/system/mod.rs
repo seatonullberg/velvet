@@ -14,33 +14,68 @@ use crate::system::elements::Element;
 pub struct System {
     /// Number of atoms in the system.
     size: usize,
-
     /// Simulation cell with periodic boundary conditions.
-    pub cell: Cell,
-
+    cell: Cell,
     /// Element type for each atom in the system.
-    pub elements: Vec<Element>,
-    /// Molecule type for each atom in the system.
-    pub molecules: Vec<usize>,
+    elements: Vec<Element>,
     /// Position of each atom in the system.
-    pub positions: Vec<Vector3<f32>>,
+    positions: Vec<Vector3<f32>>,
     /// Velocity of each atom in the system.
-    pub velocities: Vec<Vector3<f32>>,
-    /// Electronic charge of each atom in the system.
-    pub charges: Vec<f32>,
-
-    /// Collection of bond indices grouped by bond type.
-    pub bonds: Vec<Vec<(usize, usize)>>,
-    /// Collection of angle triplet indices grouped by angle type.
-    pub angles: Vec<Vec<(usize, usize, usize)>>,
-    /// Collection of dihedral quadruplet indices grouped by dihedral type.
-    pub dihedrals: Vec<Vec<(usize, usize, usize, usize)>>,
+    velocities: Vec<Vector3<f32>>,
 }
 
 impl System {
     /// Returns the number of atoms in the system.
     pub fn size(&self) -> usize {
         self.size
+    }
+
+    /// Returns the simulation cell.
+    pub fn cell(&self) -> Cell {
+        self.cell
+    }
+
+    pub fn set_cell(&mut self, cell: Cell) {
+        self.cell = cell;
+    }
+
+    pub fn set_elements(&mut self, elements: Vec<Element>) {
+        self.elements = elements;
+    }
+
+    /// Returns an iterator over the elements in the system.
+    pub fn iter_elements(&self) -> impl Iterator<Item = &Element> {
+        self.elements.iter()
+    }
+
+    pub fn iter_mut_elements(&mut self) -> impl Iterator<Item = &mut Element> {
+        self.elements.iter_mut()
+    }
+
+    pub fn set_positions(&mut self, positions: Vec<Vector3<f32>>) {
+        self.positions = positions;
+    }
+
+    /// Returns an iterator over the position vectors in the system
+    pub fn iter_positions(&self) -> impl Iterator<Item = &Vector3<f32>> {
+        self.positions.iter()
+    }
+
+    pub fn iter_mut_positions(&mut self) -> impl Iterator<Item = &mut Vector3<f32>> {
+        self.positions.iter_mut()
+    }
+
+    pub fn set_velocities(&mut self, velocities: Vec<Vector3<f32>>) {
+        self.velocities = velocities;
+    }
+
+    /// Returns an iterator over the velocity vectors in the system
+    pub fn iter_velocities(&self) -> impl Iterator<Item = &Vector3<f32>> {
+        self.velocities.iter()
+    }
+
+    pub fn iter_mut_velocities(&mut self) -> impl Iterator<Item = &mut Vector3<f32>> {
+        self.velocities.iter_mut()
     }
 }
 
@@ -49,13 +84,8 @@ pub struct SystemBuilder {
     size: usize,
     cell: Option<Cell>,
     elements: Option<Vec<Element>>,
-    molecules: Option<Vec<usize>>,
     positions: Option<Vec<Vector3<f32>>>,
     velocities: Option<Vec<Vector3<f32>>>,
-    charges: Option<Vec<f32>>,
-    bonds: Option<Vec<Vec<(usize, usize)>>>,
-    angles: Option<Vec<Vec<(usize, usize, usize)>>>,
-    dihedrals: Option<Vec<Vec<(usize, usize, usize, usize)>>>,
 }
 
 impl SystemBuilder {
@@ -69,13 +99,8 @@ impl SystemBuilder {
             size,
             cell: None,
             elements: None,
-            molecules: None,
             positions: None,
             velocities: None,
-            charges: None,
-            bonds: None,
-            angles: None,
-            dihedrals: None,
         }
     }
 
@@ -89,13 +114,6 @@ impl SystemBuilder {
     pub fn with_elements(mut self, elements: Vec<Element>) -> SystemBuilder {
         assert!(elements.len() == self.size);
         self.elements = Some(elements);
-        self
-    }
-
-    /// Sets the molecule of each atom in the system.
-    pub fn with_molecules(mut self, molecules: Vec<usize>) -> SystemBuilder {
-        assert!(molecules.len() == self.size);
-        self.molecules = Some(molecules);
         self
     }
 
@@ -113,34 +131,6 @@ impl SystemBuilder {
         self
     }
 
-    /// Sets the charge of each atom in the system.
-    pub fn with_charges(mut self, charges: Vec<f32>) -> SystemBuilder {
-        assert!(charges.len() == self.size);
-        self.charges = Some(charges);
-        self
-    }
-
-    /// Sets the pairwise bonds in the system.
-    pub fn with_bonds(mut self, bonds: Vec<Vec<(usize, usize)>>) -> SystemBuilder {
-        self.bonds = Some(bonds);
-        self
-    }
-
-    /// Sets the angle triplets in the system.
-    pub fn with_angles(mut self, angles: Vec<Vec<(usize, usize, usize)>>) -> SystemBuilder {
-        self.angles = Some(angles);
-        self
-    }
-
-    /// Sets the dihedral quadruplets in the system.
-    pub fn with_dihedrals(
-        mut self,
-        dihedrals: Vec<Vec<(usize, usize, usize, usize)>>,
-    ) -> SystemBuilder {
-        self.dihedrals = Some(dihedrals);
-        self
-    }
-
     /// Finalizes the build and returns an initialized system.
     pub fn build(self) -> System {
         let cell = match self.cell {
@@ -151,10 +141,6 @@ impl SystemBuilder {
             Some(e) => e,
             None => panic!("System requires `elements` attribute"),
         };
-        let molecules = match self.molecules {
-            Some(m) => m,
-            None => vec![0 as usize; self.size],
-        };
         let positions = match self.positions {
             Some(p) => p,
             None => panic!("System requires `positions` attribute"),
@@ -163,33 +149,13 @@ impl SystemBuilder {
             Some(v) => v,
             None => vec![Vector3::new(0.0, 0.0, 0.0); self.size],
         };
-        let charges = match self.charges {
-            Some(c) => c,
-            None => vec![0.0; self.size],
-        };
-        let bonds = match self.bonds {
-            Some(b) => b,
-            None => Vec::new(),
-        };
-        let angles = match self.angles {
-            Some(a) => a,
-            None => Vec::new(),
-        };
-        let dihedrals = match self.dihedrals {
-            Some(d) => d,
-            None => Vec::new(),
-        };
+
         System {
             size: self.size,
             cell,
             elements,
-            molecules,
             positions,
             velocities,
-            charges,
-            bonds,
-            angles,
-            dihedrals,
         }
     }
 }
