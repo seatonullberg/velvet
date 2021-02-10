@@ -2,8 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::potentials::{Potential, Restriction};
+use crate::potentials::Potential;
 use crate::system::elements::Element;
+use crate::system::System;
 
 /// Shared behavior for pair potentials.
 #[typetag::serde(tag = "type")]
@@ -14,28 +15,51 @@ pub trait PairPotential: Potential {
     fn force(&self, r: f32) -> f32;
 }
 
-/// Pair potential meta data.
+/// Metadata to define a unique pair type
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-pub struct PairPotentialMeta {
-    /// Element pair which the potential applies to.
-    pub elements: (Element, Element),
+pub struct PairMeta {
     /// Cutoff radius.
     pub cutoff: f32,
-    /// Restriction on the potential's applicability.
-    pub restriction: Restriction,
+    /// Pair of elements.
+    pub elements: (Element, Element),
 }
 
-impl PairPotentialMeta {
-    /// Returns a new `PairPotentialMeta`.
+impl PairMeta {
+    /// Returns a new `PairMeta`.
+    pub fn new(cutoff: f32, elements: (Element, Element)) -> PairMeta {
+        PairMeta { cutoff, elements }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PairDescriptor {
+    pub potential: Box<dyn PairPotential>,
+    pub meta: PairMeta,
+    pub indices: Vec<(usize, usize)>,
+}
+
+impl PairDescriptor {
     pub fn new(
-        elements: (Element, Element),
-        cutoff: f32,
-        restriction: Restriction,
-    ) -> PairPotentialMeta {
-        PairPotentialMeta {
-            elements,
-            cutoff,
-            restriction,
+        potential: Box<dyn PairPotential>,
+        meta: PairMeta,
+        system: &System,
+    ) -> PairDescriptor {
+        let mut indices = Vec::with_capacity(2 * system.size());
+        for i in 0..system.size() {
+            for j in (i + 1)..system.size() {
+                let elem_i = system.iter_elements().nth(i).unwrap();
+                let elem_j = system.iter_elements().nth(j).unwrap();
+                if (*elem_i, *elem_j) == meta.elements {
+                    indices.push((i, j));
+                }
+            }
+        }
+        indices.shrink_to_fit();
+
+        PairDescriptor {
+            potential,
+            meta,
+            indices,
         }
     }
 }

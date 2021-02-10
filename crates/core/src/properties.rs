@@ -1,10 +1,11 @@
 //! Physical properties of the simulated system.
 
 use nalgebra::Vector3;
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::constants::BOLTZMANN;
-use crate::potentials::{Potentials, Restriction};
+use crate::potentials::Potentials;
 use crate::system::System;
 
 /// Calculates a system-wide property.
@@ -39,47 +40,36 @@ impl Property for Forces {
     type Res = Vec<Vector3<f32>>;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let sys_size = system.size();
-        let mut forces: Vec<Vector3<f32>> = vec![Vector3::new(0.0, 0.0, 0.0); sys_size];
+        let pairwise_forces: Vec<Vec<((usize, usize), Vector3<f32>)>> = potentials
+            .pairs
+            .iter()
+            .map(|descriptor| {
+                descriptor
+                    .indices
+                    .par_iter()
+                    .map(|(i, j)| {
+                        let pos_i = system.iter_positions().nth(*i).unwrap();
+                        let pos_j = system.iter_positions().nth(*j).unwrap();
+                        let r = system.cell().distance(pos_i, pos_j);
+                        let indices = (*i, *j);
+                        let mut force = Vector3::zeros();
+                        if descriptor.meta.cutoff > r {
+                            let dir = system.cell().direction(pos_i, pos_j);
+                            force = descriptor.potential.force(r) * dir;
+                        }
+                        (indices, force)
+                    })
+                    .collect()
+            })
+            .collect();
 
-        // iterate over all pairs of atoms
-        for i in 0..sys_size {
-            // skip duplicate or identical pairs
-            for j in (i + 1)..sys_size {
-                // calculate distance between the pair
-                let pos1 = &system.positions[i];
-                let pos2 = &system.positions[j];
-                let r = system.cell.distance(pos1, pos2);
-
-                // iterate over the pair potentials
-                for (potential, meta) in potentials.pairs() {
-                    // check cutoff radius
-                    if meta.cutoff < r {
-                        continue;
-                    }
-
-                    // check element pair
-                    let elem1 = &system.elements[i];
-                    let elem2 = &system.elements[j];
-                    if (*elem1, *elem2) != meta.elements {
-                        continue;
-                    }
-
-                    // check restricton
-                    let ok = match meta.restriction {
-                        Restriction::None => true,
-                        Restriction::Intermolecular => system.molecules[i] != system.molecules[j],
-                        Restriction::Intramolecular => system.molecules[i] == system.molecules[j],
-                    };
-                    if ok {
-                        let dir = &system.cell.direction(pos1, pos2);
-                        let force = potential.force(r) * dir;
-                        forces[i] += force;
-                        forces[j] -= force;
-                    }
-                }
-            }
-        }
+        let mut forces: Vec<Vector3<f32>> = vec![Vector3::zeros(); system.size()];
+        pairwise_forces.iter().for_each(|pair_group| {
+            pair_group.iter().for_each(|((i, j), force)| {
+                forces[*i] += force;
+                forces[*j] -= force;
+            })
+        });
         forces
     }
 }
@@ -92,45 +82,27 @@ impl Property for PotentialEnergy {
     type Res = f32;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let sys_size = system.size();
-        let mut potential_energy: f32 = 0.0 as f32;
-
-        // iterate over all pairs of atoms
-        for i in 0..sys_size {
-            // skip duplicate or identical pairs
-            for j in (i + 1)..sys_size {
-                // calculate distance between the pair
-                let pos1 = &system.positions[i];
-                let pos2 = &system.positions[j];
-                let r = system.cell.distance(pos1, pos2);
-
-                // iterate over the pair potentials
-                for (potential, meta) in potentials.pairs() {
-                    // check cutoff radius
-                    if meta.cutoff < r {
-                        continue;
-                    }
-
-                    // check element pair
-                    let elem1 = &system.elements[i];
-                    let elem2 = &system.elements[j];
-                    if (*elem1, *elem2) != meta.elements {
-                        continue;
-                    }
-
-                    // check restricton
-                    let ok = match meta.restriction {
-                        Restriction::None => true,
-                        Restriction::Intermolecular => system.molecules[i] != system.molecules[j],
-                        Restriction::Intramolecular => system.molecules[i] == system.molecules[j],
-                    };
-                    if ok {
-                        potential_energy += potential.energy(r);
-                    }
-                }
-            }
-        }
-        potential_energy
+        potentials
+            .pairs
+            .iter()
+            .map(|descriptor| {
+                let _sum: f32 = descriptor
+                    .indices
+                    .par_iter()
+                    .map(|(i, j)| {
+                        let pos_i = system.iter_positions().nth(*i).unwrap();
+                        let pos_j = system.iter_positions().nth(*j).unwrap();
+                        let r = system.cell().distance(pos_i, pos_j);
+                        let mut energy = 0 as f32;
+                        if descriptor.meta.cutoff > r {
+                            energy = descriptor.potential.energy(r)
+                        }
+                        energy
+                    })
+                    .sum();
+                _sum
+            })
+            .sum()
     }
 }
 
@@ -142,12 +114,11 @@ impl IntrinsicProperty for KineticEnergy {
     type Res = f32;
 
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
-        let sys_size = system.size();
-        let mut kinetic_energy = 0.0 as f32;
-
-        for i in 0..sys_size {
-            kinetic_energy += 0.5 * system.elements[i].mass() * system.velocities[i].norm_squared();
-        }
+        let kinetic_energy: f32 = system
+            .iter_elements()
+            .zip(system.iter_velocities())
+            .map(|(elem, vel)| 0.5 * elem.mass() * vel.norm_squared())
+            .sum();
         kinetic_energy
     }
 }

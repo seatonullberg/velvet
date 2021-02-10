@@ -1,5 +1,6 @@
 //! Algorithms to control the temperature of a simulation.
 
+use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
 use crate::properties::{IntrinsicProperty, Temperature};
@@ -47,11 +48,11 @@ impl Thermostat for Berendsen {
     fn post_integrate(&mut self, system: &mut System) {
         let temperature = Temperature.calculate_intrinsic(system);
         let factor = f32::sqrt(1.0 + (self.target / temperature - 1.0) / self.tau);
-        system.velocities = system
-            .velocities
-            .iter_mut()
-            .map(|&mut x| x * factor)
-            .collect();
+        system.set_velocities(system
+            .iter_velocities()
+            .map(|&v| v * factor)
+            .collect::<Vec<Vector3<f32>>>()
+        );
     }
 }
 
@@ -97,7 +98,12 @@ impl Thermostat for NoseHoover {
         let psidot = self.freq.powi(2) * ((self.temperature / self.target) - 1.0);
         self.psi += psidot * (dt / 2.0);
         self.factor = f32::exp(-self.psi * (dt / 2.0));
-        system.velocities = system.velocities.iter().map(|&x| x * self.factor).collect();
+
+        system.set_velocities(system
+            .iter_velocities()
+            .map(|&v| v * self.factor)
+            .collect::<Vec<Vector3<f32>>>()
+        );
     }
 
     fn post_integrate(&mut self, system: &mut System) {

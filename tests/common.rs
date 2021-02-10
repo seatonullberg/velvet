@@ -7,6 +7,7 @@ use velvet_core::system::{System, SystemBuilder};
 
 use nalgebra::{Matrix3, Vector3};
 
+#[allow(dead_code)]
 pub fn get_argon_system() -> System {
     let system_builder = SystemBuilder::new(2);
     system_builder
@@ -33,6 +34,7 @@ pub fn get_argon_system() -> System {
         .build()
 }
 
+#[allow(dead_code)]
 pub fn get_fluorine_system() -> System {
     let system_builder = SystemBuilder::new(2);
     system_builder
@@ -59,6 +61,7 @@ pub fn get_fluorine_system() -> System {
         .build()
 }
 
+#[allow(dead_code)]
 pub fn get_argon_potentials(system: &System) -> Potentials {
     let potentials_builder = PotentialsBuilder::new();
     let lj = LennardJones::new(1.0, 3.4);
@@ -67,18 +70,11 @@ pub fn get_argon_potentials(system: &System) -> Potentials {
     potentials_builder.add_pair(descr).build()
 }
 
+#[allow(dead_code)]
 pub fn get_fluorine_potentials(system: &System) -> Potentials {
     let potentials_builder = PotentialsBuilder::new();
     let harmonic = Harmonic::new(300.0, 1.2);
     let meta = PairMeta::new(5.0, (Element::F, Element::F));
     let descr = PairDescriptor::new(Box::new(harmonic), meta, system);
     potentials_builder.add_pair(descr).build()
-}
-
-pub fn test_resources_path(filename: &str) -> String {
-    format!(
-        "{}/../../resources/test/{}",
-        env!("CARGO_MANIFEST_DIR"),
-        filename
-    )
 }

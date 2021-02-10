@@ -6,10 +6,10 @@
 //! * Molecular Dynamics, Monte Carlo, and Minimization routines
 //! * Visualization tools to analyze simulation results
 
-pub use velvet_convert as convert;
 pub use velvet_core as core;
+pub use velvet_external_data as external_data;
 
 pub mod prelude {
-    pub use super::convert::prelude::*;
     pub use super::core::prelude::*;
+    pub use super::external_data::prelude::*;
 }

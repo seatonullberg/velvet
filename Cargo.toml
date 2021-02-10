@@ -1,10 +1,10 @@
 [package]
 name = "velvet"
-version = "0.3.2"
+version = "0.4.0"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/seatonullberg/velvet"
-description = "An experimental molecular dynamics engine with a focus on user-friendliness and extensibility."
+description = "Classical atomistic simulation engine with a focus on user-friendliness and extensibility"
 license = "MIT"
 keywords = [
     "chemistry",
@@ -20,21 +20,43 @@ categories = [
 [workspace]
 members = [
     "crates/cli",
-    "crates/convert",
     "crates/core",
+    "crates/external-data",
     "crates/test-utils",
 ]
 
 [dependencies]
 hdf5 = "0.7"
 hdf5-sys = "0.7"
-velvet-convert = { path = "crates/convert", version = "0.1.2" }
-velvet-core = { path = "crates/core", version = "0.3.3" }
+velvet-core = { path = "crates/core", version = "0.4.0" }
+velvet-external-data = { path = "crates/external-data", version = "0.1.0" }
 
 [dev-dependencies]
-log = "0.4"
-plotters = "0.3.0"
-pretty_env_logger = "0.4"
+approx = "0.4"
+criterion = "0.3"
+nalgebra = "0.23"
+ron = "0.6"
+test-utils = { path = "crates/test-utils" }
+
+[[bench]]
+name = "integrator-benchmarks"
+path = "benches/integrators.rs"
+harness = false
+
+[[bench]]
+name = "property-benchmarks"
+path = "benches/properties.rs"
+harness = false
+
+[[bench]]
+name = "thermostat-benchmarks"
+path = "benches/thermostats.rs"
+harness = false
+
+[[bench]]
+name = "pair-potential-benchmarks"
+path = "benches/potentials/pair.rs"
+harness = false
 
 [package.metadata.docs.rs]
 features = ["hdf5-sys/static", "hdf5-sys/zlib"]

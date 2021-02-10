@@ -85,7 +85,7 @@ impl ConfigurationBuilder {
     }
 
     /// Returns an initialized `Configuration`.
-    pub fn finish(self) -> Configuration {
+    pub fn build(self) -> Configuration {
         let threads = match self.threads {
             Some(t) => t,
             None => 1,

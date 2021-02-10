@@ -5,7 +5,7 @@ use std::io::BufReader;
 use clap::{arg_enum, value_t, App, Arg, ArgMatches, SubCommand};
 use ron::ser::{to_string_pretty, PrettyConfig};
 
-use velvet_convert::poscar::load_poscar;
+use velvet_external_data::poscar::load_poscar;
 
 arg_enum! {
     #[derive(PartialEq, Debug)]
