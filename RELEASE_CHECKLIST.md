@@ -9,11 +9,9 @@ Refer to this document before publishing a new release of the `velvet` umbrella 
 ```bash
 $ cargo test --workspace
 ```
-- [ ] Generate benchmark report
+- [ ] Run the benchmark suite
 ```bash
 $ cargo criterion --workspace
-$ mkdir docs/benches/<version>
-$ cp -r target/criterion/reports/* docs/benches/<version>
 ```
 - [ ] Commit the changes
 ```bash
