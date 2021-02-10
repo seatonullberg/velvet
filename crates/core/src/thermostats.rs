@@ -48,10 +48,11 @@ impl Thermostat for Berendsen {
     fn post_integrate(&mut self, system: &mut System) {
         let temperature = Temperature.calculate_intrinsic(system);
         let factor = f32::sqrt(1.0 + (self.target / temperature - 1.0) / self.tau);
-        let _ = system
-            .iter_mut_velocities()
-            .map(|&mut v| v * factor)
-            .collect::<Vec<Vector3<f32>>>();
+        system.set_velocities(system
+            .iter_velocities()
+            .map(|&v| v * factor)
+            .collect::<Vec<Vector3<f32>>>()
+        );
     }
 }
 

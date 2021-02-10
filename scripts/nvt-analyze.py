@@ -14,7 +14,7 @@ if __name__ == "__main__":
     energies = [h5file["{}".format(i)]["temperature"][0] for i in logged_steps]
     
     fig, ax = plt.subplots()
-    ax.plot(logged_steps, energies)
+    ax.plot(logged_steps, energies, linewidth=0.5)
     ax.set_xlim((0, TIMESTEPS))
 
     ymin, ymax = min(energies[10:]) * 0.999, max(energies[10:]) * 1.001
