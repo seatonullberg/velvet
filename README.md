@@ -43,6 +43,7 @@ $ cargo build --release --workspace
 ## Usage
 
 The [`examples`](./examples) directory contains examples of how to use the [`velvet`](https://crates.io/crates/velvet) crate to configure simulations directly in code.
+The [`scripts`](./scripts) directory contains Python scripts to visualize the results of each example.
 
 ## Roadmap
 
