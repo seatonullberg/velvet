@@ -98,10 +98,11 @@ impl Thermostat for NoseHoover {
         self.psi += psidot * (dt / 2.0);
         self.factor = f32::exp(-self.psi * (dt / 2.0));
 
-        let _ = system
-            .iter_mut_velocities()
-            .map(|&mut v| v * self.factor)
-            .collect::<Vec<Vector3<f32>>>();
+        system.set_velocities(system
+            .iter_velocities()
+            .map(|&v| v * self.factor)
+            .collect::<Vec<Vector3<f32>>>()
+        );
     }
 
     fn post_integrate(&mut self, system: &mut System) {

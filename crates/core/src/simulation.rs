@@ -42,7 +42,7 @@ impl Simulation {
             self.propagator
                 .propagate(&mut self.system, &self.potentials);
 
-            if i == 0 || i % self.config.output_interval() == 0  || i == steps - 1{
+            if i == 0 || i % self.config.output_interval() == 0 || i == steps - 1 {
                 info!("Logging results for timestep: {}", i);
                 let group = file.create_group(&format!("{}", i)).unwrap();
                 for out in self.config.outputs() {

@@ -47,11 +47,12 @@ impl Integrator for VelocityVerlet {
         let dt = self.timestep;
 
         // update velocities at t + dt/2
-        let _ = system
-            .iter_mut_velocities()
+        system.set_velocities(system
+            .iter_velocities()
             .zip(self.accelerations.iter())
-            .map(|(&mut v, &acc)| v + (0.5 * dt * acc))
-            .collect::<Vec<Vector3<f32>>>();
+            .map(|(&v, &acc)| v + (0.5 * dt * acc))
+            .collect::<Vec<Vector3<f32>>>()
+        );
 
         // update positions at t + dt
         system.set_positions(
@@ -73,10 +74,11 @@ impl Integrator for VelocityVerlet {
             .collect();
 
         // update velocities at t + dt
-        let _ = system
-            .iter_mut_velocities()
+        system.set_velocities(system
+            .iter_velocities()
             .zip(self.accelerations.iter())
-            .map(|(&mut v, &acc)| v + (0.5 * dt * acc))
-            .collect::<Vec<Vector3<f32>>>();
+            .map(|(&v, &acc)| v + (0.5 * dt * acc))
+            .collect::<Vec<Vector3<f32>>>()
+        );
     }
 }

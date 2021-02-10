@@ -5,6 +5,7 @@ use velvet::prelude::*;
 
 static TIMESTEPS: usize = 100_000;
 static OUTPUT_INTERVAL: usize = 50;
+static OUTPUT_FILENAME: &str = "nve.h5";
 
 fn main() {
     // Load an Ar gas system from a POSCAR formatted file.
@@ -22,9 +23,7 @@ fn main() {
     let descr = PairDescriptor::new(Box::new(lj), meta, &system);
 
     // Store all of the system's potentials in a Potentials struct.
-    let potentials = PotentialsBuilder::new()
-        .add_pair(descr)
-        .build();
+    let potentials = PotentialsBuilder::new().add_pair(descr).build();
 
     // Initialize a velocity Verlet style integrator.
     let velocity_verlet = VelocityVerlet::new(1.0);
@@ -34,6 +33,7 @@ fn main() {
 
     // Initialize a configuration.
     let config = ConfigurationBuilder::new()
+        .with_output_filename(OUTPUT_FILENAME.to_string())
         .with_output_interval(OUTPUT_INTERVAL)
         .with_output(Box::new(PotentialEnergy))
         .build();

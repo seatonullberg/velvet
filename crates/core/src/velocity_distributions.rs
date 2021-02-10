@@ -34,16 +34,18 @@ impl Boltzmann {
 
 impl VelocityDistribution for Boltzmann {
     fn apply(&self, system: &mut System) {
-        let _ = system
-            .iter_mut_elements()
-            .map(|elem| {
-                let inv_mass = 1.0 / elem.mass();
-                let x = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
-                let y = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
-                let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
-                Vector3::new(x, y, z)
-            })
-            .collect::<Vec<Vector3<f32>>>();
+        system.set_velocities(
+            system
+                .iter_elements()
+                .map(|elem| {
+                    let inv_mass = 1.0 / elem.mass();
+                    let x = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
+                    let y = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
+                    let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
+                    Vector3::new(x, y, z)
+                })
+                .collect::<Vec<Vector3<f32>>>(),
+        );
         scale(system, self.target);
     }
 }
