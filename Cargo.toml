@@ -44,6 +44,11 @@ path = "benches/integrators.rs"
 harness = false
 
 [[bench]]
+name = "pair-potential-benchmarks"
+path = "benches/potentials/pair.rs"
+harness = false
+
+[[bench]]
 name = "property-benchmarks"
 path = "benches/properties.rs"
 harness = false
@@ -54,8 +59,8 @@ path = "benches/thermostats.rs"
 harness = false
 
 [[bench]]
-name = "pair-potential-benchmarks"
-path = "benches/potentials/pair.rs"
+name = "velocity-distribution-benchmarks"
+path = "benches/velocity_distributions.rs"
 harness = false
 
 [package.metadata.docs.rs]

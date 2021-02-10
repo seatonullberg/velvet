@@ -47,9 +47,9 @@ impl PairDescriptor {
         let mut indices = Vec::with_capacity(2 * system.size());
         for i in 0..system.size() {
             for j in (i + 1)..system.size() {
-                let elem_i = system.iter_elements().nth(i).unwrap();
-                let elem_j = system.iter_elements().nth(j).unwrap();
-                if (*elem_i, *elem_j) == meta.elements {
+                let elem_i = system.elements[i];
+                let elem_j = system.elements[j];
+                if (elem_i, elem_j) == meta.elements {
                     indices.push((i, j));
                 }
             }

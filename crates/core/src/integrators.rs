@@ -1,6 +1,7 @@
 //! Algorithms to integrate classical equations of motion.
 
 use nalgebra::Vector3;
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::potentials::Potentials;
@@ -47,38 +48,40 @@ impl Integrator for VelocityVerlet {
         let dt = self.timestep;
 
         // update velocities at t + dt/2
-        system.set_velocities(system
-            .iter_velocities()
-            .zip(self.accelerations.iter())
+        system.velocities = system
+            .velocities
+            .par_iter()
+            .zip(self.accelerations.par_iter())
             .map(|(&v, &acc)| v + (0.5 * dt * acc))
-            .collect::<Vec<Vector3<f32>>>()
-        );
+            .collect::<Vec<Vector3<f32>>>();
 
         // update positions at t + dt
-        system.set_positions(
-            system
-                .iter_positions()
-                .zip(system.iter_velocities())
-                .map(|(&p, &v)| p + (v * dt))
-                .collect(),
-        );
+        // !!! this block is more efficient without `par_iter`
+        system.positions = system
+            .positions
+            .iter()
+            .zip(system.velocities.iter())
+            .map(|(&p, &v)| p + (v * dt))
+            .collect();
 
         // calculate forces
         let forces = Forces.calculate(system, potentials);
 
         // update accelerations at t + dt
+        // !!! this block is more efficient without `par_iter`
         self.accelerations = forces
             .iter()
-            .zip(system.iter_elements())
+            .zip(system.elements.iter())
             .map(|(&f, &elem)| f / elem.mass())
             .collect();
 
         // update velocities at t + dt
-        system.set_velocities(system
-            .iter_velocities()
+        // !!! this block is more efficient without `par_iter`
+        system.velocities = system
+            .velocities
+            .iter()
             .zip(self.accelerations.iter())
             .map(|(&v, &acc)| v + (0.5 * dt * acc))
-            .collect::<Vec<Vector3<f32>>>()
-        );
+            .collect::<Vec<Vector3<f32>>>();
     }
 }

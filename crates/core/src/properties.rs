@@ -48,13 +48,13 @@ impl Property for Forces {
                     .indices
                     .par_iter()
                     .map(|(i, j)| {
-                        let pos_i = system.iter_positions().nth(*i).unwrap();
-                        let pos_j = system.iter_positions().nth(*j).unwrap();
-                        let r = system.cell().distance(pos_i, pos_j);
+                        let pos_i = system.positions[*i];
+                        let pos_j = system.positions[*j];
+                        let r = system.cell().distance(&pos_i, &pos_j);
                         let indices = (*i, *j);
                         let mut force = Vector3::zeros();
                         if descriptor.meta.cutoff > r {
-                            let dir = system.cell().direction(pos_i, pos_j);
+                            let dir = system.cell().direction(&pos_i, &pos_j);
                             force = descriptor.potential.force(r) * dir;
                         }
                         (indices, force)
@@ -90,9 +90,9 @@ impl Property for PotentialEnergy {
                     .indices
                     .par_iter()
                     .map(|(i, j)| {
-                        let pos_i = system.iter_positions().nth(*i).unwrap();
-                        let pos_j = system.iter_positions().nth(*j).unwrap();
-                        let r = system.cell().distance(pos_i, pos_j);
+                        let pos_i = system.positions[*i];
+                        let pos_j = system.positions[*j];
+                        let r = system.cell().distance(&pos_i, &pos_j);
                         let mut energy = 0 as f32;
                         if descriptor.meta.cutoff > r {
                             energy = descriptor.potential.energy(r)
@@ -115,8 +115,9 @@ impl IntrinsicProperty for KineticEnergy {
 
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic_energy: f32 = system
-            .iter_elements()
-            .zip(system.iter_velocities())
+            .elements
+            .iter()
+            .zip(system.velocities.iter())
             .map(|(elem, vel)| 0.5 * elem.mass() * vel.norm_squared())
             .sum();
         kinetic_energy

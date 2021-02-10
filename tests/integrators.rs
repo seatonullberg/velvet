@@ -31,5 +31,5 @@ fn velocity_verlet() {
         velocity_verlet.integrate(&mut system, &potentials);
     }
 
-    assert!(system.iter_velocities().nth(0).unwrap().norm() < 0.1)
+    assert!(system.velocities[0].norm() < 0.1)
 }

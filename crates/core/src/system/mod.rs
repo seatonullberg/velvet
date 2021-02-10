@@ -17,11 +17,11 @@ pub struct System {
     /// Simulation cell with periodic boundary conditions.
     cell: Cell,
     /// Element type for each atom in the system.
-    elements: Vec<Element>,
+    pub elements: Vec<Element>,
     /// Position of each atom in the system.
-    positions: Vec<Vector3<f32>>,
+    pub positions: Vec<Vector3<f32>>,
     /// Velocity of each atom in the system.
-    velocities: Vec<Vector3<f32>>,
+    pub velocities: Vec<Vector3<f32>>,
 }
 
 impl System {
@@ -33,49 +33,6 @@ impl System {
     /// Returns the simulation cell.
     pub fn cell(&self) -> &Cell {
         &self.cell
-    }
-
-    pub fn set_cell(&mut self, cell: Cell) {
-        self.cell = cell;
-    }
-
-    pub fn set_elements(&mut self, elements: Vec<Element>) {
-        self.elements = elements;
-    }
-
-    /// Returns an iterator over the elements in the system.
-    pub fn iter_elements(&self) -> impl Iterator<Item = &Element> {
-        self.elements.iter()
-    }
-
-    pub fn iter_mut_elements(&mut self) -> impl Iterator<Item = &mut Element> {
-        self.elements.iter_mut()
-    }
-
-    pub fn set_positions(&mut self, positions: Vec<Vector3<f32>>) {
-        self.positions = positions;
-    }
-
-    /// Returns an iterator over the position vectors in the system
-    pub fn iter_positions(&self) -> impl Iterator<Item = &Vector3<f32>> {
-        self.positions.iter()
-    }
-
-    pub fn iter_mut_positions(&mut self) -> impl Iterator<Item = &mut Vector3<f32>> {
-        self.positions.iter_mut()
-    }
-
-    pub fn set_velocities(&mut self, velocities: Vec<Vector3<f32>>) {
-        self.velocities = velocities;
-    }
-
-    /// Returns an iterator over the velocity vectors in the system
-    pub fn iter_velocities(&self) -> impl Iterator<Item = &Vector3<f32>> {
-        self.velocities.iter()
-    }
-
-    pub fn iter_mut_velocities(&mut self) -> impl Iterator<Item = &mut Vector3<f32>> {
-        self.velocities.iter_mut()
     }
 }
 

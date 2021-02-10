@@ -48,11 +48,13 @@ impl Thermostat for Berendsen {
     fn post_integrate(&mut self, system: &mut System) {
         let temperature = Temperature.calculate_intrinsic(system);
         let factor = f32::sqrt(1.0 + (self.target / temperature - 1.0) / self.tau);
-        system.set_velocities(system
-            .iter_velocities()
+
+        // !!! this block is more efficient without `par_iter`
+        system.velocities = system
+            .velocities
+            .iter()
             .map(|&v| v * factor)
-            .collect::<Vec<Vector3<f32>>>()
-        );
+            .collect::<Vec<Vector3<f32>>>();
     }
 }
 
@@ -99,11 +101,12 @@ impl Thermostat for NoseHoover {
         self.psi += psidot * (dt / 2.0);
         self.factor = f32::exp(-self.psi * (dt / 2.0));
 
-        system.set_velocities(system
-            .iter_velocities()
+        // !!! this block is more efficient without `par_iter`
+        system.velocities = system
+            .velocities
+            .iter()
             .map(|&v| v * self.factor)
-            .collect::<Vec<Vector3<f32>>>()
-        );
+            .collect::<Vec<Vector3<f32>>>();
     }
 
     fn post_integrate(&mut self, system: &mut System) {

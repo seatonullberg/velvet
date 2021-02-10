@@ -34,18 +34,18 @@ impl Boltzmann {
 
 impl VelocityDistribution for Boltzmann {
     fn apply(&self, system: &mut System) {
-        system.set_velocities(
-            system
-                .iter_elements()
-                .map(|elem| {
-                    let inv_mass = 1.0 / elem.mass();
-                    let x = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
-                    let y = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
-                    let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
-                    Vector3::new(x, y, z)
-                })
-                .collect::<Vec<Vector3<f32>>>(),
-        );
+        // !!! this block is more efficient without `par_iter`
+        system.velocities = system
+            .elements
+            .iter()
+            .map(|elem| {
+                let inv_mass = 1.0 / elem.mass();
+                let x = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
+                let y = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
+                let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
+                Vector3::new(x, y, z)
+            })
+            .collect::<Vec<Vector3<f32>>>();
         scale(system, self.target);
     }
 }
@@ -54,5 +54,6 @@ impl VelocityDistribution for Boltzmann {
 fn scale(system: &mut System, target: f32) {
     let temperature = Temperature.calculate_intrinsic(system);
     let factor = f32::sqrt(target / temperature);
-    system.set_velocities(system.iter_velocities().map(|&x| x * factor).collect())
+    // !!! this block is more efficient without `par_iter`
+    system.velocities = system.velocities.iter().map(|&x| x * factor).collect();
 }
