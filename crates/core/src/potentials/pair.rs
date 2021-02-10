@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::potentials::Potential;
 use crate::system::elements::Element;
+use crate::system::System;
 
 /// Shared behavior for pair potentials.
 #[typetag::serde(tag = "type")]
@@ -27,6 +28,39 @@ impl PairMeta {
     /// Returns a new `PairMeta`.
     pub fn new(cutoff: f32, elements: (Element, Element)) -> PairMeta {
         PairMeta { cutoff, elements }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PairDescriptor {
+    pub potential: Box<dyn PairPotential>,
+    pub meta: PairMeta,
+    pub indices: Vec<(usize, usize)>,
+}
+
+impl PairDescriptor {
+    pub fn new(
+        potential: Box<dyn PairPotential>,
+        meta: PairMeta,
+        system: &System,
+    ) -> PairDescriptor {
+        let mut indices = Vec::with_capacity(2 * system.size());
+        for i in 0..system.size() {
+            for j in (i + 1)..system.size() {
+                let elem_i = system.iter_elements().nth(i).unwrap();
+                let elem_j = system.iter_elements().nth(j).unwrap();
+                if (*elem_i, *elem_j) == meta.elements {
+                    indices.push((i, j));
+                }
+            }
+        }
+        indices.shrink_to_fit();
+
+        PairDescriptor {
+            potential,
+            meta,
+            indices,
+        }
     }
 }
 

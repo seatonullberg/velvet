@@ -31,8 +31,8 @@ impl System {
     }
 
     /// Returns the simulation cell.
-    pub fn cell(&self) -> Cell {
-        self.cell
+    pub fn cell(&self) -> &Cell {
+        &self.cell
     }
 
     pub fn set_cell(&mut self, cell: Cell) {
