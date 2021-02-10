@@ -26,5 +26,5 @@ if __name__ == "__main__":
 
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("nvt.png")
+    plt.savefig("nvt.png", dpi=300)
 
