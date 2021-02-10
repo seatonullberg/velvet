@@ -1,6 +1,6 @@
 [package]
 name = "velvet-cli"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Command line tool built on top of the Velvet API"
 license = "MIT"
