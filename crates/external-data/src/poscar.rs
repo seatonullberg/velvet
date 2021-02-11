@@ -96,29 +96,3 @@ where
     // Finish building and return the system.
     builder.build()
 }
-
-#[cfg(test)]
-mod tests {
-    use super::load_poscar;
-    use std::fs::File;
-    use std::io::BufReader;
-    use test_utils::test_resources_path;
-
-    #[test]
-    fn argon() {
-        let file = File::open(test_resources_path("argon.poscar")).unwrap();
-        let reader = BufReader::new(file);
-        let sys = load_poscar(reader);
-
-        println!("{:?}", sys.cell());
-
-        let a0 = 21.152895;
-        assert_eq!(sys.size(), 108);
-        assert_eq!(sys.cell().a(), a0);
-        assert_eq!(sys.cell().b(), a0);
-        assert_eq!(sys.cell().c(), a0);
-        assert_eq!(sys.cell().alpha(), 90.0);
-        assert_eq!(sys.cell().beta(), 90.0);
-        assert_eq!(sys.cell().gamma(), 90.0);
-    }
-}

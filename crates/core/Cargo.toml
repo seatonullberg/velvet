@@ -23,7 +23,6 @@ typetag = "0.1.6"
 
 [dev-dependencies]
 approx = "0.4"
-ron = "0.6"
 
 [package.metadata.docs.rs]
 features = ["hdf5-sys/static", "hdf5-sys/zlib"]

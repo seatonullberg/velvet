@@ -1,13 +1,12 @@
+use nalgebra::{Matrix3, Vector3};
+
 use velvet_core::potentials::pair::{Harmonic, LennardJones, PairDescriptor, PairMeta};
 use velvet_core::potentials::{Potentials, PotentialsBuilder};
-
 use velvet_core::system::cell::Cell;
 use velvet_core::system::elements::Element;
 use velvet_core::system::{System, SystemBuilder};
 
-use nalgebra::{Matrix3, Vector3};
-
-pub fn get_argon_system() -> System {
+pub fn argon_system() -> System {
     let system_builder = SystemBuilder::new(2);
     system_builder
         .with_cell(Cell::from_matrix(Matrix3::new(
@@ -33,7 +32,7 @@ pub fn get_argon_system() -> System {
         .build()
 }
 
-pub fn get_fluorine_system() -> System {
+pub fn fluorine_system() -> System {
     let system_builder = SystemBuilder::new(2);
     system_builder
         .with_cell(Cell::from_matrix(Matrix3::new(
@@ -59,7 +58,7 @@ pub fn get_fluorine_system() -> System {
         .build()
 }
 
-pub fn get_argon_potentials(system: &System) -> Potentials {
+pub fn argon_potentials(system: &System) -> Potentials {
     let potentials_builder = PotentialsBuilder::new();
     let lj = LennardJones::new(1.0, 3.4);
     let meta = PairMeta::new(8.5, (Element::Ar, Element::Ar));
@@ -67,7 +66,7 @@ pub fn get_argon_potentials(system: &System) -> Potentials {
     potentials_builder.add_pair(descr).build()
 }
 
-pub fn get_fluorine_potentials(system: &System) -> Potentials {
+pub fn fluorine_potentials(system: &System) -> Potentials {
     let potentials_builder = PotentialsBuilder::new();
     let harmonic = Harmonic::new(300.0, 1.2);
     let meta = PairMeta::new(5.0, (Element::F, Element::F));
@@ -75,7 +74,7 @@ pub fn get_fluorine_potentials(system: &System) -> Potentials {
     potentials_builder.add_pair(descr).build()
 }
 
-pub fn test_resources_path(filename: &str) -> String {
+pub fn resources_path(filename: &str) -> String {
     format!(
         "{}/../../resources/test/{}",
         env!("CARGO_MANIFEST_DIR"),

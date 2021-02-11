@@ -3,22 +3,15 @@ use approx::*;
 use velvet_core::properties::{
     Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature, TotalEnergy,
 };
-
-mod common;
+use velvet_test_utils as test_utils;
 
 #[test]
 fn forces() {
     // load system
-    // let path = test_resources_path("fluorine.sys.velvet");
-    // let file = File::open(&path).unwrap();
-    // let system: System = ron::de::from_reader(file).unwrap();
-    let system = common::get_fluorine_system();
+    let system = test_utils::fluorine_system();
 
     // load potentials
-    // let path = test_resources_path("fluorine.pot.velvet");
-    // let file = File::open(&path).unwrap();
-    // let potentials: Potentials = ron::de::from_reader(file).unwrap();
-    let potentials = common::get_fluorine_potentials(&system);
+    let potentials = test_utils::fluorine_potentials(&system);
 
     let forces = Forces.calculate(&system, &potentials);
 
@@ -33,16 +26,10 @@ fn forces() {
 #[test]
 fn energy() {
     // load system
-    // let path = test_resources_path("fluorine.sys.velvet");
-    // let file = File::open(&path).unwrap();
-    // let system: System = ron::de::from_reader(file).unwrap();
-    let system = common::get_fluorine_system();
+    let system = test_utils::fluorine_system();
 
     // load potentials
-    // let path = test_resources_path("fluorine.pot.velvet");
-    // let file = File::open(&path).unwrap();
-    // let potentials: Potentials = ron::de::from_reader(file).unwrap();
-    let potentials = common::get_fluorine_potentials(&system);
+    let potentials = test_utils::fluorine_potentials(&system);
 
     let ke = KineticEnergy.calculate_intrinsic(&system);
     let pe = PotentialEnergy.calculate(&system, &potentials);
@@ -56,10 +43,7 @@ fn energy() {
 #[test]
 fn temperature() {
     // load system
-    // let path = test_resources_path("fluorine.sys.velvet");
-    // let file = File::open(&path).unwrap();
-    // let system: System = ron::de::from_reader(file).unwrap();
-    let system = common::get_fluorine_system();
+    let system = test_utils::fluorine_system();
 
     let temp = Temperature.calculate_intrinsic(&system);
 

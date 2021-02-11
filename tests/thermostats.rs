@@ -4,28 +4,21 @@ use velvet_core::integrators::{Integrator, VelocityVerlet};
 use velvet_core::properties::{IntrinsicProperty, Temperature};
 use velvet_core::thermostats::{Berendsen, NoseHoover, Thermostat};
 use velvet_core::velocity_distributions::{Boltzmann, VelocityDistribution};
-
-mod common;
+use velvet_test_utils as test_utils;
 
 static ITERATIONS: usize = 5000;
 
 #[test]
 fn berendsen() {
     // load system
-    // let path = test_resources_path("argon.sys.velvet");
-    // let file = File::open(&path).unwrap();
-    // let mut system: System = ron::de::from_reader(file).unwrap();
-    let mut system = common::get_argon_system();
+    let mut system = test_utils::argon_system();
 
     let target = 100 as f32;
     let boltz = Boltzmann::new(target);
     boltz.apply(&mut system);
 
     // load potentials
-    // let path = test_resources_path("argon.pot.velvet");
-    // let file = File::open(&path).unwrap();
-    // let potentials: Potentials = ron::de::from_reader(file).unwrap();
-    let potentials = common::get_argon_potentials(&system);
+    let potentials = test_utils::argon_potentials(&system);
 
     let timestep = 1.0;
     let mut velocity_verlet = VelocityVerlet::new(timestep);
@@ -50,20 +43,14 @@ fn berendsen() {
 #[test]
 fn nose_hoover() {
     // load system
-    // let path = test_resources_path("argon.sys.velvet");
-    // let file = File::open(&path).unwrap();
-    // let mut system: System = ron::de::from_reader(file).unwrap();
-    let mut system = common::get_argon_system();
+    let mut system = test_utils::argon_system();
 
     let target = 100 as f32;
     let boltz = Boltzmann::new(target);
     boltz.apply(&mut system);
 
     // load potentials
-    // let path = test_resources_path("argon.pot.velvet");
-    // let file = File::open(&path).unwrap();
-    // let potentials: Potentials = ron::de::from_reader(file).unwrap();
-    let potentials = common::get_argon_potentials(&system);
+    let potentials = test_utils::argon_potentials(&system);
 
     let timestep = 1.0;
     let mut velocity_verlet = VelocityVerlet::new(timestep);

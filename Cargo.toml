@@ -35,8 +35,7 @@ velvet-external-data = { path = "crates/external-data", version = "0.1.0" }
 approx = "0.4"
 criterion = "0.3"
 nalgebra = "0.23"
-ron = "0.6"
-test-utils = { path = "crates/test-utils" }
+velvet-test-utils = { path = "crates/test-utils" }
 
 [[bench]]
 name = "integrator-benchmarks"
