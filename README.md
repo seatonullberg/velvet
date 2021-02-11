@@ -49,6 +49,12 @@ The [`scripts`](./scripts) directory contains Python scripts to visualize the re
 
 Refer to the [open issues](https://github.com/seatonullberg/velvet/issues) and [CHANGELOG.md](CHANGELOG.md) to see planned or proposed features (and bug fixes).
 
+## FAQ
+
+**Q:** Why is it called "Velvet"?
+
+**A:** "Velvet" is a concatenation of [Velocity Verlet](https://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet), a foundational algorithm in molecular dynamics simulations.
+
 ## License
 
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
