@@ -55,7 +55,7 @@ All of the project's completed and proposed features will be documented in this 
 
 ## Runtime Performance
 
-- [x] **Multithreading** - Thread parallelism via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators.
+- [x] **Multithreading** - Thread parallelism via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators (optional).
 - [ ] **SIMD** - Multiple dispatch of single instructions.
 
 ## Temperature Initialization

@@ -1,8 +1,10 @@
 //! Physical properties of the simulated system.
 
 use nalgebra::Vector3;
-use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
+
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
 
 use crate::constants::BOLTZMANN;
 use crate::potentials::Potentials;
@@ -39,6 +41,42 @@ pub struct Forces;
 impl Property for Forces {
     type Res = Vec<Vector3<f32>>;
 
+    #[cfg(not(feature = "rayon"))]
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        let pairwise_forces: Vec<Vec<((usize, usize), Vector3<f32>)>> = potentials
+            .pairs
+            .iter()
+            .map(|descriptor| {
+                descriptor
+                    .indices
+                    .iter()
+                    .map(|(i, j)| {
+                        let pos_i = system.positions[*i];
+                        let pos_j = system.positions[*j];
+                        let r = system.cell().distance(&pos_i, &pos_j);
+                        let indices = (*i, *j);
+                        let mut force = Vector3::zeros();
+                        if descriptor.meta.cutoff > r {
+                            let dir = system.cell().direction(&pos_i, &pos_j);
+                            force = descriptor.potential.force(r) * dir;
+                        }
+                        (indices, force)
+                    })
+                    .collect()
+            })
+            .collect();
+
+        let mut forces: Vec<Vector3<f32>> = vec![Vector3::zeros(); system.size()];
+        pairwise_forces.iter().for_each(|pair_group| {
+            pair_group.iter().for_each(|((i, j), force)| {
+                forces[*i] += force;
+                forces[*j] -= force;
+            })
+        });
+        forces
+    }
+
+    #[cfg(feature = "rayon")]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let pairwise_forces: Vec<Vec<((usize, usize), Vector3<f32>)>> = potentials
             .pairs
@@ -81,6 +119,32 @@ pub struct PotentialEnergy;
 impl Property for PotentialEnergy {
     type Res = f32;
 
+    #[cfg(not(feature = "rayon"))]
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        potentials
+            .pairs
+            .iter()
+            .map(|descriptor| {
+                let _sum: f32 = descriptor
+                    .indices
+                    .iter()
+                    .map(|(i, j)| {
+                        let pos_i = system.positions[*i];
+                        let pos_j = system.positions[*j];
+                        let r = system.cell().distance(&pos_i, &pos_j);
+                        let mut energy = 0 as f32;
+                        if descriptor.meta.cutoff > r {
+                            energy = descriptor.potential.energy(r)
+                        }
+                        energy
+                    })
+                    .sum();
+                _sum
+            })
+            .sum()
+    }
+
+    #[cfg(feature = "rayon")]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         potentials
             .pairs

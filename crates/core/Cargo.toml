@@ -1,6 +1,6 @@
 [package]
 name = "velvet-core"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Core feature library for the Velvet simulation engine."
 license = "MIT"
@@ -13,7 +13,6 @@ nalgebra = {version = "0.23", features = ["serde-serialize"]}
 pretty_env_logger = "0.4"
 rand = {version = "0.7", features = ["serde1"] }
 rand_distr = "0.3"
-rayon = "1.5"
 serde = {version = "1.0", features = ["derive"]}
 strum = "0.20"
 strum_macros = "0.20"
@@ -21,6 +20,7 @@ typetag = "0.1.6"
 
 hdf5 = { version = "0.7", optional = true }
 hdf5-sys = { version = "0.7", optional = true }
+rayon = { version = "1.5", optional = true }
 
 [dev-dependencies]
 approx = "0.4"

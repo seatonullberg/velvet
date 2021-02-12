@@ -1,6 +1,6 @@
 [package]
 name = "velvet"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/seatonullberg/velvet"
@@ -26,7 +26,7 @@ members = [
 ]
 
 [dependencies]
-velvet-core = { path = "crates/core", version = "0.4.1" }
+velvet-core = { path = "crates/core", version = "0.4.2" }
 velvet-external-data = { path = "crates/external-data", version = "0.1.0" }
 
 hdf5 = { version = "0.7", optional = true }
@@ -41,6 +41,7 @@ velvet-test-utils = { path = "crates/test-utils" }
 [features]
 default = []
 hdf5-output = ["velvet-core/hdf5-output", "hdf5", "hdf5-sys"]
+rayon = ["velvet-core/rayon"]
 
 [[bench]]
 name = "integrator-benchmarks"
