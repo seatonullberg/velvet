@@ -42,6 +42,9 @@ $ cargo build --release
 
 # with HDF5 dependency
 $ cargo build --release --features hdf5-output
+
+# with rayon multithreading enabled
+$ cargo build --release --features rayon
 ```
 
 ## Usage
