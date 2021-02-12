@@ -47,7 +47,7 @@ The [`scripts`](./scripts) directory contains Python scripts to visualize the re
 
 ## Roadmap
 
-Refer to the [open issues](https://github.com/seatonullberg/velvet/issues) and [CHANGELOG.md](CHANGELOG.md) to see planned or proposed features (and bug fixes).
+Refer to the [open issues](https://github.com/seatonullberg/velvet/issues), [FEATURES.md](FEATURES.md), and [CHANGELOG.md](CHANGELOG.md) to see planned or proposed features (and bug fixes).
 
 ## FAQ
 
