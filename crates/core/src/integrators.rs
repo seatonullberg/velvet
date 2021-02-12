@@ -1,7 +1,6 @@
 //! Algorithms to integrate classical equations of motion.
 
 use nalgebra::Vector3;
-use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::potentials::Potentials;
@@ -50,8 +49,8 @@ impl Integrator for VelocityVerlet {
         // update velocities at t + dt/2
         system.velocities = system
             .velocities
-            .par_iter()
-            .zip(self.accelerations.par_iter())
+            .iter()
+            .zip(self.accelerations.iter())
             .map(|(&v, &acc)| v + (0.5 * dt * acc))
             .collect::<Vec<Vector3<f32>>>();
 

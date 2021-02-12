@@ -1,6 +1,6 @@
 [package]
 name = "velvet-core"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
 description = "Core feature library for the Velvet simulation engine."
 license = "MIT"
@@ -8,8 +8,6 @@ repository = "https://github.com/seatonullberg/velvet"
 edition = "2018"
 
 [dependencies]
-hdf5 = "0.7"
-hdf5-sys = "0.7"
 log = "0.4"
 nalgebra = {version = "0.23", features = ["serde-serialize"]}
 pretty_env_logger = "0.4"
@@ -21,8 +19,15 @@ strum = "0.20"
 strum_macros = "0.20"
 typetag = "0.1.6"
 
+hdf5 = { version = "0.7", optional = true }
+hdf5-sys = { version = "0.7", optional = true }
+
 [dev-dependencies]
 approx = "0.4"
+
+[features]
+default = []
+hdf5-output = ["hdf5", "hdf5-sys"]
 
 [package.metadata.docs.rs]
 features = ["hdf5-sys/static", "hdf5-sys/zlib"]

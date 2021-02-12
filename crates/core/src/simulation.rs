@@ -28,6 +28,29 @@ impl Simulation {
         }
     }
 
+    #[cfg(not(feature = "hdf5-output"))]
+    pub fn run(&mut self, steps: usize) {
+        // Initialize the logger.
+        pretty_env_logger::init();
+        info!("Starting simulation...");
+
+        // setup propagation
+        self.propagator.setup(&mut self.system, &self.potentials);
+        for i in 0..steps {
+            self.propagator
+                .propagate(&mut self.system, &self.potentials);
+
+            if i == 0 || i % self.config.output_interval() == 0 || i == steps - 1 {
+                info!("Logging results for timestep: {}", i);
+                for out in self.config.outputs() {
+                    out.output(&self.system, &self.potentials);
+                }
+            }
+        }
+        info!("Simulation complete.")
+    }
+
+    #[cfg(feature = "hdf5-output")]
     pub fn run(&mut self, steps: usize) {
         // Initialize the logger.
         pretty_env_logger::init();

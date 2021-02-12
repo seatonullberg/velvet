@@ -16,7 +16,7 @@ Velvet is a classical atomistic simulation engine with a focus on user-friendlin
 
 ### Prerequisites
 
-Velvet's standard output format is HDF5 so you will also need a local installation of `libhdf5`. The library can be installed with your package manager or downloaded directly from source [here](https://www.hdfgroup.org/solutions/hdf5/).
+Velvet has optional support to write HDF5 formatted results. If this is your preferred format, you will need a local installation  of `libhdf5`. The library can be installed with your package manager of choice or downloaded directly from source [here](https://www.hdfgroup.org/solutions/hdf5/).
 
 * [The HDF Group](https://www.hdfgroup.org/) - Official HDF5 organization
 
@@ -37,7 +37,11 @@ $ cargo test --workspace
 ```
 3. Build in release mode
 ```bash
-$ cargo build --release --workspace
+# without optional dependencies
+$ cargo build --release
+
+# with HDF5 dependency
+$ cargo build --release --features hdf5-output
 ```
 
 ## Usage

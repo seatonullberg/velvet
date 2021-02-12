@@ -4,6 +4,7 @@ use velvet_core::outputs::Output;
 use velvet_core::properties::{Forces, KineticEnergy, PotentialEnergy, Temperature, TotalEnergy};
 use velvet_test_utils as test_utils;
 
+#[cfg(feature = "hdf5-output")]
 #[test]
 fn forces() {
     // load system
@@ -30,6 +31,7 @@ fn forces() {
     assert_relative_eq!(res[1][0], target, epsilon = 1e-3);
 }
 
+#[cfg(feature = "hdf5-output")]
 #[test]
 fn energy() {
     // load system
@@ -62,6 +64,7 @@ fn energy() {
     assert_relative_eq!(ke_res[0] + pe_res[0], te_res[0], epsilon = 1e-5);
 }
 
+#[cfg(feature = "hdf5-output")]
 #[test]
 fn temperature() {
     // load system

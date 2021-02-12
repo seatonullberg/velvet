@@ -23,7 +23,7 @@ All of the project's completed and proposed features will be documented in this 
 
 ### Outputs
 
-- [x] **HDF5** - Write results in [HDF5](https://www.hdfgroup.org/solutions/hdf5/) format with `libhdf5` dependency.
+- [x] **HDF5** - Write results in [HDF5](https://www.hdfgroup.org/solutions/hdf5/) format with (optional) `libhdf5` dependency.
 - [ ] **CBOR** - Serialize simulation configurations as binary [CBOR](https://cbor.io/) data.
 
 ## Integration Algorithms
