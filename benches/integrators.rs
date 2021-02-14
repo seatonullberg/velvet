@@ -9,7 +9,7 @@ use velvet_external_data::poscar::load_poscar;
 use velvet_test_utils as test_utils;
 
 pub fn velocity_verlet_benchmark(c: &mut Criterion) {
-    let file = File::open(test_utils::resources_path("argon.poscar")).unwrap();
+    let file = File::open(test_utils::resources_path("Ar.poscar")).unwrap();
     let reader = BufReader::new(file);
     let mut system = load_poscar(reader);
 

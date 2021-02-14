@@ -10,7 +10,7 @@ use velvet_test_utils as test_utils;
 pub fn velocity_distributions_group_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("velocity_distributions");
 
-    let file = File::open(test_utils::resources_path("argon.poscar")).unwrap();
+    let file = File::open(test_utils::resources_path("Ar.poscar")).unwrap();
     let reader = BufReader::new(file);
     let mut system = load_poscar(reader);
 

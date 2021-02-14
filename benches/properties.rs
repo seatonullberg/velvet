@@ -3,15 +3,16 @@ use std::io::BufReader;
 
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use velvet_core::properties::{
-    Forces, IntrinsicProperty, KineticEnergy, PotentialEnergy, Property, Temperature,
-};
+use velvet_core::properties::energy::{KineticEnergy, PotentialEnergy, TotalEnergy};
+use velvet_core::properties::forces::Forces;
+use velvet_core::properties::temperature::Temperature;
+use velvet_core::properties::{IntrinsicProperty, Property};
 use velvet_core::velocity_distributions::{Boltzmann, VelocityDistribution};
 use velvet_external_data::poscar::load_poscar;
 use velvet_test_utils as test_utils;
 
 pub fn forces_benchmark(c: &mut Criterion) {
-    let file = File::open(test_utils::resources_path("argon.poscar")).unwrap();
+    let file = File::open(test_utils::resources_path("Ar.poscar")).unwrap();
     let reader = BufReader::new(file);
     let system = load_poscar(reader);
 
@@ -24,7 +25,7 @@ pub fn forces_benchmark(c: &mut Criterion) {
 }
 
 pub fn potential_energy_benchmark(c: &mut Criterion) {
-    let file = File::open(test_utils::resources_path("argon.poscar")).unwrap();
+    let file = File::open(test_utils::resources_path("Ar.poscar")).unwrap();
     let reader = BufReader::new(file);
     let system = load_poscar(reader);
 
@@ -37,7 +38,7 @@ pub fn potential_energy_benchmark(c: &mut Criterion) {
 }
 
 pub fn kinetic_energy_benchmark(c: &mut Criterion) {
-    let file = File::open(test_utils::resources_path("argon.poscar")).unwrap();
+    let file = File::open(test_utils::resources_path("Ar.poscar")).unwrap();
     let reader = BufReader::new(file);
     let system = load_poscar(reader);
 
@@ -50,7 +51,7 @@ pub fn kinetic_energy_benchmark(c: &mut Criterion) {
 }
 
 pub fn temperature_benchmark(c: &mut Criterion) {
-    let file = File::open(test_utils::resources_path("argon.poscar")).unwrap();
+    let file = File::open(test_utils::resources_path("Ar.poscar")).unwrap();
     let reader = BufReader::new(file);
     let mut system = load_poscar(reader);
     let boltz = Boltzmann::new(1000 as f32);
