@@ -1,5 +1,4 @@
 use std::io::BufRead;
-use std::iter::FromIterator;
 use std::str::FromStr;
 
 use nalgebra::{Matrix3, Vector3};
@@ -68,30 +67,28 @@ where
     // TODO: change this panic to a result.
     match poscar.site_symbols() {
         Some(symbols) => {
-            let elements: Vec<Element> =
-                Vec::from_iter(symbols.map(|x| Element::from_str(x).unwrap()));
+            let elements: Vec<Element> = symbols.map(|x| Element::from_str(x).unwrap()).collect();
             builder = builder.with_elements(elements)
         }
         None => panic!("POSCAR file is missing site symbols"),
     }
 
     // Set system positions.
-    let positions: Vec<Vector3<f32>> = Vec::from_iter(
-        poscar
-            .scaled_cart_positions()
-            .iter()
-            .map(|x| Vector3::new(x[0] as f32, x[1] as f32, x[2] as f32)),
-    );
+    let positions: Vec<Vector3<f32>> = poscar
+        .scaled_cart_positions()
+        .iter()
+        .map(|x| Vector3::new(x[0] as f32, x[1] as f32, x[2] as f32))
+        .collect();
     builder = builder.with_positions(positions);
 
     // Set system velocities if they exist.
     if let Some(vels) = poscar.cart_velocities() {
-        let velocities: Vec<Vector3<f32>> = Vec::from_iter(
-            vels.iter()
-                .map(|x| Vector3::new(x[0] as f32, x[1] as f32, x[2] as f32)),
-        );
+        let velocities: Vec<Vector3<f32>> = vels
+            .iter()
+            .map(|x| Vector3::new(x[0] as f32, x[1] as f32, x[2] as f32))
+            .collect();
         builder = builder.with_velocities(velocities);
-    };
+    }
 
     // Finish building and return the system.
     builder.build()

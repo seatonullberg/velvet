@@ -3,7 +3,8 @@
 use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
-use crate::properties::{IntrinsicProperty, Temperature};
+use crate::properties::temperature::Temperature;
+use crate::properties::IntrinsicProperty;
 use crate::system::System;
 
 /// An algorithm used to control simulation temperature.

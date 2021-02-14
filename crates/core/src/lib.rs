@@ -12,6 +12,8 @@
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate strum_macros;
 
 #[warn(missing_docs)]
 pub mod config;
@@ -30,14 +32,18 @@ pub mod prelude {
     pub use super::config::*;
     pub use super::integrators::*;
     pub use super::outputs::*;
+    pub use super::potentials::coulomb::*;
     pub use super::potentials::pair::*;
     pub use super::potentials::*;
     pub use super::propagators::*;
+    pub use super::properties::energy::*;
+    pub use super::properties::forces::*;
+    pub use super::properties::temperature::*;
     pub use super::properties::*;
     pub use super::simulation::*;
     pub use super::system::cell::*;
     pub use super::system::elements::*;
-    pub use super::system::{System, SystemBuilder};
+    pub use super::system::*;
     pub use super::thermostats::*;
     pub use super::velocity_distributions::*;
 }

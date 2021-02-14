@@ -86,22 +86,15 @@ impl ConfigurationBuilder {
 
     /// Returns an initialized `Configuration`.
     pub fn build(self) -> Configuration {
-        let threads = match self.threads {
-            Some(t) => t,
-            None => 1,
-        };
+        let threads = self.threads.unwrap_or(1);
 
         let outputs = self.outputs;
 
-        let output_interval = match self.output_interval {
-            Some(interval) => interval,
-            None => 1,
-        };
+        let output_interval = self.output_interval.unwrap_or(1);
 
-        let output_filename = match self.output_filename {
-            Some(filename) => filename,
-            None => "velvet.h5".to_string(),
-        };
+        let output_filename = self
+            .output_filename
+            .unwrap_or_else(|| "velvet.h5".to_string());
 
         Configuration {
             threads,

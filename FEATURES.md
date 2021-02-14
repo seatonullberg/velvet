@@ -38,6 +38,10 @@ All of the project's completed and proposed features will be documented in this 
 
 ### Bond Potentials
 
+### Coulombic Potentials
+
+- [ ] **Wolf Summation** - [Wolf](https://en.wikipedia.org/wiki/Wolf_summation) (1999) computationally efficient summation method for electroatatic interactions. 
+
 ### Pair Potentials
 
 - [x] **Lennard-Jones** - [Lennard-Jones](https://en.wikipedia.org/wiki/Lennard-Jones_potential) (12,6) style pairwose interatomic potential.

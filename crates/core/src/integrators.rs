@@ -4,7 +4,8 @@ use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
 use crate::potentials::Potentials;
-use crate::properties::{Forces, Property};
+use crate::properties::forces::Forces;
+use crate::properties::Property;
 use crate::system::System;
 
 /// A numerical integration algorithm.

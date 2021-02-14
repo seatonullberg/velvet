@@ -4,7 +4,8 @@ use nalgebra::Vector3;
 use rand_distr::{Distribution, Normal};
 
 use crate::constants::BOLTZMANN;
-use crate::properties::{IntrinsicProperty, Temperature};
+use crate::properties::temperature::Temperature;
+use crate::properties::IntrinsicProperty;
 use crate::system::System;
 
 /// Shared behavior for algorithms that can initialize a velocity distribution.

@@ -1,5 +1,7 @@
 //! Data structures to hold physical information about the simulation environment.
 
+use std::collections::HashMap;
+
 pub mod cell;
 pub mod elements;
 
@@ -33,6 +35,20 @@ impl System {
     /// Returns the simulation cell.
     pub fn cell(&self) -> &Cell {
         &self.cell
+    }
+
+    /// Returns a mapping of each element type to its number of occurrences in the system.
+    pub fn element_counts(&self) -> HashMap<Element, usize> {
+        let mut counts: HashMap<Element, usize> = HashMap::new();
+        for i in 0..self.size() {
+            let elem = self.elements[i];
+            let count = match counts.get_mut(&elem) {
+                Some(v) => *v,
+                None => 1,
+            };
+            let _ = counts.insert(elem, count);
+        }
+        counts
     }
 }
 

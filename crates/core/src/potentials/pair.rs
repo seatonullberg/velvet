@@ -16,49 +16,35 @@ pub trait PairPotential: Potential {
 }
 
 /// Metadata to define a unique pair type
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PairMeta {
     /// Cutoff radius.
     pub cutoff: f32,
     /// Pair of elements.
     pub elements: (Element, Element),
-}
-
-impl PairMeta {
-    /// Returns a new `PairMeta`.
-    pub fn new(cutoff: f32, elements: (Element, Element)) -> PairMeta {
-        PairMeta { cutoff, elements }
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct PairDescriptor {
-    pub potential: Box<dyn PairPotential>,
-    pub meta: PairMeta,
+    /// Indices of each target pair.
     pub indices: Vec<(usize, usize)>,
 }
 
-impl PairDescriptor {
-    pub fn new(
-        potential: Box<dyn PairPotential>,
-        meta: PairMeta,
-        system: &System,
-    ) -> PairDescriptor {
-        let mut indices = Vec::with_capacity(2 * system.size());
+impl PairMeta {
+    pub fn new(cutoff: f32, elements: (Element, Element), system: &System) -> PairMeta {
+        let mut indices = Vec::with_capacity(system.size() * system.size());
         for i in 0..system.size() {
             for j in (i + 1)..system.size() {
                 let elem_i = system.elements[i];
                 let elem_j = system.elements[j];
-                if (elem_i, elem_j) == meta.elements {
+                if (elem_i, elem_j) == elements {
                     indices.push((i, j));
+                } else if (elem_j, elem_i) == elements {
+                    indices.push((j, i))
                 }
             }
         }
         indices.shrink_to_fit();
 
-        PairDescriptor {
-            potential,
-            meta,
+        PairMeta {
+            cutoff,
+            elements,
             indices,
         }
     }
@@ -94,9 +80,9 @@ impl PairPotential for LennardJones {
     }
 
     fn force(&self, r: f32) -> f32 {
-        let term_a = (48.0 * self.sigma.powi(12) * self.epsilon) / r.powi(13);
-        let term_b = (24.0 * self.sigma.powi(6) * self.epsilon) / r.powi(7);
-        term_a - term_b
+        let term_a = (24.0 * self.sigma.powi(6)) / r.powi(7);
+        let term_b = (48.0 * self.sigma.powi(12)) / r.powi(13);
+        self.epsilon * (term_a - term_b)
     }
 }
 
@@ -238,7 +224,7 @@ mod tests {
             0.0,
             epsilon = 1e-6
         );
-        assert_relative_eq!(lj.force(2.5), -0.9577348);
+        assert_relative_eq!(lj.force(2.5), 0.9577348);
     }
 
     #[test]
