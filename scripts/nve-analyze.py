@@ -17,9 +17,6 @@ if __name__ == "__main__":
     ax.plot(logged_steps, energies, linewidth=0.5)
     ax.set_xlim((0, TIMESTEPS))
 
-    ymin, ymax = min(energies[10:]) * 0.9999, max(energies[10:]) * 1.0001
-
-    ax.set_ylim((ymin, ymax))
     ax.set_xlabel("Timesteps")
     ax.set_ylabel("Potential Energy (kJ/mol)")
     ax.yaxis.set_major_formatter(FormatStrFormatter("%.4f"))
@@ -27,4 +24,3 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.tight_layout()
     plt.savefig("nve.png", dpi=300)
-

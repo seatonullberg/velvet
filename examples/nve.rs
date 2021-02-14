@@ -9,7 +9,7 @@ static OUTPUT_FILENAME: &str = "nve.h5";
 
 fn main() {
     // Load an Ar gas system from a POSCAR formatted file.
-    let file = File::open("resources/test/argon.poscar").unwrap();
+    let file = File::open("resources/test/Ar.poscar").unwrap();
     let reader = BufReader::new(file);
     let mut system = load_poscar(reader);
 
@@ -19,11 +19,12 @@ fn main() {
 
     // Initialize a Lennard-Jones style pair potential between all Ar-Ar pairs.
     let lj = LennardJones::new(1.0, 3.4);
-    let meta = PairMeta::new(8.5, (Element::Ar, Element::Ar));
-    let descr = PairDescriptor::new(Box::new(lj), meta, &system);
+    let meta = PairMeta::new(8.5, (Element::Ar, Element::Ar), &system);
 
     // Store all of the system's potentials in a Potentials struct.
-    let potentials = PotentialsBuilder::new().add_pair(descr).build();
+    let potentials = PotentialsBuilder::new()
+        .add_pair(meta, Box::new(lj))
+        .build();
 
     // Initialize a velocity Verlet style integrator.
     let velocity_verlet = VelocityVerlet::new(1.0);
@@ -35,7 +36,10 @@ fn main() {
     let config = ConfigurationBuilder::new()
         .with_output_filename(OUTPUT_FILENAME.to_string())
         .with_output_interval(OUTPUT_INTERVAL)
+        .with_output(Box::new(TotalEnergy))
         .with_output(Box::new(PotentialEnergy))
+        .with_output(Box::new(KineticEnergy))
+        .with_output(Box::new(Temperature))
         .build();
 
     // Run the simulation.
