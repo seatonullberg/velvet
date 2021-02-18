@@ -49,6 +49,39 @@ impl PairMeta {
         }
     }
 }
+/// Harmonic style pair potential.
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+pub struct Harmonic {
+    k: f32,
+    x0: f32,
+}
+
+impl Harmonic {
+    /// Returns a new Harmonic style pair potential.
+    ///
+    /// # Arguments
+    ///
+    /// * `k` - Spring constant
+    /// * `x0` - Equilibrium displacement distance
+    pub fn new(k: f32, x0: f32) -> Harmonic {
+        Harmonic { k, x0 }
+    }
+}
+
+#[typetag::serde]
+impl Potential for Harmonic {}
+
+#[typetag::serde]
+impl PairPotential for Harmonic {
+    fn energy(&self, r: f32) -> f32 {
+        let dr = r - self.x0;
+        self.k * dr * dr
+    }
+
+    fn force(&self, r: f32) -> f32 {
+        2.0 * self.k * (r - self.x0)
+    }
+}
 
 /// Lennard-Jones style pair potential.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
@@ -83,40 +116,6 @@ impl PairPotential for LennardJones {
         let term_a = (24.0 * self.sigma.powi(6)) / r.powi(7);
         let term_b = (48.0 * self.sigma.powi(12)) / r.powi(13);
         self.epsilon * (term_a - term_b)
-    }
-}
-
-/// Harmonic style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-pub struct Harmonic {
-    k: f32,
-    x0: f32,
-}
-
-impl Harmonic {
-    /// Returns a new Harmonic style pair potential.
-    ///
-    /// # Arguments
-    ///
-    /// * `k` - Spring constant
-    /// * `x0` - Equilibrium displacement distance
-    pub fn new(k: f32, x0: f32) -> Harmonic {
-        Harmonic { k, x0 }
-    }
-}
-
-#[typetag::serde]
-impl Potential for Harmonic {}
-
-#[typetag::serde]
-impl PairPotential for Harmonic {
-    fn energy(&self, r: f32) -> f32 {
-        let dr = r - self.x0;
-        0.5 * self.k * dr * dr
-    }
-
-    fn force(&self, r: f32) -> f32 {
-        self.k * (self.x0 - r)
     }
 }
 
@@ -164,8 +163,8 @@ impl PairPotential for Mie {
     fn force(&self, r: f32) -> f32 {
         let c = (self.gamma_r / (self.gamma_r - self.gamma_a))
             * (self.gamma_r / self.gamma_a).powf(self.gamma_a / (self.gamma_r - self.gamma_a));
-        let term_a = (c * self.gamma_r * self.epsilon * (self.sigma / r).powf(self.gamma_r)) / r;
-        let term_b = (c * self.gamma_a * self.epsilon * (self.sigma / r).powf(self.gamma_a)) / r;
+        let term_a = (c * self.gamma_a * self.epsilon * (self.sigma / r).powf(self.gamma_a)) / r;
+        let term_b = (c * self.gamma_r * self.epsilon * (self.sigma / r).powf(self.gamma_r)) / r;
         term_a - term_b
     }
 }
@@ -203,8 +202,8 @@ impl PairPotential for Morse {
     }
 
     fn force(&self, r: f32) -> f32 {
-        let term_a = f32::exp(-2.0 * self.a * (r - self.r_e));
-        let term_b = f32::exp(-self.a * (r - self.r_e));
+        let term_a = f32::exp(-self.a * (r - self.r_e));
+        let term_b = f32::exp(-2.0 * self.a * (r - self.r_e));
         2.0 * self.a * self.d_e * (term_a - term_b)
     }
 }
@@ -215,44 +214,119 @@ mod tests {
     use approx::*;
 
     #[test]
-    fn lennard_jones() {
-        let lj = LennardJones::new(0.8, 2.0);
-        assert_relative_eq!(lj.energy(2.0), 0.0);
-        assert_relative_eq!(lj.energy(2.5), -0.6189586);
-        assert_relative_eq!(
-            lj.force(f32::powf(2.0, 1.0 / 6.0) * 2.0).abs(),
-            0.0,
-            epsilon = 1e-6
-        );
-        assert_relative_eq!(lj.force(2.5), 0.9577348);
+    fn harmonic() {
+        // initialize the potantial
+        let k = 50.0;
+        let x0 = 2.0;
+        let harmonic = Harmonic::new(k, x0);
+        let r0 = 1.5;
+        let r1 = 2.0;
+        let r2 = 2.5;
+
+        // test r0 energy and force
+        let r0_energy = 12.5;
+        let r0_force = -50.0;
+        assert_relative_eq!(r0_energy, harmonic.energy(r0));
+        assert_relative_eq!(r0_force, harmonic.force(r0));
+
+        // test r1 energy and force
+        let r1_energy = 0.0;
+        let r1_force = 0.0;
+        assert_relative_eq!(r1_energy, harmonic.energy(r1));
+        assert_relative_eq!(r1_force, harmonic.force(r1));
+
+        // test r1 energy and force
+        let r2_energy = 12.5;
+        let r2_force = 50.0;
+        assert_relative_eq!(r2_energy, harmonic.energy(r2));
+        assert_relative_eq!(r2_force, harmonic.force(r2));
     }
 
     #[test]
-    fn harmonic() {
-        let harm = Harmonic::new(50.0, 2.0);
-        assert_relative_eq!(harm.energy(2.0), 0.0);
-        assert_relative_eq!(harm.energy(2.5), 6.25);
-        assert_relative_eq!(harm.force(2.0), 0.0);
-        assert_relative_eq!(harm.force(2.5), -25.0);
+    fn lennard_jones() {
+        // initialize the potential
+        let epsilon = 1.0;
+        let sigma = 2.5;
+        let lj = LennardJones::new(epsilon, sigma);
+        let r0 = 2.0;
+        let r1 = 2.5;
+        let r2 = 3.0;
+
+        // test r0 energy and force
+        let r0_energy = 42.948872;
+        let r0_force = -303.469598;
+        assert_relative_eq!(r0_energy, lj.energy(r0));
+        assert_relative_eq!(r0_force, lj.force(r0));
+
+        // test r1 energy and force
+        let r1_energy = 0.0;
+        let r1_force = -9.6;
+        assert_relative_eq!(r1_energy, lj.energy(r1));
+        assert_relative_eq!(r1_force, lj.force(r1));
+
+        // test r2 energy and force
+        let r2_energy = -0.89096529;
+        let r2_force = 0.8846772;
+        assert_relative_eq!(r2_energy, lj.energy(r2));
+        assert_relative_eq!(r2_force, lj.force(r2));
     }
 
     #[test]
     fn mie() {
-        let mie = Mie::new(0.8, 2.0, 6.0, 12.0);
-        assert_relative_eq!(mie.energy(2.0), 0.0);
-        assert_relative_eq!(mie.energy(2.5), -0.61895853);
-        assert_relative_eq!(
-            mie.force(f32::powf(2.0, 1.0 / 6.0) * 2.0).abs(),
-            0.0,
-            epsilon = 1e-5
-        );
-        assert_relative_eq!(mie.force(2.5), -0.9577347);
+        let epsilon = 1.0;
+        let sigma = 2.5;
+        let gamma_a = 6.0;
+        let gamma_r = 12.0;
+        let mie = Mie::new(epsilon, sigma, gamma_a, gamma_r);
+
+        let r0 = 2.0;
+        let r1 = 2.5;
+        let r2 = 3.0;
+
+        // test r0 energy and force
+        let r0_energy = 42.948872;
+        let r0_force = -303.469598;
+        assert_relative_eq!(r0_energy, mie.energy(r0));
+        assert_relative_eq!(r0_force, mie.force(r0));
+
+        // test r1 energy and force
+        let r1_energy = 0.0;
+        let r1_force = -9.6;
+        assert_relative_eq!(r1_energy, mie.energy(r1));
+        assert_relative_eq!(r1_force, mie.force(r1));
+
+        // test r2 energy and force
+        let r2_energy = -0.89096529;
+        let r2_force = 0.8846772;
+        assert_relative_eq!(r2_energy, mie.energy(r2));
+        assert_relative_eq!(r2_force, mie.force(r2));
     }
 
     #[test]
     fn morse() {
-        let morse = Morse::new(1.3, 4.0, 2.0);
-        assert_relative_eq!(morse.energy(2.0), -4.0);
-        assert_relative_eq!(morse.force(2.0), 0.0);
+        let a = 1.5;
+        let d_e = 4.0;
+        let r_e = 2.0;
+        let morse = Morse::new(a, d_e, r_e);
+
+        let r0 = 1.5;
+        let r1 = 2.0;
+        let r2 = 2.5;
+
+        // test r0 energy and force
+        let r0_energy = 0.9907551;
+        let r0_force = -28.376266;
+        assert_relative_eq!(r0_energy, morse.energy(r0));
+        assert_relative_eq!(r0_force, morse.force(r0));
+
+        let r1_energy = -4.0;
+        let r1_force = 0.0;
+        assert_relative_eq!(r1_energy, morse.energy(r1));
+        assert_relative_eq!(r1_force, morse.force(r1));
+
+        let r2_energy = -2.8864117;
+        let r2_force = 2.9908366;
+        assert_relative_eq!(r2_energy, morse.energy(r2));
+        assert_relative_eq!(r2_force, morse.force(r2));
     }
 }
