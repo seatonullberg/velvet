@@ -3,11 +3,11 @@
 use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
+use crate::internal::Float;
 use crate::potentials::Potentials;
 use crate::properties::forces::Forces;
 use crate::properties::Property;
 use crate::system::System;
-use crate::internal::Float;
 
 /// A numerical integration algorithm.
 #[typetag::serde(tag = "type")]

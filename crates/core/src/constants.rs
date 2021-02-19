@@ -1,9 +1,9 @@
 //! Useful physical constants expressed in the internal unit system.
 
-#[cfg(feature = "f64")]
-pub use std::f64::consts::{FRAC_2_SQRT_PI, PI};
 #[cfg(not(feature = "f64"))]
 pub use std::f32::consts::{FRAC_2_SQRT_PI, PI};
+#[cfg(feature = "f64")]
+pub use std::f64::consts::{FRAC_2_SQRT_PI, PI};
 
 /// Boltzmann constant in kcal/(mol*K).
 #[cfg(feature = "f64")]

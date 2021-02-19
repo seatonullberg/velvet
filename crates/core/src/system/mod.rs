@@ -8,9 +8,9 @@ pub mod elements;
 use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
+use crate::internal::Float;
 use crate::system::cell::Cell;
 use crate::system::elements::Element;
-use crate::internal::Float;
 
 /// Collection of atomic properties and bonding information.
 #[derive(Clone, Debug, Serialize, Deserialize)]

@@ -235,20 +235,20 @@ mod tests {
         // test r0 energy and force
         let r0_energy = 12.5;
         let r0_force = -50.0;
-        assert_relative_eq!(r0_energy, harmonic.energy(r0), epsilon=1e-5);
-        assert_relative_eq!(r0_force, harmonic.force(r0), epsilon=1e-5);
+        assert_relative_eq!(r0_energy, harmonic.energy(r0), epsilon = 1e-5);
+        assert_relative_eq!(r0_force, harmonic.force(r0), epsilon = 1e-5);
 
         // test r1 energy and force
         let r1_energy = 0.0;
         let r1_force = 0.0;
-        assert_relative_eq!(r1_energy, harmonic.energy(r1), epsilon=1e-5);
-        assert_relative_eq!(r1_force, harmonic.force(r1), epsilon=1e-5);
+        assert_relative_eq!(r1_energy, harmonic.energy(r1), epsilon = 1e-5);
+        assert_relative_eq!(r1_force, harmonic.force(r1), epsilon = 1e-5);
 
         // test r1 energy and force
         let r2_energy = 12.5;
         let r2_force = 50.0;
-        assert_relative_eq!(r2_energy, harmonic.energy(r2), epsilon=1e-5);
-        assert_relative_eq!(r2_force, harmonic.force(r2), epsilon=1e-5);
+        assert_relative_eq!(r2_energy, harmonic.energy(r2), epsilon = 1e-5);
+        assert_relative_eq!(r2_force, harmonic.force(r2), epsilon = 1e-5);
     }
 
     #[test]
@@ -264,20 +264,20 @@ mod tests {
         // test r0 energy and force
         let r0_energy = 42.948872;
         let r0_force = -303.469598;
-        assert_relative_eq!(r0_energy, lj.energy(r0), epsilon=1e-5);
-        assert_relative_eq!(r0_force, lj.force(r0), epsilon=1e-5);
+        assert_relative_eq!(r0_energy, lj.energy(r0), epsilon = 1e-5);
+        assert_relative_eq!(r0_force, lj.force(r0), epsilon = 1e-5);
 
         // test r1 energy and force
         let r1_energy = 0.0;
         let r1_force = -9.6;
-        assert_relative_eq!(r1_energy, lj.energy(r1), epsilon=1e-5);
-        assert_relative_eq!(r1_force, lj.force(r1), epsilon=1e-5);
+        assert_relative_eq!(r1_energy, lj.energy(r1), epsilon = 1e-5);
+        assert_relative_eq!(r1_force, lj.force(r1), epsilon = 1e-5);
 
         // test r2 energy and force
         let r2_energy = -0.89096529;
         let r2_force = 0.8846772;
-        assert_relative_eq!(r2_energy, lj.energy(r2), epsilon=1e-5);
-        assert_relative_eq!(r2_force, lj.force(r2), epsilon=1e-5);
+        assert_relative_eq!(r2_energy, lj.energy(r2), epsilon = 1e-5);
+        assert_relative_eq!(r2_force, lj.force(r2), epsilon = 1e-5);
     }
 
     #[test]
@@ -295,20 +295,20 @@ mod tests {
         // test r0 energy and force
         let r0_energy = 42.948872;
         let r0_force = -303.469598;
-        assert_relative_eq!(r0_energy, mie.energy(r0), epsilon=1e-5);
-        assert_relative_eq!(r0_force, mie.force(r0), epsilon=1e-5);
+        assert_relative_eq!(r0_energy, mie.energy(r0), epsilon = 1e-5);
+        assert_relative_eq!(r0_force, mie.force(r0), epsilon = 1e-5);
 
         // test r1 energy and force
         let r1_energy = 0.0;
         let r1_force = -9.6;
-        assert_relative_eq!(r1_energy, mie.energy(r1), epsilon=1e-5);
-        assert_relative_eq!(r1_force, mie.force(r1), epsilon=1e-5);
+        assert_relative_eq!(r1_energy, mie.energy(r1), epsilon = 1e-5);
+        assert_relative_eq!(r1_force, mie.force(r1), epsilon = 1e-5);
 
         // test r2 energy and force
         let r2_energy = -0.89096529;
         let r2_force = 0.8846772;
-        assert_relative_eq!(r2_energy, mie.energy(r2), epsilon=1e-5);
-        assert_relative_eq!(r2_force, mie.force(r2), epsilon=1e-5);
+        assert_relative_eq!(r2_energy, mie.energy(r2), epsilon = 1e-5);
+        assert_relative_eq!(r2_force, mie.force(r2), epsilon = 1e-5);
     }
 
     #[test]
@@ -325,17 +325,17 @@ mod tests {
         // test r0 energy and force
         let r0_energy = 0.9907561;
         let r0_force = -28.376268;
-        assert_relative_eq!(r0_energy, morse.energy(r0), epsilon=1e-5);
-        assert_relative_eq!(r0_force, morse.force(r0), epsilon=1e-5);
+        assert_relative_eq!(r0_energy, morse.energy(r0), epsilon = 1e-5);
+        assert_relative_eq!(r0_force, morse.force(r0), epsilon = 1e-5);
 
         let r1_energy = -4.0;
         let r1_force = 0.0;
-        assert_relative_eq!(r1_energy, morse.energy(r1), epsilon=1e-5);
-        assert_relative_eq!(r1_force, morse.force(r1), epsilon=1e-5);
+        assert_relative_eq!(r1_energy, morse.energy(r1), epsilon = 1e-5);
+        assert_relative_eq!(r1_force, morse.force(r1), epsilon = 1e-5);
 
         let r2_energy = -2.8864117;
         let r2_force = 2.9908366;
-        assert_relative_eq!(r2_energy, morse.energy(r2), epsilon=1e-5);
-        assert_relative_eq!(r2_force, morse.force(r2), epsilon=1e-5);
+        assert_relative_eq!(r2_energy, morse.energy(r2), epsilon = 1e-5);
+        assert_relative_eq!(r2_force, morse.force(r2), epsilon = 1e-5);
     }
 }

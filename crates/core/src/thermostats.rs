@@ -3,10 +3,10 @@
 use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
+use crate::internal::Float;
 use crate::properties::temperature::Temperature;
 use crate::properties::IntrinsicProperty;
 use crate::system::System;
-use crate::internal::Float;
 
 /// An algorithm used to control simulation temperature.
 #[typetag::serde(tag = "type")]

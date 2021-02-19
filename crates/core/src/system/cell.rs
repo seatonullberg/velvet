@@ -23,7 +23,14 @@ impl Cell {
     /// * `alpha` - Angle betwen the `b` and `c` vectors (degrees)
     /// * `beta` - Angle between the `a` and `c` vectors (degrees)
     /// * `gamma` - Angle between the `a` and `b` vectors (degrees)
-    pub fn triclinic(a: Float, b: Float, c: Float, alpha: Float, beta: Float, gamma: Float) -> Cell {
+    pub fn triclinic(
+        a: Float,
+        b: Float,
+        c: Float,
+        alpha: Float,
+        beta: Float,
+        gamma: Float,
+    ) -> Cell {
         let cos_alpha = alpha.to_radians().cos();
         let cos_beta = beta.to_radians().cos();
         let (sin_gamma, cos_gamma) = gamma.to_radians().sin_cos();
@@ -185,10 +192,10 @@ impl Cell {
 #[cfg(test)]
 mod tests {
     use super::Cell;
-    use approx::*;
-    use nalgebra::Vector3;
     use crate::constants::PI;
     use crate::internal::Float;
+    use approx::*;
+    use nalgebra::Vector3;
 
     #[test]
     fn new() {
@@ -277,11 +284,11 @@ mod tests {
         let v2 = Vector3::new(1.0, 0.0, 0.0);
         let v3 = Vector3::new(1.0, 1.0, 0.0);
         let v4 = Vector3::new(2.0, 1.0, 0.0);
-        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), PI, epsilon=1e-6);
+        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), PI, epsilon = 1e-6);
         let v1 = Vector3::new(1.241, 0.444, 0.349);
         let v2 = Vector3::new(-0.011, -0.441, 0.333);
         let v3 = Vector3::new(-1.176, 0.296, -0.332);
         let v4 = Vector3::new(-1.396, 1.211, 0.219);
-        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), -1.045379, epsilon=1e-6);
+        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), -1.045379, epsilon = 1e-6);
     }
 }

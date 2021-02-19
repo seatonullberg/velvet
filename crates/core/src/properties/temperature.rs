@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use crate::constants::BOLTZMANN;
+use crate::internal::Float;
 use crate::properties::energy::KineticEnergy;
 use crate::properties::IntrinsicProperty;
 use crate::system::System;
-use crate::internal::Float;
 
 /// Instantaneous temperature of the system.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]

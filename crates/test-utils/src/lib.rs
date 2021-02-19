@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::BufReader;
 
 use velvet_core::potentials::coulomb::{CoulombMeta, Wolf};
-use velvet_core::potentials::pair::{Harmonic, LennardJones, PairMeta};
+use velvet_core::potentials::pair::{LennardJones, PairMeta};
 use velvet_core::potentials::{Potentials, PotentialsBuilder};
 use velvet_core::system::elements::Element;
 use velvet_core::system::System;

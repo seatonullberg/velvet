@@ -93,7 +93,7 @@ fn xenon() {
     assert_relative_eq!(
         Temperature.calculate(&system, &potentials),
         temp_target,
-        epsilon = 50.0
+        epsilon = 100.0
     );
 }
 

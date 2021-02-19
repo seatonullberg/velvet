@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use crate::internal::Float;
 use crate::potentials::Potentials;
 use crate::properties::{IntrinsicProperty, Property};
 use crate::system::System;
-use crate::internal::Float;
 
 /// Potential energy due to coulombic potentials.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
@@ -40,18 +40,27 @@ impl Property for PairEnergy {
     type Res = Float;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let mut energy = 0 as Float;
-        for (meta, potential) in &potentials.pairs {
-            for (i, j) in &meta.indices {
-                let pos_i = system.positions[*i];
-                let pos_j = system.positions[*j];
-                let r = system.cell().distance(&pos_i, &pos_j);
-                if meta.cutoff > r {
-                    energy += potential.energy(r);
-                }
-            }
-        }
-        energy
+        potentials
+            .pairs
+            .iter()
+            .map(|(meta, potential)| {
+                let energy: Float = meta
+                    .indices
+                    .iter()
+                    .map(|(i, j)| {
+                        let pos_i = system.positions[*i];
+                        let pos_j = system.positions[*j];
+                        let r = system.cell().distance(&pos_i, &pos_j);
+                        if r < meta.cutoff {
+                            potential.energy(r)
+                        } else {
+                            0.0
+                        }
+                    })
+                    .sum();
+                energy
+            })
+            .sum()
     }
 }
 

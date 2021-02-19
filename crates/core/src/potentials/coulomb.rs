@@ -1,7 +1,7 @@
 /// Electrostatic interaction potentials.
 
 #[cfg(feature = "f64")]
-use libm::erfc as erfc;
+use libm::erfc;
 #[cfg(not(feature = "f64"))]
 use libm::erfcf as erfc;
 
