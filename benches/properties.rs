@@ -3,7 +3,7 @@ use std::io::BufReader;
 
 use criterion::{criterion_group, criterion_main, Criterion};
 
-use velvet_core::properties::energy::{KineticEnergy, PotentialEnergy, TotalEnergy};
+use velvet_core::properties::energy::{KineticEnergy, PotentialEnergy};
 use velvet_core::properties::forces::Forces;
 use velvet_core::properties::temperature::Temperature;
 use velvet_core::properties::{IntrinsicProperty, Property};
@@ -54,7 +54,7 @@ pub fn temperature_benchmark(c: &mut Criterion) {
     let file = File::open(test_utils::resources_path("Ar.poscar")).unwrap();
     let reader = BufReader::new(file);
     let mut system = load_poscar(reader);
-    let boltz = Boltzmann::new(1000 as f32);
+    let boltz = Boltzmann::new(1000.0);
     boltz.apply(&mut system);
     c.bench_function("temperature", |b| {
         b.iter(|| Temperature.calculate_intrinsic(&system))

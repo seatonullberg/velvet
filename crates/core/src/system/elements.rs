@@ -27,7 +27,7 @@ pub enum Element {
 
 impl Element {
     /// Returns the atomic mass of the element in amu.
-    pub fn mass(&self) -> f32 {
+    pub const fn mass(&self) -> f64 {
         match self {
             Element::H => 1.008,
             Element::He => 4.0026,
@@ -42,7 +42,7 @@ impl Element {
     }
 
     /// Returns the atomic mass of the element in amu.
-    pub fn charge(&self) -> f32 {
+    pub const fn charge(&self) -> f64 {
         match self {
             Element::H => 1.0,
             Element::He => 0.0,

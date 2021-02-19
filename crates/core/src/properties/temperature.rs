@@ -10,13 +10,13 @@ use crate::system::System;
 pub struct Temperature;
 
 impl IntrinsicProperty for Temperature {
-    type Res = f32;
+    type Res = f64;
 
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic = KineticEnergy.calculate_intrinsic(system);
         // NOTE: Calculating DOF this way is a potentially nasty bug if future
         // support is added for degrees of freedom beyond just 3D particles.
-        let dof = (system.size() * 3) as f32;
+        let dof = (system.size() * 3) as f64;
         2.0 * kinetic / (dof * BOLTZMANN)
     }
 }

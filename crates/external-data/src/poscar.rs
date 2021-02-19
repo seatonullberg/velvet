@@ -47,16 +47,16 @@ where
 
     // Set system cell.
     let vecs = poscar.scaled_lattice_vectors();
-    let matrix: Matrix3<f32> = Matrix3::new(
-        vecs[0][0] as f32,
-        vecs[1][0] as f32,
-        vecs[2][0] as f32,
-        vecs[0][1] as f32,
-        vecs[1][1] as f32,
-        vecs[2][1] as f32,
-        vecs[0][2] as f32,
-        vecs[1][2] as f32,
-        vecs[2][2] as f32,
+    let matrix: Matrix3<f64> = Matrix3::new(
+        vecs[0][0] as f64,
+        vecs[1][0] as f64,
+        vecs[2][0] as f64,
+        vecs[0][1] as f64,
+        vecs[1][1] as f64,
+        vecs[2][1] as f64,
+        vecs[0][2] as f64,
+        vecs[1][2] as f64,
+        vecs[2][2] as f64,
     );
     let cell = Cell::from_matrix(matrix);
     builder = builder.with_cell(cell);
@@ -74,18 +74,18 @@ where
     }
 
     // Set system positions.
-    let positions: Vec<Vector3<f32>> = poscar
+    let positions: Vec<Vector3<f64>> = poscar
         .scaled_cart_positions()
         .iter()
-        .map(|x| Vector3::new(x[0] as f32, x[1] as f32, x[2] as f32))
+        .map(|x| Vector3::new(x[0] as f64, x[1] as f64, x[2] as f64))
         .collect();
     builder = builder.with_positions(positions);
 
     // Set system velocities if they exist.
     if let Some(vels) = poscar.cart_velocities() {
-        let velocities: Vec<Vector3<f32>> = vels
+        let velocities: Vec<Vector3<f64>> = vels
             .iter()
-            .map(|x| Vector3::new(x[0] as f32, x[1] as f32, x[2] as f32))
+            .map(|x| Vector3::new(x[0] as f64, x[1] as f64, x[2] as f64))
             .collect();
         builder = builder.with_velocities(velocities);
     }

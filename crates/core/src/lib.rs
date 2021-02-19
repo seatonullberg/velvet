@@ -1,13 +1,13 @@
 //! Core feature library for the Velvet simulation engine.
 //!
-//! Internal unit system:
+//! Internal unit system follows LAMMPS `real` style.
 //!
-//! * `Distance` - Angstrom (A)
-//! * `Time` - Femtosecond (fs)
-//! * `Mass` - Atomic mass unit (amu)
-//! * `Temperature` - Kelvin (K)
-//! * `Quantity` - Number of particles
-//! * `Angle` - Radians (rad)
+//! * `Mass` - grams/mole
+//! * `Distance` - angstrom
+//! * `Time` - femtosecond
+//! * `Energy` - Kcal/mole
+//! * `Force` - Kcal/mole-angstrom
+//! * `Temperature` - Kelvin
 
 extern crate pretty_env_logger;
 #[macro_use]

@@ -21,9 +21,9 @@ pub struct System {
     /// Element type for each atom in the system.
     pub elements: Vec<Element>,
     /// Position of each atom in the system.
-    pub positions: Vec<Vector3<f32>>,
+    pub positions: Vec<Vector3<f64>>,
     /// Velocity of each atom in the system.
-    pub velocities: Vec<Vector3<f32>>,
+    pub velocities: Vec<Vector3<f64>>,
 }
 
 impl System {
@@ -57,8 +57,8 @@ pub struct SystemBuilder {
     size: usize,
     cell: Option<Cell>,
     elements: Option<Vec<Element>>,
-    positions: Option<Vec<Vector3<f32>>>,
-    velocities: Option<Vec<Vector3<f32>>>,
+    positions: Option<Vec<Vector3<f64>>>,
+    velocities: Option<Vec<Vector3<f64>>>,
 }
 
 impl SystemBuilder {
@@ -91,14 +91,14 @@ impl SystemBuilder {
     }
 
     /// Sets the position of each atom in the system.
-    pub fn with_positions(mut self, positions: Vec<Vector3<f32>>) -> SystemBuilder {
+    pub fn with_positions(mut self, positions: Vec<Vector3<f64>>) -> SystemBuilder {
         assert!(positions.len() == self.size);
         self.positions = Some(positions);
         self
     }
 
     /// Sets the velocity of each atom in the system.
-    pub fn with_velocities(mut self, velocities: Vec<Vector3<f32>>) -> SystemBuilder {
+    pub fn with_velocities(mut self, velocities: Vec<Vector3<f64>>) -> SystemBuilder {
         assert!(velocities.len() == self.size);
         self.velocities = Some(velocities);
         self

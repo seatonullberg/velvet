@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 /// Matrix representation of a 3D bounding box.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Cell {
-    matrix: Matrix3<f32>,
-    inv_matrix: Matrix3<f32>,
+    matrix: Matrix3<f64>,
+    inv_matrix: Matrix3<f64>,
 }
 
 impl Cell {
@@ -21,7 +21,7 @@ impl Cell {
     /// * `alpha` - Angle betwen the `b` and `c` vectors (degrees)
     /// * `beta` - Angle between the `a` and `c` vectors (degrees)
     /// * `gamma` - Angle between the `a` and `b` vectors (degrees)
-    pub fn triclinic(a: f32, b: f32, c: f32, alpha: f32, beta: f32, gamma: f32) -> Cell {
+    pub fn triclinic(a: f64, b: f64, c: f64, alpha: f64, beta: f64, gamma: f64) -> Cell {
         let cos_alpha = alpha.to_radians().cos();
         let cos_beta = beta.to_radians().cos();
         let (sin_gamma, cos_gamma) = gamma.to_radians().sin_cos();
@@ -31,7 +31,7 @@ impl Cell {
 
         let c_x = c * cos_beta;
         let c_y = c * (cos_alpha - cos_beta * cos_gamma) / sin_gamma;
-        let c_z = f32::sqrt(c * c - c_y * c_y - c_x * c_x);
+        let c_z = f64::sqrt(c * c - c_y * c_y - c_x * c_x);
 
         let matrix = Matrix3::new(a, b_x, c_x, 0.0, b_y, c_y, 0.0, 0.0, c_z);
         let inv_matrix = matrix.try_inverse().unwrap();
@@ -40,49 +40,49 @@ impl Cell {
     }
 
     /// Returns a new cell initialized from a 3x3 matrix.
-    pub fn from_matrix(matrix: Matrix3<f32>) -> Cell {
+    pub fn from_matrix(matrix: Matrix3<f64>) -> Cell {
         let inv_matrix = matrix.try_inverse().unwrap();
         Cell { matrix, inv_matrix }
     }
 
     /// Returns the magnitude of the 'a' vector.
-    pub fn a(&self) -> f32 {
+    pub fn a(&self) -> f64 {
         self.a_vector().norm()
     }
 
     /// Returns the magnitude of the 'b' vector.
-    pub fn b(&self) -> f32 {
+    pub fn b(&self) -> f64 {
         self.b_vector().norm()
     }
 
     /// Returns the magnitude of the 'c' vector.
-    pub fn c(&self) -> f32 {
+    pub fn c(&self) -> f64 {
         self.c_vector().norm()
     }
 
     /// Return the angle between 'b' and 'c' in degrees.
-    pub fn alpha(&self) -> f32 {
+    pub fn alpha(&self) -> f64 {
         let b = self.b_vector();
         let c = self.c_vector();
         b.angle(&c).to_degrees()
     }
 
     /// Returns the angle between 'a' and 'c' in degrees.
-    pub fn beta(&self) -> f32 {
+    pub fn beta(&self) -> f64 {
         let a = self.a_vector();
         let c = self.c_vector();
         a.angle(&c).to_degrees()
     }
 
     /// Returns the angle between 'a' and 'b' in degrees.
-    pub fn gamma(&self) -> f32 {
+    pub fn gamma(&self) -> f64 {
         let a = self.a_vector();
         let b = self.b_vector();
         a.angle(&b).to_degrees()
     }
 
     /// Returns the 'a' vector.
-    pub fn a_vector(&self) -> Vector3<f32> {
+    pub fn a_vector(&self) -> Vector3<f64> {
         Vector3::new(
             self.matrix[(0, 0)],
             self.matrix[(1, 0)],
@@ -91,7 +91,7 @@ impl Cell {
     }
 
     /// Returns the 'b' vector.
-    pub fn b_vector(&self) -> Vector3<f32> {
+    pub fn b_vector(&self) -> Vector3<f64> {
         Vector3::new(
             self.matrix[(0, 1)],
             self.matrix[(1, 1)],
@@ -100,7 +100,7 @@ impl Cell {
     }
 
     /// Returns the 'c' vector.
-    pub fn c_vector(&self) -> Vector3<f32> {
+    pub fn c_vector(&self) -> Vector3<f64> {
         Vector3::new(
             self.matrix[(0, 2)],
             self.matrix[(1, 2)],
@@ -109,64 +109,64 @@ impl Cell {
     }
 
     /// Converts a cartesian position to a fractional position.
-    pub fn fractional(&self, cartesian: &Vector3<f32>) -> Vector3<f32> {
+    pub fn fractional(&self, cartesian: &Vector3<f64>) -> Vector3<f64> {
         self.inv_matrix * cartesian
     }
 
     /// Converts a fractional position to a cartesian position.
-    pub fn cartesian(&self, fractional: &Vector3<f32>) -> Vector3<f32> {
+    pub fn cartesian(&self, fractional: &Vector3<f64>) -> Vector3<f64> {
         self.matrix * fractional
     }
 
     /// Wraps a position vector into the cell obeying periodic boundary conditions.
-    pub fn wrap_vector(&self, vector: &mut Vector3<f32>) {
+    pub fn wrap_vector(&self, vector: &mut Vector3<f64>) {
         let mut fractional = self.fractional(vector);
-        fractional[0] -= f32::floor(fractional[0]);
-        fractional[1] -= f32::floor(fractional[1]);
-        fractional[2] -= f32::floor(fractional[2]);
+        fractional[0] -= f64::floor(fractional[0]);
+        fractional[1] -= f64::floor(fractional[1]);
+        fractional[2] -= f64::floor(fractional[2]);
         *vector = self.cartesian(&fractional);
     }
 
     /// Finds the image of a position vector in the cell obeying periodic boundary conditions.
-    pub fn vector_image(&self, vector: &mut Vector3<f32>) {
+    pub fn vector_image(&self, vector: &mut Vector3<f64>) {
         let mut fractional = self.fractional(vector);
-        fractional[0] -= f32::round(fractional[0]);
-        fractional[1] -= f32::round(fractional[1]);
-        fractional[2] -= f32::round(fractional[2]);
+        fractional[0] -= f64::round(fractional[0]);
+        fractional[1] -= f64::round(fractional[1]);
+        fractional[2] -= f64::round(fractional[2]);
         *vector = self.cartesian(&fractional);
     }
 
     /// Returns the unit vector path between `v1` and `v2` obeying periodic boundary conditions.
-    pub fn direction(&self, v1: &Vector3<f32>, v2: &Vector3<f32>) -> Vector3<f32> {
+    pub fn direction(&self, v1: &Vector3<f64>, v2: &Vector3<f64>) -> Vector3<f64> {
         let mut d = v2 - v1;
         self.vector_image(&mut d);
         d.normalize()
     }
 
     /// Returns the distance between `v1` and `v2` obeying periodic boundary conditions.
-    pub fn distance(&self, v1: &Vector3<f32>, v2: &Vector3<f32>) -> f32 {
+    pub fn distance(&self, v1: &Vector3<f64>, v2: &Vector3<f64>) -> f64 {
         let mut d = v2 - v1;
         self.vector_image(&mut d);
         d.norm()
     }
 
     /// Returns the angle between `v1`, `v2` and `v3` obeying periodic boundary conditions.
-    pub fn angle(&self, v1: &Vector3<f32>, v2: &Vector3<f32>, v3: &Vector3<f32>) -> f32 {
+    pub fn angle(&self, v1: &Vector3<f64>, v2: &Vector3<f64>, v3: &Vector3<f64>) -> f64 {
         let mut v12 = v1 - v2;
         self.vector_image(&mut v12);
         let mut v32 = v3 - v2;
         self.vector_image(&mut v32);
-        f32::acos(v12.dot(&v32) / (v12.norm() * v32.norm()))
+        f64::acos(v12.dot(&v32) / (v12.norm() * v32.norm()))
     }
 
     /// Returns the dihedral angle between `v1`, `v2`, `v3`, and `v4`.
     pub fn dihedral(
         &self,
-        v1: &Vector3<f32>,
-        v2: &Vector3<f32>,
-        v3: &Vector3<f32>,
-        v4: &Vector3<f32>,
-    ) -> f32 {
+        v1: &Vector3<f64>,
+        v2: &Vector3<f64>,
+        v3: &Vector3<f64>,
+        v4: &Vector3<f64>,
+    ) -> f64 {
         let mut v21 = v2 - v1;
         self.vector_image(&mut v21);
         let mut v32 = v3 - v2;
@@ -176,7 +176,7 @@ impl Cell {
 
         let u = v21.cross(&v32);
         let v = v32.cross(&v43);
-        f32::atan2(v32.norm() * v.dot(&v21), u.dot(&v))
+        f64::atan2(v32.norm() * v.dot(&v21), u.dot(&v))
     }
 }
 
@@ -235,7 +235,11 @@ mod tests {
         let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
         let v1 = Vector3::new(0.0, 0.0, 0.0);
         let v2 = Vector3::new(1.0, 2.0, 6.0);
-        assert_relative_eq!(cell.distance(&v1, &v2), f32::sqrt(6.0));
+        assert_relative_eq!(cell.distance(&v1, &v2), f64::sqrt(6.0));
+        let cell = Cell::triclinic(1.0, 1.0, 1.0, 90.0, 90.0, 90.0);
+        let v1 = Vector3::new(0.1, 0.0, 0.0);
+        let v2 = Vector3::new(0.9, 0.0, 0.0);
+        assert_relative_eq!(cell.distance(&v1, &v2), 0.2);
     }
 
     #[test]
@@ -244,20 +248,22 @@ mod tests {
         let a = Vector3::new(1.0, 0.0, 0.0);
         let b = Vector3::new(0.0, 0.0, 0.0);
         let c = Vector3::new(0.0, 1.0, 0.0);
-        assert_relative_eq!(cell.angle(&a, &b, &c), std::f32::consts::PI / 2.0);
+        assert_relative_eq!(cell.angle(&a, &b, &c), std::f64::consts::PI / 2.0);
         let a = Vector3::new(1.0, 0.0, 0.0);
         let b = Vector3::new(0.0, 0.0, 0.0);
-        let c = Vector3::new(f32::cos(1.877), f32::sin(1.877), 0.0);
+        let c = Vector3::new(f64::cos(1.877), f64::sin(1.877), 0.0);
         assert_relative_eq!(cell.angle(&a, &b, &c), 1.877);
     }
 
     #[test]
     fn direction() {
-        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
-        let v1 = Vector3::new(0.0, 0.0, 0.0);
-        let v2 = Vector3::new(1.0, 2.0, 6.0);
+        let cell = Cell::triclinic(1.0, 1.0, 1.0, 90.0, 90.0, 90.0);
+        let v1 = Vector3::new(0.5, 0.5, 0.5);
+        let v2 = Vector3::new(0.5, 0.5, 1.1);
         let res = cell.direction(&v1, &v2);
-        assert_eq!(res.norm(), 1.0);
+        assert_relative_eq!(res[0], 0.0, epsilon = 1e-5);
+        assert_relative_eq!(res[1], 0.0, epsilon = 1e-5);
+        assert_relative_eq!(res[2], -1.0);
     }
 
     #[test]
@@ -267,11 +273,11 @@ mod tests {
         let v2 = Vector3::new(1.0, 0.0, 0.0);
         let v3 = Vector3::new(1.0, 1.0, 0.0);
         let v4 = Vector3::new(2.0, 1.0, 0.0);
-        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), std::f32::consts::PI);
+        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), std::f64::consts::PI, epsilon=1e-6);
         let v1 = Vector3::new(1.241, 0.444, 0.349);
         let v2 = Vector3::new(-0.011, -0.441, 0.333);
         let v3 = Vector3::new(-1.176, 0.296, -0.332);
         let v4 = Vector3::new(-1.396, 1.211, 0.219);
-        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), -1.045379);
+        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), -1.045379, epsilon=1e-6);
     }
 }

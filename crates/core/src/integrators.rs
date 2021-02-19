@@ -20,8 +20,8 @@ pub trait Integrator: Send + Sync {
 /// Velocity Verlet integration algorithm.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct VelocityVerlet {
-    timestep: f32,
-    accelerations: Vec<Vector3<f32>>,
+    timestep: f64,
+    accelerations: Vec<Vector3<f64>>,
 }
 
 impl VelocityVerlet {
@@ -30,7 +30,7 @@ impl VelocityVerlet {
     /// # Arguments
     ///
     /// * `timestep` - Timestep duration
-    pub fn new(timestep: f32) -> VelocityVerlet {
+    pub fn new(timestep: f64) -> VelocityVerlet {
         VelocityVerlet {
             timestep,
             accelerations: Vec::new(),
@@ -41,47 +41,37 @@ impl VelocityVerlet {
 #[typetag::serde]
 impl Integrator for VelocityVerlet {
     fn setup(&mut self, system: &System, _: &Potentials) {
-        self.accelerations = vec![Vector3::default(); system.size()];
+        self.accelerations = vec![Vector3::zeros(); system.size()];
     }
 
     fn integrate(&mut self, system: &mut System, potentials: &Potentials) {
         let dt = self.timestep;
 
-        // update velocities at t + dt/2
-        system.velocities = system
-            .velocities
-            .iter()
-            .zip(self.accelerations.iter())
-            .map(|(&v, &acc)| v + (0.5 * dt * acc))
-            .collect::<Vec<Vector3<f32>>>();
-
-        // update positions at t + dt
-        // !!! this block is more efficient without `par_iter`
-        system.positions = system
+        system
             .positions
-            .iter()
+            .iter_mut()
             .zip(system.velocities.iter())
-            .map(|(&p, &v)| p + (v * dt))
-            .collect();
+            .zip(self.accelerations.iter())
+            .for_each(|((pos, vel), acc)| {
+                *pos += (vel * dt) + (0.5 * acc * dt.powi(2));
+            });
 
-        // calculate forces
         let forces = Forces.calculate(system, potentials);
-
-        // update accelerations at t + dt
-        // !!! this block is more efficient without `par_iter`
-        self.accelerations = forces
+        let new_accelerations: Vec<Vector3<f64>> = forces
             .iter()
             .zip(system.elements.iter())
-            .map(|(&f, &elem)| f / elem.mass())
+            .map(|(f, elem)| f / elem.mass())
             .collect();
 
-        // update velocities at t + dt
-        // !!! this block is more efficient without `par_iter`
-        system.velocities = system
+        system
             .velocities
-            .iter()
+            .iter_mut()
             .zip(self.accelerations.iter())
-            .map(|(&v, &acc)| v + (0.5 * dt * acc))
-            .collect::<Vec<Vector3<f32>>>();
+            .zip(new_accelerations.iter())
+            .for_each(|((vel, acc), new_acc)| {
+                *vel += 0.5 * dt * (acc + new_acc);
+            });
+
+        self.accelerations = new_accelerations;
     }
 }

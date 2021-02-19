@@ -3,8 +3,8 @@ use std::io::BufReader;
 
 use velvet::prelude::*;
 
-static TIMESTEPS: usize = 100_000;
-static OUTPUT_INTERVAL: usize = 50;
+static TIMESTEPS: usize = 100000;
+static OUTPUT_INTERVAL: usize = 100;
 static OUTPUT_FILENAME: &str = "nve.h5";
 
 fn main() {
@@ -14,11 +14,11 @@ fn main() {
     let mut system = load_poscar(reader);
 
     // Initialize the system temperature using a Boltzmann velocity distribution.
-    let boltz = Boltzmann::new(300 as f32);
+    let boltz = Boltzmann::new(300.0);
     boltz.apply(&mut system);
 
     // Initialize a Lennard-Jones style pair potential between all Ar-Ar pairs.
-    let lj = LennardJones::new(1.0, 3.4);
+    let lj = LennardJones::new(4.184, 3.4);
     let meta = PairMeta::new(8.5, (Element::Ar, Element::Ar), &system);
 
     // Store all of the system's potentials in a Potentials struct.
@@ -27,7 +27,7 @@ fn main() {
         .build();
 
     // Initialize a velocity Verlet style integrator.
-    let velocity_verlet = VelocityVerlet::new(1.0);
+    let velocity_verlet = VelocityVerlet::new(0.5);
 
     // Run MD with no thermostat to simulate the NVE ensemble.
     let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(NullThermostat));
@@ -36,9 +36,9 @@ fn main() {
     let config = ConfigurationBuilder::new()
         .with_output_filename(OUTPUT_FILENAME.to_string())
         .with_output_interval(OUTPUT_INTERVAL)
-        .with_output(Box::new(TotalEnergy))
         .with_output(Box::new(PotentialEnergy))
         .with_output(Box::new(KineticEnergy))
+        .with_output(Box::new(TotalEnergy))
         .with_output(Box::new(Temperature))
         .build();
 

@@ -17,8 +17,8 @@ pub trait VelocityDistribution: Send + Sync {
 /// Maxwell Boltzmann style velocity distribution.
 #[derive(Clone, Copy, Debug)]
 pub struct Boltzmann {
-    target: f32,
-    distr: Normal<f32>,
+    target: f64,
+    distr: Normal<f64>,
 }
 
 impl Boltzmann {
@@ -27,8 +27,8 @@ impl Boltzmann {
     /// # Arguments
     ///
     /// * `target` - Target temperature (Kelvin)
-    pub fn new(target: f32) -> Boltzmann {
-        let distr = Normal::new(0.0, f32::sqrt(BOLTZMANN * target)).unwrap();
+    pub fn new(target: f64) -> Boltzmann {
+        let distr = Normal::new(0.0, f64::sqrt(BOLTZMANN * target)).unwrap();
         Boltzmann { target, distr }
     }
 }
@@ -46,15 +46,15 @@ impl VelocityDistribution for Boltzmann {
                 let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
                 Vector3::new(x, y, z)
             })
-            .collect::<Vec<Vector3<f32>>>();
+            .collect::<Vec<Vector3<f64>>>();
         scale(system, self.target);
     }
 }
 
 /// Scale all velocities in system to the target value.
-fn scale(system: &mut System, target: f32) {
+fn scale(system: &mut System, target: f64) {
     let temperature = Temperature.calculate_intrinsic(system);
-    let factor = f32::sqrt(target / temperature);
+    let factor = f64::sqrt(target / temperature);
     // !!! this block is more efficient without `par_iter`
     system.velocities = system.velocities.iter().map(|&x| x * factor).collect();
 }

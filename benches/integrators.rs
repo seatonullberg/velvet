@@ -13,7 +13,7 @@ pub fn velocity_verlet_benchmark(c: &mut Criterion) {
     let reader = BufReader::new(file);
     let mut system = load_poscar(reader);
 
-    let target = 100 as f32;
+    let target = 100.0;
     let boltz = Boltzmann::new(target);
     boltz.apply(&mut system);
 

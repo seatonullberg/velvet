@@ -39,7 +39,7 @@ pub fn xenon_system() -> System {
 }
 
 pub fn argon_potentials(system: &System) -> Potentials {
-    let lj = LennardJones::new(1.0, 3.4);
+    let lj = LennardJones::new(4.184, 3.4);
     let meta = PairMeta::new(8.5, (Element::Ar, Element::Ar), system);
     PotentialsBuilder::new()
         .add_pair(meta, Box::new(lj))

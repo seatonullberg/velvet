@@ -14,7 +14,7 @@ fn main() {
     let mut system = load_poscar(reader);
 
     // Initialize the system temperature using a Boltzmann velocity distribution.
-    let boltz = Boltzmann::new(300 as f32);
+    let boltz = Boltzmann::new(300.0);
     boltz.apply(&mut system);
 
     // Initialize a Lennard-Jones style pair potential between all Ar-Ar pairs.
@@ -30,7 +30,7 @@ fn main() {
     let velocity_verlet = VelocityVerlet::new(1.0);
 
     // Initialize a Nose-Hoover style thermostat.
-    let nose_hoover = NoseHoover::new(300 as f32, 1.5, 1.0);
+    let nose_hoover = NoseHoover::new(300.0, 1.5, 1.0);
 
     // Run MD with a thermostat to simulate the NVT ensemble.
     let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
@@ -39,8 +39,10 @@ fn main() {
     let config = ConfigurationBuilder::new()
         .with_output_filename(OUTPUT_FILENAME.to_string())
         .with_output_interval(OUTPUT_INTERVAL)
-        .with_output(Box::new(Temperature))
+        .with_output(Box::new(PotentialEnergy))
+        .with_output(Box::new(KineticEnergy))
         .with_output(Box::new(TotalEnergy))
+        .with_output(Box::new(Temperature))
         .build();
 
     // Run the simulation.

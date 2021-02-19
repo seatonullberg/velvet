@@ -30,17 +30,26 @@ impl Simulation {
 
     #[cfg(not(feature = "hdf5-output"))]
     pub fn run(&mut self, steps: usize) {
-        // Initialize the logger.
+        // initialize the logger.
         pretty_env_logger::init();
-        info!("Starting simulation...");
+
+        // log initial state
+        info!("Initial state:");
+        for out in self.config.outputs() {
+            out.output(&self.system, &self.potentials);
+        }
 
         // setup propagation
         self.propagator.setup(&mut self.system, &self.potentials);
+
+        // start iteration
+        info!("Starting simulation...");
         for i in 0..steps {
             self.propagator
                 .propagate(&mut self.system, &self.potentials);
 
-            if i == 0 || i % self.config.output_interval() == 0 || i == steps - 1 {
+            // log intermediate state
+            if i % self.config.output_interval() == 0 || i == steps - 1 {
                 info!("Logging results for timestep: {}", i);
                 for out in self.config.outputs() {
                     out.output(&self.system, &self.potentials);
