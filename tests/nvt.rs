@@ -42,6 +42,34 @@ fn argon() {
 }
 
 #[test]
+fn binary_gas() {
+    let mut system = test_utils::binary_gas_system();
+    let potentials = test_utils::binary_gas_potentials(&system);
+    nvt(&mut system, &potentials);
+
+    let pe_target = -4800.0;
+    assert_relative_eq!(
+        PotentialEnergy.calculate(&mut system, &potentials),
+        pe_target,
+        epsilon = 100.0
+    );
+
+    let ke_target = 100.0;
+    assert_relative_eq!(
+        KineticEnergy.calculate(&mut system, &potentials),
+        ke_target,
+        epsilon = 25.0
+    );
+
+    let temp_target = 300.0;
+    assert_relative_eq!(
+        Temperature.calculate(&system, &potentials),
+        temp_target,
+        epsilon = 50.0
+    );
+}
+
+#[test]
 fn xenon() {
     let mut system = test_utils::xenon_system();
     let potentials = test_utils::xenon_potentials(&system);
@@ -51,7 +79,7 @@ fn xenon() {
     assert_relative_eq!(
         PotentialEnergy.calculate(&mut system, &potentials),
         pe_target,
-        epsilon = 200.0
+        epsilon = 1000.0
     );
 
     let ke_target = 90.0;

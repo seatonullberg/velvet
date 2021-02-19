@@ -20,12 +20,6 @@ pub fn binary_gas_system() -> System {
     load_poscar(reader)
 }
 
-pub fn fluorine_system() -> System {
-    let file = File::open(resources_path("F.poscar")).unwrap();
-    let reader = BufReader::new(file);
-    load_poscar(reader)
-}
-
 pub fn rocksalt_system() -> System {
     let file = File::open(resources_path("NaCl.poscar")).unwrap();
     let reader = BufReader::new(file);
@@ -47,24 +41,16 @@ pub fn argon_potentials(system: &System) -> Potentials {
 }
 
 pub fn binary_gas_potentials(system: &System) -> Potentials {
-    let lj0 = LennardJones::new(1.0, 3.4);
+    let lj0 = LennardJones::new(4.184, 3.4);
     let meta0 = PairMeta::new(12.0, (Element::Ar, Element::Ar), &system);
-    let lj1 = LennardJones::new(1.87, 4.57);
+    let lj1 = LennardJones::new(7.824, 4.57);
     let meta1 = PairMeta::new(12.0, (Element::Xe, Element::Xe), &system);
-    let lj2 = LennardJones::new(1.5, 4.0);
+    let lj2 = LennardJones::new(6.276, 4.0);
     let meta2 = PairMeta::new(12.0, (Element::Ar, Element::Xe), &system);
     PotentialsBuilder::new()
         .add_pair(meta0, Box::new(lj0))
         .add_pair(meta1, Box::new(lj1))
         .add_pair(meta2, Box::new(lj2))
-        .build()
-}
-
-pub fn fluorine_potentials(system: &System) -> Potentials {
-    let harmonic = Harmonic::new(300.0, 1.2);
-    let meta = PairMeta::new(5.0, (Element::F, Element::F), system);
-    PotentialsBuilder::new()
-        .add_pair(meta, Box::new(harmonic))
         .build()
 }
 
