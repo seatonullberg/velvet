@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
+use crate::internal::Float;
 use crate::potentials::Potentials;
 use crate::properties::Property;
 use crate::system::System;
@@ -13,10 +14,10 @@ use crate::system::System;
 pub struct CoulombForces;
 
 impl Property for CoulombForces {
-    type Res = Vec<Vector3<f64>>;
+    type Res = Vec<Vector3<Float>>;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let mut forces: Vec<Vector3<f64>> = vec![Vector3::zeros(); system.size()];
+        let mut forces: Vec<Vector3<Float>> = vec![Vector3::zeros(); system.size()];
         for (meta, potential) in &potentials.coulombs {
             for (i, j) in &meta.indices {
                 let elem_i = system.elements[*i];
@@ -43,10 +44,10 @@ impl Property for CoulombForces {
 pub struct PairForces;
 
 impl Property for PairForces {
-    type Res = Vec<Vector3<f64>>;
+    type Res = Vec<Vector3<Float>>;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let mut forces: Vec<Vector3<f64>> = vec![Vector3::zeros(); system.size()];
+        let mut forces: Vec<Vector3<Float>> = vec![Vector3::zeros(); system.size()];
         for (meta, potential) in &potentials.pairs {
             for (i, j) in &meta.indices {
                 let pos_i = system.positions[*i];
@@ -71,7 +72,7 @@ impl Property for PairForces {
 pub struct Forces;
 
 impl Property for Forces {
-    type Res = Vec<Vector3<f64>>;
+    type Res = Vec<Vector3<Float>>;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let pair_forces = PairForces.calculate(system, potentials);

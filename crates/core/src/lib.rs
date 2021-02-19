@@ -16,6 +16,7 @@ extern crate log;
 extern crate strum_macros;
 
 #[warn(missing_docs)]
+mod internal;
 pub mod config;
 pub mod constants;
 pub mod integrators;

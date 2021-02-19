@@ -3,16 +3,17 @@ use serde::{Deserialize, Serialize};
 use crate::potentials::Potentials;
 use crate::properties::{IntrinsicProperty, Property};
 use crate::system::System;
+use crate::internal::Float;
 
 /// Potential energy due to coulombic potentials.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct CoulombEnergy;
 
 impl Property for CoulombEnergy {
-    type Res = f64;
+    type Res = Float;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let mut energy = 0 as f64;
+        let mut energy = 0.0;
         for (meta, potential) in &potentials.coulombs {
             for (i, j) in &meta.indices {
                 let elem_i = system.elements[*i];
@@ -36,10 +37,10 @@ impl Property for CoulombEnergy {
 pub struct PairEnergy;
 
 impl Property for PairEnergy {
-    type Res = f64;
+    type Res = Float;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let mut energy = 0 as f64;
+        let mut energy = 0 as Float;
         for (meta, potential) in &potentials.pairs {
             for (i, j) in &meta.indices {
                 let pos_i = system.positions[*i];
@@ -59,7 +60,7 @@ impl Property for PairEnergy {
 pub struct PotentialEnergy;
 
 impl Property for PotentialEnergy {
-    type Res = f64;
+    type Res = Float;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let coulomb_energy = CoulombEnergy.calculate(system, potentials);
@@ -73,10 +74,10 @@ impl Property for PotentialEnergy {
 pub struct KineticEnergy;
 
 impl IntrinsicProperty for KineticEnergy {
-    type Res = f64;
+    type Res = Float;
 
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
-        let kinetic_energy: f64 = system
+        let kinetic_energy: Float = system
             .elements
             .iter()
             .zip(system.velocities.iter())
@@ -91,7 +92,7 @@ impl IntrinsicProperty for KineticEnergy {
 pub struct TotalEnergy;
 
 impl Property for TotalEnergy {
-    type Res = f64;
+    type Res = Float;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let kinetic = KineticEnergy.calculate(system, potentials);

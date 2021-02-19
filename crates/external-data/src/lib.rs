@@ -1,5 +1,6 @@
 //! Utilities to import and export external data formats.
 
+mod internal;
 pub mod poscar;
 
 pub mod prelude {

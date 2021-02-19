@@ -7,6 +7,7 @@ use crate::potentials::Potentials;
 use crate::properties::forces::Forces;
 use crate::properties::Property;
 use crate::system::System;
+use crate::internal::Float;
 
 /// A numerical integration algorithm.
 #[typetag::serde(tag = "type")]
@@ -20,8 +21,8 @@ pub trait Integrator: Send + Sync {
 /// Velocity Verlet integration algorithm.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct VelocityVerlet {
-    timestep: f64,
-    accelerations: Vec<Vector3<f64>>,
+    timestep: Float,
+    accelerations: Vec<Vector3<Float>>,
 }
 
 impl VelocityVerlet {
@@ -30,7 +31,7 @@ impl VelocityVerlet {
     /// # Arguments
     ///
     /// * `timestep` - Timestep duration
-    pub fn new(timestep: f64) -> VelocityVerlet {
+    pub fn new(timestep: Float) -> VelocityVerlet {
         VelocityVerlet {
             timestep,
             accelerations: Vec::new(),
@@ -57,7 +58,7 @@ impl Integrator for VelocityVerlet {
             });
 
         let forces = Forces.calculate(system, potentials);
-        let new_accelerations: Vec<Vector3<f64>> = forces
+        let new_accelerations: Vec<Vector3<Float>> = forces
             .iter()
             .zip(system.elements.iter())
             .map(|(f, elem)| f / elem.mass())

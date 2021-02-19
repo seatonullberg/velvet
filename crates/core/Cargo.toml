@@ -28,6 +28,7 @@ approx = "0.4"
 
 [features]
 default = []
+f64 = []
 hdf5-output = ["hdf5", "hdf5-sys"]
 
 [package.metadata.docs.rs]

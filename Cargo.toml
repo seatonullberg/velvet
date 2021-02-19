@@ -40,6 +40,7 @@ velvet-test-utils = { path = "crates/test-utils" }
 
 [features]
 default = []
+f64 = ["velvet-core/f64", "velvet-external-data/f64", "velvet-test-utils/f64"]
 hdf5-output = ["velvet-core/hdf5-output", "hdf5", "hdf5-sys"]
 rayon = ["velvet-core/rayon"]
 

@@ -2,6 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::internal::Float;
+
 /// Every element on the periodic table.
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize, EnumString, Hash, Eq)]
 pub enum Element {
@@ -27,7 +29,7 @@ pub enum Element {
 
 impl Element {
     /// Returns the atomic mass of the element in amu.
-    pub const fn mass(&self) -> f64 {
+    pub const fn mass(&self) -> Float {
         match self {
             Element::H => 1.008,
             Element::He => 4.0026,
@@ -42,7 +44,7 @@ impl Element {
     }
 
     /// Returns the atomic mass of the element in amu.
-    pub const fn charge(&self) -> f64 {
+    pub const fn charge(&self) -> Float {
         match self {
             Element::H => 1.0,
             Element::He => 0.0,

@@ -23,7 +23,7 @@ fn argon() {
     assert_relative_eq!(
         PotentialEnergy.calculate(&mut system, &potentials),
         pe_target,
-        epsilon = 25.0
+        epsilon = 50.0
     );
 
     let ke_target = 90.0;

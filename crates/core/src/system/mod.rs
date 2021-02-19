@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::system::cell::Cell;
 use crate::system::elements::Element;
+use crate::internal::Float;
 
 /// Collection of atomic properties and bonding information.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -21,9 +22,9 @@ pub struct System {
     /// Element type for each atom in the system.
     pub elements: Vec<Element>,
     /// Position of each atom in the system.
-    pub positions: Vec<Vector3<f64>>,
+    pub positions: Vec<Vector3<Float>>,
     /// Velocity of each atom in the system.
-    pub velocities: Vec<Vector3<f64>>,
+    pub velocities: Vec<Vector3<Float>>,
 }
 
 impl System {
@@ -57,8 +58,8 @@ pub struct SystemBuilder {
     size: usize,
     cell: Option<Cell>,
     elements: Option<Vec<Element>>,
-    positions: Option<Vec<Vector3<f64>>>,
-    velocities: Option<Vec<Vector3<f64>>>,
+    positions: Option<Vec<Vector3<Float>>>,
+    velocities: Option<Vec<Vector3<Float>>>,
 }
 
 impl SystemBuilder {
@@ -91,14 +92,14 @@ impl SystemBuilder {
     }
 
     /// Sets the position of each atom in the system.
-    pub fn with_positions(mut self, positions: Vec<Vector3<f64>>) -> SystemBuilder {
+    pub fn with_positions(mut self, positions: Vec<Vector3<Float>>) -> SystemBuilder {
         assert!(positions.len() == self.size);
         self.positions = Some(positions);
         self
     }
 
     /// Sets the velocity of each atom in the system.
-    pub fn with_velocities(mut self, velocities: Vec<Vector3<f64>>) -> SystemBuilder {
+    pub fn with_velocities(mut self, velocities: Vec<Vector3<Float>>) -> SystemBuilder {
         assert!(velocities.len() == self.size);
         self.velocities = Some(velocities);
         self

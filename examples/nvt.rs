@@ -18,8 +18,8 @@ fn main() {
     boltz.apply(&mut system);
 
     // Initialize a Lennard-Jones style pair potential between all Ar-Ar pairs.
-    let lj = LennardJones::new(1.0, 3.4);
-    let meta = PairMeta::new(8.0, (Element::Ar, Element::Ar), &system);
+    let lj = LennardJones::new(4.184, 3.4);
+    let meta = PairMeta::new(8.5, (Element::Ar, Element::Ar), &system);
 
     // Store all of the system's potentials in a Potentials struct.
     let potentials = PotentialsBuilder::new()
@@ -27,10 +27,10 @@ fn main() {
         .build();
 
     // Initialize a velocity Verlet style integrator.
-    let velocity_verlet = VelocityVerlet::new(1.0);
+    let velocity_verlet = VelocityVerlet::new(0.1);
 
     // Initialize a Nose-Hoover style thermostat.
-    let nose_hoover = NoseHoover::new(300.0, 1.5, 1.0);
+    let nose_hoover = NoseHoover::new(300.0, 1.25, 1.0);
 
     // Run MD with a thermostat to simulate the NVT ensemble.
     let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));

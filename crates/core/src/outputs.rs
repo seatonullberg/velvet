@@ -6,6 +6,7 @@ use crate::properties::forces::Forces;
 use crate::properties::temperature::Temperature;
 use crate::properties::Property;
 use crate::system::System;
+use crate::internal::Float;
 
 #[cfg(not(feature = "hdf5-output"))]
 #[typetag::serde(tag = "type")]
@@ -34,10 +35,10 @@ impl Output for Forces {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let forces = self.calculate(system, potentials);
         let dataset = group
-            .new_dataset::<[f32; 3]>()
+            .new_dataset::<[Float; 3]>()
             .create("forces", system.size())
             .unwrap();
-        let arr: Vec<[f32; 3]> = forces.iter().map(|x| [x[0], x[1], x[2]]).collect();
+        let arr: Vec<[Float; 3]> = forces.iter().map(|x| [x[0], x[1], x[2]]).collect();
         dataset.write(arr.as_slice()).unwrap()
     }
 }
@@ -57,7 +58,7 @@ impl Output for KineticEnergy {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
         let dataset = group
-            .new_dataset::<f32>()
+            .new_dataset::<Float>()
             .create("kinetic_energy", 1)
             .unwrap();
         dataset.write(&[energy]).unwrap();
@@ -79,7 +80,7 @@ impl Output for PotentialEnergy {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
         let dataset = group
-            .new_dataset::<f32>()
+            .new_dataset::<Float>()
             .create("potential_energy", 1)
             .unwrap();
         dataset.write(&[energy]).unwrap();
@@ -101,7 +102,7 @@ impl Output for TotalEnergy {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
         let dataset = group
-            .new_dataset::<f32>()
+            .new_dataset::<Float>()
             .create("total_energy", 1)
             .unwrap();
         dataset.write(&[energy]).unwrap();
@@ -123,7 +124,7 @@ impl Output for CoulombEnergy {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
         let dataset = group
-            .new_dataset::<f32>()
+            .new_dataset::<Float>()
             .create("coulomb_energy", 1)
             .unwrap();
         dataset.write(&[energy]).unwrap();
@@ -144,7 +145,7 @@ impl Output for PairEnergy {
 impl Output for PairEnergy {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
-        let dataset = group.new_dataset::<f32>().create("pair_energy", 1).unwrap();
+        let dataset = group.new_dataset::<Float>().create("pair_energy", 1).unwrap();
         dataset.write(&[energy]).unwrap();
     }
 }
@@ -163,7 +164,7 @@ impl Output for Temperature {
 impl Output for Temperature {
     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let temperature = self.calculate(system, potentials);
-        let dataset = group.new_dataset::<f32>().create("temperature", 1).unwrap();
+        let dataset = group.new_dataset::<Float>().create("temperature", 1).unwrap();
         dataset.write(&[temperature]).unwrap();
     }
 }

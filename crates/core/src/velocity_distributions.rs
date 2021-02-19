@@ -7,6 +7,7 @@ use crate::constants::BOLTZMANN;
 use crate::properties::temperature::Temperature;
 use crate::properties::IntrinsicProperty;
 use crate::system::System;
+use crate::internal::Float;
 
 /// Shared behavior for algorithms that can initialize a velocity distribution.
 pub trait VelocityDistribution: Send + Sync {
@@ -17,8 +18,8 @@ pub trait VelocityDistribution: Send + Sync {
 /// Maxwell Boltzmann style velocity distribution.
 #[derive(Clone, Copy, Debug)]
 pub struct Boltzmann {
-    target: f64,
-    distr: Normal<f64>,
+    target: Float,
+    distr: Normal<Float>,
 }
 
 impl Boltzmann {
@@ -27,8 +28,8 @@ impl Boltzmann {
     /// # Arguments
     ///
     /// * `target` - Target temperature (Kelvin)
-    pub fn new(target: f64) -> Boltzmann {
-        let distr = Normal::new(0.0, f64::sqrt(BOLTZMANN * target)).unwrap();
+    pub fn new(target: Float) -> Boltzmann {
+        let distr = Normal::new(0.0, Float::sqrt(BOLTZMANN * target)).unwrap();
         Boltzmann { target, distr }
     }
 }
@@ -46,15 +47,15 @@ impl VelocityDistribution for Boltzmann {
                 let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
                 Vector3::new(x, y, z)
             })
-            .collect::<Vec<Vector3<f64>>>();
+            .collect::<Vec<Vector3<Float>>>();
         scale(system, self.target);
     }
 }
 
 /// Scale all velocities in system to the target value.
-fn scale(system: &mut System, target: f64) {
+fn scale(system: &mut System, target: Float) {
     let temperature = Temperature.calculate_intrinsic(system);
-    let factor = f64::sqrt(target / temperature);
+    let factor = Float::sqrt(target / temperature);
     // !!! this block is more efficient without `par_iter`
     system.velocities = system.velocities.iter().map(|&x| x * factor).collect();
 }

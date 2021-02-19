@@ -2,7 +2,10 @@ use criterion::{criterion_group, criterion_main, Criterion};
 
 use velvet_core::potentials::pair::{Harmonic, LennardJones, Mie, Morse, PairPotential};
 
+#[cfg(feature = "f64")]
 static DISTANCE: f64 = 1.0;
+#[cfg(not(feature = "f64"))]
+static DISTANCE: f32 = 1.0;
 
 pub fn lennard_jones_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("lennard_jones");

@@ -3,8 +3,8 @@ use std::io::BufReader;
 
 use velvet::prelude::*;
 
-static TIMESTEPS: usize = 100000;
-static OUTPUT_INTERVAL: usize = 100;
+static TIMESTEPS: usize = 100_000;
+static OUTPUT_INTERVAL: usize = 50;
 static OUTPUT_FILENAME: &str = "nve.h5";
 
 fn main() {
@@ -27,7 +27,7 @@ fn main() {
         .build();
 
     // Initialize a velocity Verlet style integrator.
-    let velocity_verlet = VelocityVerlet::new(0.5);
+    let velocity_verlet = VelocityVerlet::new(0.1);
 
     // Run MD with no thermostat to simulate the NVE ensemble.
     let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(NullThermostat));
