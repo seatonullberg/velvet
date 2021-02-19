@@ -86,7 +86,7 @@ pub fn rocksalt_potentials(system: &System) -> Potentials {
 }
 
 pub fn xenon_potentials(system: &System) -> Potentials {
-    let lj = LennardJones::new(1.87, 4.57);
+    let lj = LennardJones::new(7.824, 4.57);
     let meta = PairMeta::new(12.0, (Element::Xe, Element::Xe), system);
     PotentialsBuilder::new()
         .add_pair(meta, Box::new(lj))

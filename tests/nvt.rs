@@ -41,6 +41,34 @@ fn argon() {
     );
 }
 
+#[test]
+fn xenon() {
+    let mut system = test_utils::xenon_system();
+    let potentials = test_utils::xenon_potentials(&system);
+    nvt(&mut system, &potentials);
+
+    let pe_target = -5500.0;
+    assert_relative_eq!(
+        PotentialEnergy.calculate(&mut system, &potentials),
+        pe_target,
+        epsilon = 200.0
+    );
+
+    let ke_target = 90.0;
+    assert_relative_eq!(
+        KineticEnergy.calculate(&mut system, &potentials),
+        ke_target,
+        epsilon = 25.0
+    );
+
+    let temp_target = 300.0;
+    assert_relative_eq!(
+        Temperature.calculate(&system, &potentials),
+        temp_target,
+        epsilon = 50.0
+    );
+}
+
 fn nvt(system: &mut System, potentials: &Potentials) {
     let boltz = Boltzmann::new(300.0);
     boltz.apply(system);
