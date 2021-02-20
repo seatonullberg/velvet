@@ -37,15 +37,16 @@ $ cargo test --workspace
 ```
 3. Build in release mode
 ```bash
-# without optional dependencies
 $ cargo build --release
-
-# with HDF5 dependency
-$ cargo build --release --features hdf5-output
-
-# with rayon multithreading enabled
-$ cargo build --release --features rayon
 ```
+
+#### Optional Features
+
+Velvet supports a number of compile time options that can be opted into by using the `--features` flag when building with Cargo.
+
+* `f64` - Sets the underlying storage type to a 64 bit floating point number. Default is 32 bit.
+* `hdf5-output` - Enables HDF5 formatted output. Requires a local installation of `libhdf5`.
+* `rayon` - Enables multithreading with `rayon` parallel iterators.
 
 ## Usage
 
@@ -68,4 +69,5 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
 ## Acknowledgements
 
+* [LAMMPS](https://github.com/lammps/lammps) - Large-scale Atomic/Molecular Massively Parallel Simulator
 * [Lumol](https://github.com/lumol-org/lumol) - Universal extensible molecular simulation engine
