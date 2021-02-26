@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+
 use std::fs::File;
 use std::io::BufReader;
 
@@ -8,6 +10,8 @@ static OUTPUT_INTERVAL: usize = 50;
 static OUTPUT_FILENAME: &str = "nve.h5";
 
 fn main() {
+    pretty_env_logger::init();
+
     // Load an Ar gas system from a POSCAR formatted file.
     let file = File::open("resources/test/Ar.poscar").unwrap();
     let reader = BufReader::new(file);
@@ -19,11 +23,12 @@ fn main() {
 
     // Initialize a Lennard-Jones style pair potential between all Ar-Ar pairs.
     let lj = LennardJones::new(4.184, 3.4);
-    let meta = PairMeta::new(8.5, (Element::Ar, Element::Ar), &system);
+    let argon = Specie::from_element(0, Element::Ar);
 
     // Store all of the system's potentials in a Potentials struct.
     let potentials = PotentialsBuilder::new()
-        .add_pair(meta, Box::new(lj))
+        .with_update_interval(5)
+        .with_pair(Box::new(lj), 8.5, (argon, argon))
         .build();
 
     // Initialize a velocity Verlet style integrator.

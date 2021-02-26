@@ -16,7 +16,6 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     ax.plot(logged_steps, energies, linewidth=0.5)
     ax.set_xlim((0, TIMESTEPS))
-    ax.set_ylim((-3120, -3150))
 
     ax.set_xlabel("Timesteps")
     ax.set_ylabel("Potential Energy (kcal/mol)")
