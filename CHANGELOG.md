@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+### Added
 
-* Make `rayon` an optional dependency.
+* Neighbor list optimization.
+* `Specie` struct for custom atom types.
+
+### Removed
+
+* `rayon` feature (bring back in a future release).
 
 ## [0.4.1] - 2021-02-12
 

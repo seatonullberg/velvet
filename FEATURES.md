@@ -59,7 +59,7 @@ All of the project's completed and proposed features will be documented in this 
 
 ## Runtime Performance
 
-- [x] **Multithreading** - Thread parallelism via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators (optional).
+- [ ] **Multithreading** - Thread parallelism via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators (optional).
 - [ ] **SIMD** - Multiple dispatch of single instructions.
 
 ## Temperature Initialization
@@ -71,5 +71,3 @@ All of the project's completed and proposed features will be documented in this 
 
 - [x] **Berendsen** - [Berendsen](https://en.wikipedia.org/wiki/Berendsen_thermostat) (1984) velocity rescale thermostat.
 - [x] **Nose-Hoover** - [Nose-Hoover](https://en.wikipedia.org/wiki/Nos%C3%A9%E2%80%93Hoover_thermostat) (1984) deterministic thermostat.
-
-

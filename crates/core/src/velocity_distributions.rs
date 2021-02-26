@@ -38,10 +38,11 @@ impl VelocityDistribution for Boltzmann {
     fn apply(&self, system: &mut System) {
         // !!! this block is more efficient without `par_iter`
         system.velocities = system
-            .elements
+            .specie_ids
             .iter()
-            .map(|elem| {
-                let inv_mass = 1.0 / elem.mass();
+            .map(|id| {
+                let sp = system.species[id];
+                let inv_mass = 1.0 / sp.mass();
                 let x = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
                 let y = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
                 let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());

@@ -4,132 +4,110 @@ use std::collections::HashMap;
 
 pub mod cell;
 pub mod elements;
+pub mod species;
 
 use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
 use crate::system::cell::Cell;
-use crate::system::elements::Element;
+use crate::system::species::Specie;
 
 /// Collection of atomic properties and bonding information.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct System {
     /// Number of atoms in the system.
-    size: usize,
+    pub size: usize,
     /// Simulation cell with periodic boundary conditions.
-    cell: Cell,
-    /// Element type for each atom in the system.
-    pub elements: Vec<Element>,
+    pub cell: Cell,
+    /// Species in the system mapped to their ID.
+    pub species: HashMap<usize, Specie>,
+    /// Specie ID of each atom in the system.
+    pub specie_ids: Vec<usize>,
     /// Position of each atom in the system.
     pub positions: Vec<Vector3<Float>>,
     /// Velocity of each atom in the system.
     pub velocities: Vec<Vector3<Float>>,
 }
 
-impl System {
-    /// Returns the number of atoms in the system.
-    pub fn size(&self) -> usize {
-        self.size
-    }
+// /// Constructor for the [`System`](velvet_core::system::System) type.
+// pub struct SystemBuilder {
+//     size: usize,
+//     cell: Option<Cell>,
+//     species: Option<Vec<Specie>>,
+//     positions: Option<Vec<Vector3<Float>>>,
+//     velocities: Option<Vec<Vector3<Float>>>,
+// }
 
-    /// Returns the simulation cell.
-    pub fn cell(&self) -> &Cell {
-        &self.cell
-    }
+// impl SystemBuilder {
+//     /// Returns a new system builder.
+//     ///
+//     /// # Arguments
+//     ///
+//     /// * `size` - The number of atoms in the system
+//     pub fn new(size: usize) -> SystemBuilder {
+//         SystemBuilder {
+//             size,
+//             cell: None,
+//             species: None,
+//             positions: None,
+//             velocities: None,
+//         }
+//     }
 
-    /// Returns a mapping of each element type to its number of occurrences in the system.
-    pub fn element_counts(&self) -> HashMap<Element, usize> {
-        let mut counts: HashMap<Element, usize> = HashMap::new();
-        for i in 0..self.size() {
-            let elem = self.elements[i];
-            let count = match counts.get_mut(&elem) {
-                Some(v) => *v,
-                None => 1,
-            };
-            let _ = counts.insert(elem, count);
-        }
-        counts
-    }
-}
+//     /// Sets the system cell.
+//     pub fn with_cell(mut self, cell: Cell) -> SystemBuilder {
+//         self.cell = Some(cell);
+//         self
+//     }
 
-/// Constructor for the [`System`](velvet_core::system::System) type.
-pub struct SystemBuilder {
-    size: usize,
-    cell: Option<Cell>,
-    elements: Option<Vec<Element>>,
-    positions: Option<Vec<Vector3<Float>>>,
-    velocities: Option<Vec<Vector3<Float>>>,
-}
+//     /// Sets the specie types in the system.
+//     pub fn with_species(mut self, species: Vec<Specie>) -> SystemBuilder {
+//         self.species = Some(species);
+//         self
+//     }
 
-impl SystemBuilder {
-    /// Returns a new system builder.
-    ///
-    /// # Arguments
-    ///
-    /// * `size` - The number of atoms in the system
-    pub fn new(size: usize) -> SystemBuilder {
-        SystemBuilder {
-            size,
-            cell: None,
-            elements: None,
-            positions: None,
-            velocities: None,
-        }
-    }
+//     pub fn with_specie_ids
 
-    /// Sets the system cell.
-    pub fn with_cell(mut self, cell: Cell) -> SystemBuilder {
-        self.cell = Some(cell);
-        self
-    }
+//     /// Sets the position of each atom in the system.
+//     pub fn with_positions(mut self, positions: Vec<Vector3<Float>>) -> SystemBuilder {
+//         assert!(positions.len() == self.size);
+//         self.positions = Some(positions);
+//         self
+//     }
 
-    /// Sets the element of each atom in the system.
-    pub fn with_elements(mut self, elements: Vec<Element>) -> SystemBuilder {
-        assert!(elements.len() == self.size);
-        self.elements = Some(elements);
-        self
-    }
+//     /// Sets the velocity of each atom in the system.
+//     pub fn with_velocities(mut self, velocities: Vec<Vector3<Float>>) -> SystemBuilder {
+//         assert!(velocities.len() == self.size);
+//         self.velocities = Some(velocities);
+//         self
+//     }
 
-    /// Sets the position of each atom in the system.
-    pub fn with_positions(mut self, positions: Vec<Vector3<Float>>) -> SystemBuilder {
-        assert!(positions.len() == self.size);
-        self.positions = Some(positions);
-        self
-    }
+//     /// Finalizes the build and returns an initialized system.
+//     pub fn build(self) -> System {
+//         let cell = match self.cell {
+//             Some(c) => c,
+//             None => panic!("System requires `cell` attribute"),
+//         };
+//         let species = match self.species {
+//             Some(e) => e,
+//             None => panic!("System requires `species` attribute"),
+//         };
+//         let positions = match self.positions {
+//             Some(p) => p,
+//             None => panic!("System requires `positions` attribute"),
+//         };
+//         let velocities = match self.velocities {
+//             Some(v) => v,
+//             None => vec![Vector3::new(0.0, 0.0, 0.0); self.size],
+//         };
 
-    /// Sets the velocity of each atom in the system.
-    pub fn with_velocities(mut self, velocities: Vec<Vector3<Float>>) -> SystemBuilder {
-        assert!(velocities.len() == self.size);
-        self.velocities = Some(velocities);
-        self
-    }
-
-    /// Finalizes the build and returns an initialized system.
-    pub fn build(self) -> System {
-        let cell = match self.cell {
-            Some(c) => c,
-            None => panic!("System requires `cell` attribute"),
-        };
-        let elements = match self.elements {
-            Some(e) => e,
-            None => panic!("System requires `elements` attribute"),
-        };
-        let positions = match self.positions {
-            Some(p) => p,
-            None => panic!("System requires `positions` attribute"),
-        };
-        let velocities = match self.velocities {
-            Some(v) => v,
-            None => vec![Vector3::new(0.0, 0.0, 0.0); self.size],
-        };
-
-        System {
-            size: self.size,
-            cell,
-            elements,
-            positions,
-            velocities,
-        }
-    }
-}
+//         System {
+//             size: self.size,
+//             cell,
+//             species,
+//             positions,
+//             velocities,
+//         }
+//     }
+// }

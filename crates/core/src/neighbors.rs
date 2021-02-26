@@ -47,17 +47,17 @@ impl NeighborList {
     }
 
     pub fn update(&mut self, system: &System) {
-        let mut new_pairs: Vec<(usize, usize)> = Vec::with_capacity(system.size * system.size);
-        self.possible_pairs.iter().for_each(|(i, j)| {
-            let pos_i = system.positions[*i];
-            let pos_j = system.positions[*j];
-            let r = system.cell.distance(&pos_i, &pos_j);
-            if r < self.cutoff {
-                new_pairs.push((*i, *j))
-            }
-        });
-        new_pairs.shrink_to_fit();
-        self.current_pairs = new_pairs;
+        self.current_pairs = self
+            .possible_pairs
+            .iter()
+            .copied()
+            .filter(|(i, j)| {
+                let pos_i = system.positions[*i];
+                let pos_j = system.positions[*j];
+                let r = system.cell.distance(&pos_i, &pos_j);
+                r < self.cutoff
+            })
+            .collect()
     }
 
     pub fn iter(&self) -> impl Iterator<Item = &(usize, usize)> {
@@ -123,5 +123,11 @@ impl NeighborsBuilder {
             neighbor_lists: self.neighbor_lists,
             pairs: self.pairs,
         }
+    }
+}
+
+impl Default for NeighborsBuilder {
+    fn default() -> Self {
+        Self::new()
     }
 }

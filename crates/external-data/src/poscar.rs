@@ -1,4 +1,6 @@
+use std::collections::{HashMap, HashSet};
 use std::io::BufRead;
+use std::ops::Not;
 use std::str::FromStr;
 
 use nalgebra::{Matrix3, Vector3};
@@ -33,7 +35,7 @@ use crate::internal::Float;
 ///     0.25 0.25 0.25
 ///     ".as_bytes());
 ///
-/// assert_eq!(system.size(), 2);
+/// assert_eq!(system.size, 2);
 /// ```
 pub fn load_poscar<R>(reader: R) -> System
 where
@@ -44,8 +46,6 @@ where
 
     // Alias for the system size.
     let size = poscar.num_sites();
-
-    let mut builder = SystemBuilder::new(size);
 
     // Set system cell.
     let vecs = poscar.scaled_lattice_vectors();
@@ -61,19 +61,41 @@ where
         vecs[2][2] as Float,
     );
     let cell = Cell::from_matrix(matrix);
-    builder = builder.with_cell(cell);
 
-    // Set system elements if they exist.
-    // Panic if they do not exist.
-    //
-    // TODO: change this panic to a result.
-    match poscar.site_symbols() {
+    let species: HashMap<usize, Specie> = match poscar.group_symbols() {
+        Some(symbols) => symbols
+            .enumerate()
+            .fold(HashMap::new(), |mut acc, (i, symbol)| {
+                let element = Element::from_str(symbol).unwrap();
+                let specie = Specie::from_element(i, element);
+                acc.insert(i, specie);
+                acc
+            }),
+        None => panic!("Missing species."),
+    };
+
+    let specie_ids: Vec<usize> = match poscar.site_symbols() {
         Some(symbols) => {
-            let elements: Vec<Element> = symbols.map(|x| Element::from_str(x).unwrap()).collect();
-            builder = builder.with_elements(elements)
+            let mut id = 0;
+            let mut scanned_symbols = HashSet::new();
+            symbols
+                .map(|symbol| {
+                    // TODO: refactor this mess
+                    if scanned_symbols.len() == 0 {
+                        scanned_symbols.insert(symbol);
+                        id
+                    } else {
+                        if scanned_symbols.contains(symbol).not() {
+                            scanned_symbols.insert(symbol);
+                            id += 1;
+                        }
+                        id
+                    }
+                })
+                .collect()
         }
-        None => panic!("POSCAR file is missing site symbols"),
-    }
+        None => panic!("Missing specie ids."),
+    };
 
     // Set system positions.
     let positions: Vec<Vector3<Float>> = poscar
@@ -81,17 +103,21 @@ where
         .iter()
         .map(|x| Vector3::new(x[0] as Float, x[1] as Float, x[2] as Float))
         .collect();
-    builder = builder.with_positions(positions);
 
-    // Set system velocities if they exist.
-    if let Some(vels) = poscar.cart_velocities() {
-        let velocities: Vec<Vector3<Float>> = vels
+    let velocities: Vec<Vector3<Float>> = match poscar.cart_velocities() {
+        Some(vels) => vels
             .iter()
             .map(|x| Vector3::new(x[0] as Float, x[1] as Float, x[2] as Float))
-            .collect();
-        builder = builder.with_velocities(velocities);
-    }
+            .collect(),
+        None => vec![Vector3::zeros(); positions.len()],
+    };
 
-    // Finish building and return the system.
-    builder.build()
+    System {
+        size,
+        cell,
+        species,
+        specie_ids,
+        positions,
+        velocities,
+    }
 }

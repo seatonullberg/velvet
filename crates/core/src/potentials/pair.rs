@@ -4,8 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
 use crate::potentials::Potential;
-use crate::system::elements::Element;
-use crate::system::System;
 
 /// Shared behavior for pair potentials.
 #[typetag::serde(tag = "type")]
@@ -14,41 +12,6 @@ pub trait PairPotential: Potential {
     fn energy(&self, r: Float) -> Float;
     /// Returns the magnitude of the force acting on an atom separated from another by a distance `r`.
     fn force(&self, r: Float) -> Float;
-}
-
-/// Metadata to define a unique pair type
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PairMeta {
-    /// Cutoff radius.
-    pub cutoff: Float,
-    /// Pair of elements.
-    pub elements: (Element, Element),
-    /// Indices of each target pair.
-    pub indices: Vec<(usize, usize)>,
-}
-
-impl PairMeta {
-    pub fn new(cutoff: Float, elements: (Element, Element), system: &System) -> PairMeta {
-        let mut indices = Vec::with_capacity(system.size() * system.size());
-        for i in 0..system.size() {
-            for j in (i + 1)..system.size() {
-                let elem_i = system.elements[i];
-                let elem_j = system.elements[j];
-                if (elem_i, elem_j) == elements {
-                    indices.push((i, j));
-                } else if (elem_j, elem_i) == elements {
-                    indices.push((j, i))
-                }
-            }
-        }
-        indices.shrink_to_fit();
-
-        PairMeta {
-            cutoff,
-            elements,
-            indices,
-        }
-    }
 }
 /// Harmonic style pair potential.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]

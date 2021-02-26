@@ -42,7 +42,7 @@ impl VelocityVerlet {
 #[typetag::serde]
 impl Integrator for VelocityVerlet {
     fn setup(&mut self, system: &System, _: &Potentials) {
-        self.accelerations = vec![Vector3::zeros(); system.size()];
+        self.accelerations = vec![Vector3::zeros(); system.size];
     }
 
     fn integrate(&mut self, system: &mut System, potentials: &Potentials) {
@@ -60,8 +60,8 @@ impl Integrator for VelocityVerlet {
         let forces = Forces.calculate(system, potentials);
         let new_accelerations: Vec<Vector3<Float>> = forces
             .iter()
-            .zip(system.elements.iter())
-            .map(|(f, elem)| f / elem.mass())
+            .zip(system.specie_ids.iter())
+            .map(|(f, id)| f / system.species[id].mass())
             .collect();
 
         system

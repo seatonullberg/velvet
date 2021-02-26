@@ -71,11 +71,10 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn compare_invalid() {
         let hydrogen = Element::H;
         let helium = Element::He;
-        assert_eq!(hydrogen, helium);
+        assert_ne!(hydrogen, helium);
     }
 
     #[test]
@@ -83,20 +82,5 @@ mod tests {
         let hydrogen0 = Element::H;
         let hydrogen1 = Element::H;
         assert_eq!(hydrogen0, hydrogen1);
-    }
-
-    #[test]
-    #[should_panic]
-    fn compare_invalid_tuples() {
-        let pair0 = (Element::He, Element::H);
-        let pair1 = (Element::H, Element::He);
-        assert_eq!(pair0, pair1);
-    }
-
-    #[test]
-    fn compare_valid_tuples() {
-        let pair0 = (Element::H, Element::He);
-        let pair1 = (Element::H, Element::He);
-        assert_eq!(pair0, pair1);
     }
 }

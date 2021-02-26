@@ -35,18 +35,19 @@ hdf5-sys = { version = "0.7", optional = true }
 [dev-dependencies]
 approx = "0.4"
 criterion = "0.3"
+log = "0.4"
 nalgebra = "0.23"
+pretty_env_logger = "0.4"
 velvet-test-utils = { path = "crates/test-utils" }
 
 [features]
 default = []
 f64 = ["velvet-core/f64", "velvet-external-data/f64", "velvet-test-utils/f64"]
 hdf5-output = ["velvet-core/hdf5-output", "hdf5", "hdf5-sys"]
-rayon = ["velvet-core/rayon"]
 
 [[bench]]
-name = "integrator-benchmarks"
-path = "benches/integrators.rs"
+name = "neighbor-benchmarks"
+path = "benches/neighbors.rs"
 harness = false
 
 [[bench]]
@@ -57,16 +58,6 @@ harness = false
 [[bench]]
 name = "property-benchmarks"
 path = "benches/properties.rs"
-harness = false
-
-[[bench]]
-name = "thermostat-benchmarks"
-path = "benches/thermostats.rs"
-harness = false
-
-[[bench]]
-name = "velocity-distribution-benchmarks"
-path = "benches/velocity_distributions.rs"
 harness = false
 
 [package.metadata.docs.rs]

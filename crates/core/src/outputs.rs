@@ -2,9 +2,7 @@
 use crate::internal::Float;
 
 use crate::potentials::Potentials;
-use crate::properties::energy::{
-    CoulombEnergy, KineticEnergy, PairEnergy, PotentialEnergy, TotalEnergy,
-};
+use crate::properties::energy::{KineticEnergy, PairEnergy, PotentialEnergy, TotalEnergy};
 use crate::properties::forces::Forces;
 use crate::properties::temperature::Temperature;
 use crate::properties::Property;
@@ -38,7 +36,7 @@ impl Output for Forces {
         let forces = self.calculate(system, potentials);
         let dataset = group
             .new_dataset::<[Float; 3]>()
-            .create("forces", system.size())
+            .create("forces", system.size)
             .unwrap();
         let arr: Vec<[Float; 3]> = forces.iter().map(|x| [x[0], x[1], x[2]]).collect();
         dataset.write(arr.as_slice()).unwrap()
@@ -111,27 +109,27 @@ impl Output for TotalEnergy {
     }
 }
 
-#[cfg(not(feature = "hdf5-output"))]
-#[typetag::serde]
-impl Output for CoulombEnergy {
-    fn output(&self, system: &System, potentials: &Potentials) {
-        let energy = self.calculate(system, potentials);
-        info!("Coulomb Energy: {:?}", energy);
-    }
-}
+// #[cfg(not(feature = "hdf5-output"))]
+// #[typetag::serde]
+// impl Output for CoulombEnergy {
+//     fn output(&self, system: &System, potentials: &Potentials) {
+//         let energy = self.calculate(system, potentials);
+//         info!("Coulomb Energy: {:?}", energy);
+//     }
+// }
 
-#[cfg(feature = "hdf5-output")]
-#[typetag::serde]
-impl Output for CoulombEnergy {
-    fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
-        let energy = self.calculate(system, potentials);
-        let dataset = group
-            .new_dataset::<Float>()
-            .create("coulomb_energy", 1)
-            .unwrap();
-        dataset.write(&[energy]).unwrap();
-    }
-}
+// #[cfg(feature = "hdf5-output")]
+// #[typetag::serde]
+// impl Output for CoulombEnergy {
+//     fn output(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
+//         let energy = self.calculate(system, potentials);
+//         let dataset = group
+//             .new_dataset::<Float>()
+//             .create("coulomb_energy", 1)
+//             .unwrap();
+//         dataset.write(&[energy]).unwrap();
+//     }
+// }
 
 #[cfg(not(feature = "hdf5-output"))]
 #[typetag::serde]

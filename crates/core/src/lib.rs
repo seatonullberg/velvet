@@ -18,8 +18,8 @@ extern crate strum_macros;
 pub mod config;
 pub mod constants;
 pub mod integrators;
-#[warn(missing_docs)]
 mod internal;
+pub mod neighbors;
 pub mod outputs;
 pub mod potentials;
 pub mod propagators;
@@ -44,6 +44,7 @@ pub mod prelude {
     pub use super::simulation::*;
     pub use super::system::cell::*;
     pub use super::system::elements::*;
+    pub use super::system::species::*;
     pub use super::system::*;
     pub use super::thermostats::*;
     pub use super::velocity_distributions::*;

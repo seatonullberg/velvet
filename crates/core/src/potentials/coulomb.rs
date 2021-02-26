@@ -27,9 +27,9 @@ pub struct CoulombMeta {
 
 impl CoulombMeta {
     pub fn new(cutoff: Float, system: &System) -> CoulombMeta {
-        let mut indices = Vec::with_capacity(system.size() * system.size());
-        for i in 0..system.size() {
-            for j in (i + 1)..system.size() {
+        let mut indices = Vec::with_capacity(system.size * system.size);
+        for i in 0..system.size {
+            for j in (i + 1)..system.size {
                 indices.push((i, j));
             }
         }

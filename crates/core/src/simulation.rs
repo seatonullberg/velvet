@@ -28,60 +28,48 @@ impl Simulation {
         }
     }
 
-    #[cfg(not(feature = "hdf5-output"))]
     pub fn run(&mut self, steps: usize) {
-        // initialize the logger.
-        pretty_env_logger::init();
-
-        // log initial state
-        info!("Initial state:");
-        for out in self.config.outputs() {
-            out.output(&self.system, &self.potentials);
-        }
-
-        // setup propagation
-        self.propagator.setup(&mut self.system, &self.potentials);
-
-        // start iteration
-        info!("Starting simulation...");
-        for i in 0..steps {
-            self.propagator
-                .propagate(&mut self.system, &self.potentials);
-
-            // log intermediate state
-            if i % self.config.output_interval() == 0 || i == steps - 1 {
-                info!("Logging results for timestep: {}", i);
-                for out in self.config.outputs() {
-                    out.output(&self.system, &self.potentials);
-                }
-            }
-        }
-        info!("Simulation complete.")
-    }
-
-    #[cfg(feature = "hdf5-output")]
-    pub fn run(&mut self, steps: usize) {
-        // Initialize the logger.
-        pretty_env_logger::init();
-        info!("Starting simulation...");
-
-        // open HDF5 output file
+        #[cfg(feature = "hdf5-output")]
         let file = hdf5::File::create(self.config.output_filename()).unwrap();
 
+        // setup potentials
+        self.potentials.setup(&self.system);
+
         // setup propagation
         self.propagator.setup(&mut self.system, &self.potentials);
+
+        // start iteration loop
+        info!("Starting iteration loop...");
         for i in 0..steps {
+            // do the propagation step
             self.propagator
                 .propagate(&mut self.system, &self.potentials);
 
-            if i == 0 || i % self.config.output_interval() == 0 || i == steps - 1 {
-                info!("Logging results for timestep: {}", i);
+            // update neighbors lists if necessary
+            if i % self.potentials.update_interval == 0 {
+                self.potentials.update(&self.system)
+            }
+
+            // output results
+            if i % self.config.output_interval() == 0 || i == steps - 1 {
+                info!("Results for timestep: {}", i);
+
+                #[cfg(feature = "hdf5-output")]
                 let group = file.create_group(&format!("{}", i)).unwrap();
+
                 for out in self.config.outputs() {
+                    #[cfg(not(feature = "hdf5-output"))]
+                    out.output(&self.system, &self.potentials);
+
+                    #[cfg(feature = "hdf5-output")]
                     out.output(&self.system, &self.potentials, &group);
                 }
             }
         }
-        info!("Simulation complete.")
+        info!("Iteration loop complete ({} iterations).", steps);
+    }
+
+    pub fn consume(self) -> (System, Potentials) {
+        (self.system, self.potentials)
     }
 }
