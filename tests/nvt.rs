@@ -1,13 +1,15 @@
 use approx::*;
 
-use velvet_core::integrators::{Integrator, VelocityVerlet};
+use velvet::prelude::ConfigurationBuilder;
+use velvet_core::integrators::VelocityVerlet;
 use velvet_core::potentials::Potentials;
-use velvet_core::propagators::{MolecularDynamics, Propagator};
+use velvet_core::propagators::MolecularDynamics;
 use velvet_core::properties::energy::{KineticEnergy, PotentialEnergy};
 use velvet_core::properties::temperature::Temperature;
 use velvet_core::properties::Property;
+use velvet_core::simulation::Simulation;
 use velvet_core::system::System;
-use velvet_core::thermostats::{NoseHoover, Thermostat};
+use velvet_core::thermostats::NoseHoover;
 use velvet_core::velocity_distributions::{Boltzmann, VelocityDistribution};
 use velvet_test_utils as test_utils;
 
@@ -15,9 +17,9 @@ static ITERATIONS: usize = 10000;
 
 #[test]
 fn argon() {
-    let mut system = test_utils::argon_system();
-    let potentials = test_utils::argon_potentials(&system);
-    nvt(&mut system, &potentials);
+    let system = test_utils::argon_system();
+    let potentials = test_utils::argon_potentials();
+    let (mut system, potentials) = nvt(system, potentials);
 
     let pe_target = -3090.0;
     assert_relative_eq!(
@@ -43,15 +45,15 @@ fn argon() {
 
 #[test]
 fn binary_gas() {
-    let mut system = test_utils::binary_gas_system();
-    let potentials = test_utils::binary_gas_potentials(&system);
-    nvt(&mut system, &potentials);
+    let system = test_utils::binary_gas_system();
+    let potentials = test_utils::binary_gas_potentials();
+    let (mut system, potentials) = nvt(system, potentials);
 
     let pe_target = -4800.0;
     assert_relative_eq!(
         PotentialEnergy.calculate(&mut system, &potentials),
         pe_target,
-        epsilon = 100.0
+        epsilon = 200.0
     );
 
     let ke_target = 100.0;
@@ -71,9 +73,9 @@ fn binary_gas() {
 
 #[test]
 fn xenon() {
-    let mut system = test_utils::xenon_system();
-    let potentials = test_utils::xenon_potentials(&system);
-    nvt(&mut system, &potentials);
+    let system = test_utils::xenon_system();
+    let potentials = test_utils::xenon_potentials();
+    let (mut system, potentials) = nvt(system, potentials);
 
     let pe_target = -5500.0;
     assert_relative_eq!(
@@ -97,20 +99,20 @@ fn xenon() {
     );
 }
 
-fn nvt(system: &mut System, potentials: &Potentials) {
+fn nvt(mut system: System, potentials: Potentials) -> (System, Potentials) {
     let boltz = Boltzmann::new(300.0);
-    boltz.apply(system);
+    boltz.apply(&mut system);
 
-    let mut velocity_verlet = VelocityVerlet::new(0.5);
-    velocity_verlet.setup(system, potentials);
+    let velocity_verlet = VelocityVerlet::new(0.1);
 
-    let mut nose_hoover = NoseHoover::new(300.0, 1.5, 1.0);
-    nose_hoover.setup(system);
+    let nose_hoover = NoseHoover::new(300.0, 1.5, 1.0);
 
-    let mut md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
-    md.setup(system, potentials);
+    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
 
-    for _ in 0..ITERATIONS {
-        md.propagate(system, potentials);
-    }
+    let config = ConfigurationBuilder::default().build();
+
+    let mut sim = Simulation::new(system, potentials, Box::new(md), config);
+    sim.run(ITERATIONS);
+
+    sim.consume()
 }

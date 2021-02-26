@@ -1,11 +1,13 @@
 use approx::*;
 
-use velvet_core::integrators::{Integrator, VelocityVerlet};
+use velvet::prelude::ConfigurationBuilder;
+use velvet_core::integrators::VelocityVerlet;
 use velvet_core::potentials::Potentials;
-use velvet_core::propagators::{MolecularDynamics, Propagator};
+use velvet_core::propagators::MolecularDynamics;
 use velvet_core::properties::energy::{KineticEnergy, PotentialEnergy};
 use velvet_core::properties::temperature::Temperature;
 use velvet_core::properties::Property;
+use velvet_core::simulation::Simulation;
 use velvet_core::system::System;
 use velvet_core::thermostats::NullThermostat;
 use velvet_core::velocity_distributions::{Boltzmann, VelocityDistribution};
@@ -15,9 +17,9 @@ static ITERATIONS: usize = 10000;
 
 #[test]
 fn argon() {
-    let mut system = test_utils::argon_system();
-    let potentials = test_utils::argon_potentials(&system);
-    nve(&mut system, &potentials);
+    let system = test_utils::argon_system();
+    let potentials = test_utils::argon_potentials();
+    let (mut system, potentials) = nve(system, potentials);
 
     let pe_target = -3130.0;
     assert_relative_eq!(
@@ -43,9 +45,9 @@ fn argon() {
 
 #[test]
 fn binary_gas() {
-    let mut system = test_utils::binary_gas_system();
-    let potentials = test_utils::binary_gas_potentials(&system);
-    nve(&mut system, &potentials);
+    let system = test_utils::binary_gas_system();
+    let potentials = test_utils::binary_gas_potentials();
+    let (mut system, potentials) = nve(system, potentials);
 
     let pe_target = -4600.0;
     assert_relative_eq!(
@@ -71,9 +73,9 @@ fn binary_gas() {
 
 #[test]
 fn xenon() {
-    let mut system = test_utils::xenon_system();
-    let potentials = test_utils::xenon_potentials(&system);
-    nve(&mut system, &potentials);
+    let system = test_utils::xenon_system();
+    let potentials = test_utils::xenon_potentials();
+    let (mut system, potentials) = nve(system, potentials);
 
     let pe_target = -5500.0;
     assert_relative_eq!(
@@ -97,17 +99,18 @@ fn xenon() {
     );
 }
 
-fn nve(system: &mut System, potentials: &Potentials) {
+fn nve(mut system: System, potentials: Potentials) -> (System, Potentials) {
     let boltz = Boltzmann::new(300.0);
-    boltz.apply(system);
+    boltz.apply(&mut system);
 
-    let mut velocity_verlet = VelocityVerlet::new(0.1);
-    velocity_verlet.setup(&system, &potentials);
+    let velocity_verlet = VelocityVerlet::new(0.1);
 
-    let mut md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(NullThermostat));
-    md.setup(system, &potentials);
+    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(NullThermostat));
 
-    for _ in 0..ITERATIONS {
-        md.propagate(system, &potentials);
-    }
+    let config = ConfigurationBuilder::default().build();
+
+    let mut sim = Simulation::new(system, potentials, Box::new(md), config);
+    sim.run(ITERATIONS);
+
+    sim.consume()
 }
