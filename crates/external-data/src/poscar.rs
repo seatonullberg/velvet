@@ -81,7 +81,7 @@ where
             symbols
                 .map(|symbol| {
                     // TODO: refactor this mess
-                    if scanned_symbols.len() == 0 {
+                    if scanned_symbols.is_empty() {
                         scanned_symbols.insert(symbol);
                         id
                     } else {

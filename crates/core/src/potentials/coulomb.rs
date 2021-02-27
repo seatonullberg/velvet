@@ -2,15 +2,15 @@
 
 #[cfg(feature = "f64")]
 use libm::erfc;
+
 #[cfg(not(feature = "f64"))]
 use libm::erfcf as erfc;
 
 use serde::{Deserialize, Serialize};
 
-use crate::constants::{FOUR_PI_EPSILON_0, FRAC_2_SQRT_PI, PI};
+use crate::constants::PI;
 use crate::internal::Float;
 use crate::potentials::Potential;
-use crate::system::System;
 
 #[typetag::serde(tag = "type")]
 pub trait CoulombPotential: Potential {
@@ -19,45 +19,17 @@ pub trait CoulombPotential: Potential {
     fn force(&self, qi: Float, qj: Float, r: Float) -> Float;
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct CoulombMeta {
-    pub cutoff: Float,
-    pub indices: Vec<(usize, usize)>,
-}
-
-impl CoulombMeta {
-    pub fn new(cutoff: Float, system: &System) -> CoulombMeta {
-        let mut indices = Vec::with_capacity(system.size * system.size);
-        for i in 0..system.size {
-            for j in (i + 1)..system.size {
-                indices.push((i, j));
-            }
-        }
-        indices.shrink_to_fit();
-
-        CoulombMeta { cutoff, indices }
-    }
-}
-
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Wolf {
     alpha: Float,
-    energy_constant: Float,
-    force_constant: Float,
+    cutoff: Float,
 }
 
 impl Wolf {
-    pub fn new(cutoff: Float) -> Wolf {
-        let alpha = PI / cutoff;
-        let alpha_cut = alpha * cutoff;
-        let alpha_cut_2 = alpha_cut * alpha_cut;
-        let energy_constant = erfc(alpha_cut) / cutoff;
-        let force_constant = erfc(alpha_cut) / (cutoff * cutoff)
-            + FRAC_2_SQRT_PI * alpha * -alpha_cut_2.exp() / cutoff;
+    pub fn new(alpha: Float, cutoff: Float) -> Wolf {
         Wolf {
             alpha,
-            energy_constant,
-            force_constant,
+            cutoff,
         }
     }
 }
@@ -68,19 +40,22 @@ impl Potential for Wolf {}
 #[typetag::serde]
 impl CoulombPotential for Wolf {
     fn energy(&self, qi: Float, qj: Float, r: Float) -> Float {
-        qi * qj * (erfc(self.alpha * r) / r - self.energy_constant) / FOUR_PI_EPSILON_0
+        let term_a = erfc(self.alpha * r) / r;
+        let term_b = erfc(self.alpha * self.cutoff) / self.cutoff;
+        qi * qj *  (term_a - term_b)
     }
 
     fn energy_self(&self, qi: Float) -> Float {
-        qi * qi * 0.5 * (self.energy_constant + self.alpha * FRAC_2_SQRT_PI) / FOUR_PI_EPSILON_0
+        let term_a = 0.5 * erfc(self.alpha * self.cutoff) / self.cutoff;
+        let term_b = self.alpha / Float::sqrt(PI);
+        -(qi * qi) * (term_a + term_b)
     }
 
     fn force(&self, qi: Float, qj: Float, r: Float) -> Float {
         let r2 = r * r;
-        let alpha_r = self.alpha * r;
-        let exp_alpha_r = Float::exp(-alpha_r * alpha_r);
-        let factor = erfc(alpha_r) / r2 + self.alpha * FRAC_2_SQRT_PI * exp_alpha_r / r;
-        qi * qj * (factor - self.force_constant) / (r * FOUR_PI_EPSILON_0)
+        let term_a = -erfc(self.alpha * r) / r2;
+        let term_b = 2.0 * self.alpha * Float::exp(-(self.alpha * self.alpha * r2)) / (Float::sqrt(PI) * r);
+        qi * qj * (term_a - term_b)
     }
 }
 
@@ -91,20 +66,18 @@ mod tests {
 
     #[test]
     fn wolf() {
-        let wolf = Wolf::new(8.0);
+        let wolf = Wolf::new(0.25, 8.0);
 
-        let energy_self_na = wolf.energy_self(1.0);
-        let energy_self_cl = wolf.energy_self(-1.0);
         let energy_wolf = wolf.energy(1.0, -1.0, 1.5);
-        let energy_target = -0.09263977;
-        assert_relative_eq!(
-            energy_wolf - energy_self_na - energy_self_cl,
-            energy_target,
-            epsilon = 1e-2
-        );
+        let energy_target = -0.396671;
+        assert_relative_eq!(energy_wolf, energy_target, epsilon=1e-5);
 
-        let force_wolf_a = wolf.force(-1.0, 1.0, 1.5);
-        let force_wolf_b = wolf.force(1.0, -1.0, 1.5);
-        assert_relative_eq!(force_wolf_a - force_wolf_b, 0.0);
+        let force_wolf = wolf.force(1.0, -1.0, 1.5);
+        let force_target = 0.428229;
+        assert_relative_eq!(force_wolf, force_target, epsilon=1e-5);
+
+        let energy_self_wolf = wolf.energy_self(1.0);
+        let energy_self_target = -0.141340;
+        assert_relative_eq!(energy_self_wolf, energy_self_target, epsilon=1e-5);
     }
 }
