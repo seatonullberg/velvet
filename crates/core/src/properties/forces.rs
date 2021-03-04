@@ -47,9 +47,12 @@ impl Property for PairForces {
         potentials
             .pair_interactions()
             .iter()
-            .map(|(potential, i, j)| {
-                let pos_i = system.positions[*i];
-                let pos_j = system.positions[*j];
+            .map(|interaction| {
+                let potential = &interaction.potential;
+                let i = interaction.index_i;
+                let j = interaction.index_j;
+                let pos_i = system.positions[i];
+                let pos_j = system.positions[j];
                 let r = system.cell.distance(&pos_i, &pos_j);
                 let dir = system.cell.direction(&pos_i, &pos_j);
                 (potential.force(r) * dir, i, j)
@@ -57,8 +60,8 @@ impl Property for PairForces {
             .fold(
                 vec![Vector3::zeros(); system.size],
                 |mut accumulator, (force, i, j)| {
-                    accumulator[*i] += force;
-                    accumulator[*j] -= force;
+                    accumulator[i] += force;
+                    accumulator[j] -= force;
                     accumulator
                 },
             )

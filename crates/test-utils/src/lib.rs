@@ -1,12 +1,16 @@
 use std::fs::File;
 use std::io::BufReader;
+use std::rc::Rc;
 
+use velvet_core::neighbors::NeighborList;
 use velvet_core::potentials::pair::LennardJones;
 use velvet_core::potentials::{Potentials, PotentialsBuilder};
 use velvet_core::system::elements::Element;
 use velvet_core::system::species::Specie;
 use velvet_core::system::System;
 use velvet_external_data::poscar::load_poscar;
+
+static UPDATE_FREQUENCY: usize = 3;
 
 pub fn argon_system() -> System {
     let file = File::open(resources_path("Ar.poscar")).unwrap();
@@ -35,21 +39,23 @@ pub fn xenon_system() -> System {
 pub fn argon_potentials() -> Potentials {
     let argon = Specie::from_element(0, Element::Ar);
     let lj = LennardJones::new(4.184, 3.4);
-    PotentialsBuilder::new()
-        .with_pair(Box::new(lj), 8.5, (argon, argon))
-        .build()
+    let nl = NeighborList::new(8.5, Some((argon, argon)), UPDATE_FREQUENCY);
+    PotentialsBuilder::new().with_pair(Rc::new(lj), nl).build()
 }
 
 pub fn binary_gas_potentials() -> Potentials {
     let argon = Specie::from_element(0, Element::Ar);
     let xenon = Specie::from_element(1, Element::Xe);
     let lj0 = LennardJones::new(4.184, 3.4);
+    let nl0 = NeighborList::new(12.0, Some((argon, argon)), UPDATE_FREQUENCY);
     let lj1 = LennardJones::new(7.824, 4.57);
+    let nl1 = NeighborList::new(12.0, Some((xenon, xenon)), UPDATE_FREQUENCY);
     let lj2 = LennardJones::new(6.276, 4.0);
+    let nl2 = NeighborList::new(12.0, Some((argon, xenon)), UPDATE_FREQUENCY);
     PotentialsBuilder::new()
-        .with_pair(Box::new(lj0), 12.0, (argon, argon))
-        .with_pair(Box::new(lj1), 12.0, (xenon, xenon))
-        .with_pair(Box::new(lj2), 12.0, (argon, xenon))
+        .with_pair(Rc::new(lj0), nl0)
+        .with_pair(Rc::new(lj1), nl1)
+        .with_pair(Rc::new(lj2), nl2)
         .build()
 }
 
@@ -73,9 +79,8 @@ pub fn binary_gas_potentials() -> Potentials {
 pub fn xenon_potentials() -> Potentials {
     let xenon = Specie::from_element(0, Element::Xe);
     let lj = LennardJones::new(7.824, 4.57);
-    PotentialsBuilder::new()
-        .with_pair(Box::new(lj), 12.0, (xenon, xenon))
-        .build()
+    let nl = NeighborList::new(12.0, Some((xenon, xenon)), UPDATE_FREQUENCY);
+    PotentialsBuilder::new().with_pair(Rc::new(lj), nl).build()
 }
 
 pub fn resources_path(filename: &str) -> String {

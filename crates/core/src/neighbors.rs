@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
@@ -10,22 +8,28 @@ use crate::system::System;
 pub struct NeighborList {
     cutoff: Float,
     species: Option<(Specie, Specie)>,
-    possible_pairs: Vec<(usize, usize)>,
-    current_pairs: Vec<(usize, usize)>,
+    pub update_frequency: usize,
+    possible_indices: Vec<(usize, usize)>,
+    current_indices: Vec<(usize, usize)>,
 }
 
 impl NeighborList {
-    pub fn new(cutoff: Float, species: Option<(Specie, Specie)>) -> NeighborList {
+    pub fn new(
+        cutoff: Float,
+        species: Option<(Specie, Specie)>,
+        update_frequency: usize,
+    ) -> NeighborList {
         NeighborList {
             cutoff,
             species,
-            possible_pairs: Vec::new(),
-            current_pairs: Vec::new(),
+            update_frequency,
+            possible_indices: Vec::new(),
+            current_indices: Vec::new(),
         }
     }
 
     pub fn setup(&mut self, system: &System) {
-        self.possible_pairs = Vec::with_capacity(system.size * system.size);
+        self.possible_indices = Vec::with_capacity(system.size * system.size);
         for i in 0..system.size {
             let sp_i = system.species[&system.specie_ids[i]];
             for j in (i + 1)..system.size {
@@ -33,22 +37,22 @@ impl NeighborList {
                 match self.species {
                     Some(species) => {
                         if (sp_i, sp_j) == species {
-                            self.possible_pairs.push((i, j))
+                            self.possible_indices.push((i, j))
                         } else if (sp_j, sp_i) == species {
-                            self.possible_pairs.push((j, i))
+                            self.possible_indices.push((j, i))
                         }
                     }
-                    None => self.possible_pairs.push((i, j)),
+                    None => self.possible_indices.push((i, j)),
                 }
             }
         }
-        self.possible_pairs.shrink_to_fit();
+        self.possible_indices.shrink_to_fit();
         self.update(system)
     }
 
     pub fn update(&mut self, system: &System) {
-        self.current_pairs = self
-            .possible_pairs
+        self.current_indices = self
+            .possible_indices
             .iter()
             .copied()
             .filter(|(i, j)| {
@@ -60,74 +64,7 @@ impl NeighborList {
             .collect()
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = &(usize, usize)> {
-        self.current_pairs.iter()
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Neighbors {
-    neighbor_lists: Vec<NeighborList>,
-    pairs: HashMap<(usize, usize), usize>,
-}
-
-impl Neighbors {
-    pub fn setup(&mut self, system: &System) {
-        self.neighbor_lists
-            .iter_mut()
-            .for_each(|nl| nl.setup(system));
-        self.update(system)
-    }
-
-    pub fn update(&mut self, system: &System) {
-        self.neighbor_lists
-            .iter_mut()
-            .for_each(|nl| nl.update(system));
-
-        let pairs = &mut self.pairs;
-        self.neighbor_lists
-            .iter()
-            .enumerate()
-            .for_each(|(index, nl)| {
-                nl.iter().for_each(|(i, j)| {
-                    pairs.insert((*i, *j), index);
-                })
-            });
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = (&(usize, usize), &usize)> {
-        self.pairs.iter()
-    }
-}
-
-pub struct NeighborsBuilder {
-    neighbor_lists: Vec<NeighborList>,
-    pairs: HashMap<(usize, usize), usize>,
-}
-
-impl NeighborsBuilder {
-    pub fn new() -> NeighborsBuilder {
-        NeighborsBuilder {
-            neighbor_lists: Vec::new(),
-            pairs: HashMap::new(),
-        }
-    }
-
-    pub fn with_neighbor_list(mut self, neighbor_list: NeighborList) -> NeighborsBuilder {
-        self.neighbor_lists.push(neighbor_list);
-        self
-    }
-
-    pub fn build(self) -> Neighbors {
-        Neighbors {
-            neighbor_lists: self.neighbor_lists,
-            pairs: self.pairs,
-        }
-    }
-}
-
-impl Default for NeighborsBuilder {
-    fn default() -> Self {
-        Self::new()
+    pub fn indices(&self) -> &Vec<(usize, usize)> {
+        &self.current_indices
     }
 }

@@ -45,10 +45,8 @@ impl Simulation {
             self.propagator
                 .propagate(&mut self.system, &self.potentials);
 
-            // update neighbors lists if necessary
-            if i % self.potentials.update_interval == 0 {
-                self.potentials.update(&self.system)
-            }
+            // update the itneraction groups
+            self.potentials.update(&self.system, i);
 
             // output results
             if i % self.config.output_interval() == 0 || i == steps - 1 {

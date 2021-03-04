@@ -3,12 +3,12 @@
 pub mod coulomb;
 pub mod pair;
 
+use std::rc::Rc;
+
 use serde::{Deserialize, Serialize};
 
-use crate::internal::Float;
-use crate::neighbors::{NeighborList, Neighbors, NeighborsBuilder};
-use crate::potentials::pair::PairPotential;
-use crate::system::species::Specie;
+use crate::neighbors::NeighborList;
+use crate::potentials::pair::{PairInteraction, PairPotential};
 use crate::system::System;
 
 /// Base trait for all potentials.
@@ -18,68 +18,84 @@ pub trait Potential: Send + Sync {}
 /// Container type to hold instances of each potential in the system.
 #[derive(Serialize, Deserialize)]
 pub struct Potentials {
-    neighbors: Neighbors,
-    pairs: Vec<Box<dyn PairPotential>>,
-    pub update_interval: usize,
+    pair_potentials: Vec<Rc<dyn PairPotential>>,
+    pair_neighbor_lists: Vec<NeighborList>,
+    pair_interactions: Vec<PairInteraction>,
 }
 
 impl Potentials {
     pub fn setup(&mut self, system: &System) {
-        self.neighbors.setup(system);
+        // setup pair potentials
+        self.pair_neighbor_lists
+            .iter_mut()
+            .for_each(|nl| nl.setup(system));
+
+        // force an initial update
+        self.update(system, 0);
     }
 
-    pub fn update(&mut self, system: &System) {
-        self.neighbors.update(system);
-    }
-
-    pub fn pair_interactions(&self) -> Vec<(&dyn PairPotential, usize, usize)> {
-        self.neighbors
+    pub fn update(&mut self, system: &System, iteration: usize) {
+        // update pair potential neighbor lists
+        self.pair_neighbor_lists.iter_mut().for_each(|nl| {
+            if iteration % nl.update_frequency == 0 {
+                nl.update(system)
+            }
+        });
+        // rebuild the pair potential interactions
+        self.pair_interactions = self
+            .pair_potentials
             .iter()
-            .map(move |((i, j), index)| (&*self.pairs[*index], *i, *j))
-            .collect()
+            .zip(self.pair_neighbor_lists.iter())
+            .fold(Vec::new(), |mut accumulator, (potential, nl)| {
+                nl.indices().iter().for_each(|(i, j)| {
+                    let interaction = PairInteraction {
+                        potential: potential.clone(),
+                        index_i: *i,
+                        index_j: *j,
+                    };
+                    accumulator.push(interaction);
+                });
+                accumulator
+            });
+    }
+
+    pub fn pair_interactions(&self) -> &Vec<PairInteraction> {
+        &self.pair_interactions
     }
 }
 
 /// Constructor for the [`Potentials`](velvet_core::potentials::Potentials) type.
 pub struct PotentialsBuilder {
-    neighbors_builder: NeighborsBuilder,
-    pairs: Vec<Box<dyn PairPotential>>,
-    update_interval: usize,
+    pair_potentials: Vec<Rc<dyn PairPotential>>,
+    pair_neighbor_lists: Vec<NeighborList>,
+    pair_interactions: Vec<PairInteraction>,
 }
 
 impl PotentialsBuilder {
     /// Returns a new `PotentialsBuilder`.
     pub fn new() -> PotentialsBuilder {
         PotentialsBuilder {
-            neighbors_builder: NeighborsBuilder::new(),
-            pairs: Vec::new(),
-            update_interval: 1,
+            pair_potentials: Vec::new(),
+            pair_neighbor_lists: Vec::new(),
+            pair_interactions: Vec::new(),
         }
     }
 
     pub fn with_pair(
         mut self,
-        potential: Box<dyn PairPotential>,
-        cutoff: Float,
-        species: (Specie, Specie),
+        potential: Rc<dyn PairPotential>,
+        neighbor_list: NeighborList,
     ) -> PotentialsBuilder {
-        let nl = NeighborList::new(cutoff, Some(species));
-        self.neighbors_builder = self.neighbors_builder.with_neighbor_list(nl);
-        self.pairs.push(potential);
-        self
-    }
-
-    pub fn with_update_interval(mut self, interval: usize) -> PotentialsBuilder {
-        self.update_interval = interval;
+        self.pair_potentials.push(potential);
+        self.pair_neighbor_lists.push(neighbor_list);
         self
     }
 
     pub fn build(self) -> Potentials {
-        let neighbors = self.neighbors_builder.build();
         Potentials {
-            neighbors,
-            pairs: self.pairs,
-            update_interval: self.update_interval,
+            pair_potentials: self.pair_potentials,
+            pair_neighbor_lists: self.pair_neighbor_lists,
+            pair_interactions: self.pair_interactions,
         }
     }
 }

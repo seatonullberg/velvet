@@ -9,7 +9,10 @@ pub fn neighbor_list_update_benchmark(c: &mut Criterion) {
     let system = test_utils::argon_system();
     let argon = Specie::from_element(0, Element::Ar);
 
-    let mut neighbor_list = NeighborList::new(8.5, Some((argon, argon)));
+    // update frequency will not be respected in this test.
+    let update_frequency = 5;
+
+    let mut neighbor_list = NeighborList::new(8.5, Some((argon, argon)), update_frequency);
     neighbor_list.setup(&system);
 
     c.bench_function("neighbor_list_update", |b| {

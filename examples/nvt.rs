@@ -2,8 +2,10 @@ extern crate pretty_env_logger;
 
 use std::fs::File;
 use std::io::BufReader;
+use std::rc::Rc;
 
 use velvet::prelude::*;
+use velvet_core::neighbors::NeighborList;
 
 static TIMESTEPS: usize = 100_000;
 static OUTPUT_INTERVAL: usize = 50;
@@ -26,9 +28,9 @@ fn main() {
     let argon = Specie::from_element(0, Element::Ar);
 
     // Store all of the system's potentials in a Potentials struct.
+    let neighbor_list = NeighborList::new(8.5, Some((argon, argon)), 3);
     let potentials = PotentialsBuilder::new()
-        .with_update_interval(5)
-        .with_pair(Box::new(lj), 8.5, (argon, argon))
+        .with_pair(Rc::new(lj), neighbor_list)
         .build();
 
     // Initialize a velocity Verlet style integrator.
