@@ -28,14 +28,14 @@ All of the project's completed and proposed features will be documented in this 
 
 ## Data Formats <a name="data-formats">
 
-### Inputs <a name="data-formats-inputs>
+### Inputs <a name="data-formats-inputs">
 
 - [x] **POSCAR** - Load internal system representation from [VASP](https://www.vasp.at/wiki/index.php/POSCAR)'s structure file format.
 - [ ] **CIF** - Load internal system representation from a [crystallographic information file](https://en.wikipedia.org/wiki/Crystallographic_Information_File).
 - [ ] **LAMMPS** - Load internal system representation from [LAMMPS](https://lammps.sandia.gov/doc/2001/data_format.html)'s data file format.
 - [ ] **PDB** - Load internal system representation from a [protein data bank file](https://www.cgl.ucsf.edu/chimera/docs/UsersGuide/tutorials/pdbintro.html).
 
-### Outputs <a name="data-formats-outputs>
+### Outputs <a name="data-formats-outputs">
 
 - [x] **HDF5** - Write results in [HDF5](https://www.hdfgroup.org/solutions/hdf5/) format with (optional) `libhdf5` dependency.
 - [ ] **CBOR** - Serialize simulation configurations as binary [CBOR](https://cbor.io/) data.
@@ -64,13 +64,13 @@ All of the project's completed and proposed features will be documented in this 
 - [ ] **Cosine** - [Cosine](https://lammps.sandia.gov/doc/angle_cosine.html) angle potential.
     - [ ] Angle interactions 
 
-## Propogation Techniques <a name="propogation-techniques>
+## Propogation Techniques <a name="propogation-techniques">
 
 - [x] **Molecular Dynamics** - Timestep integration based propagation.
 - [ ] **Monte Carlo** - Stochastic movement based propagation.
 - [ ] **Energy Minimization** - Numerical minimization of the system's energy to optimize positions and/or system size.
 
-## Runtime Performance <a name="runtime-performance>
+## Runtime Performance <a name="runtime-performance">
 
 - [x] **Neighbor Lists** - [Neighbor list](https://en.wikipedia.org/wiki/Verlet_list) buffering of nonbonded interactions.
 - [ ] **Multithreading** - Thread parallelism via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators (optional).
