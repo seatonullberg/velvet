@@ -28,7 +28,6 @@ members = [
 [dependencies]
 velvet-core = { path = "crates/core", version = "0.4.2" }
 velvet-external-data = { path = "crates/external-data", version = "0.1.0" }
-
 hdf5 = { version = "0.7", optional = true }
 hdf5-sys = { version = "0.7", optional = true }
 
@@ -38,26 +37,28 @@ criterion = "0.3"
 log = "0.4"
 nalgebra = "0.23"
 pretty_env_logger = "0.4"
+vasp-poscar = "0.3.2"
 velvet-test-utils = { path = "crates/test-utils" }
 
 [features]
 default = []
-f64 = ["velvet-core/f64", "velvet-external-data/f64", "velvet-test-utils/f64"]
-hdf5-output = ["velvet-core/hdf5-output", "hdf5", "hdf5-sys"]
+f64 = [
+    "velvet-core/f64", 
+    "velvet-external-data/f64", 
+    "velvet-test-utils/f64",
+]
+hdf5-output = [
+    "hdf5", 
+    "hdf5-sys",
+    "velvet-core/hdf5-output",
+]
+rayon = [
+    "velvet-core/rayon",
+]
 
 [[bench]]
-name = "neighbor-benchmarks"
-path = "benches/neighbors.rs"
-harness = false
-
-[[bench]]
-name = "pair-potential-benchmarks"
-path = "benches/potentials/pair.rs"
-harness = false
-
-[[bench]]
-name = "property-benchmarks"
-path = "benches/properties.rs"
+name = "argon-benchmarks"
+path = "benches/argon.rs"
 harness = false
 
 [package.metadata.docs.rs]
