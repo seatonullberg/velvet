@@ -1,3 +1,6 @@
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+
 use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
@@ -6,9 +9,9 @@ use crate::system::System;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct NeighborList {
-    cutoff: Float,
+    pub cutoff: Float,
+    thickness: Float,
     species: Option<(Specie, Specie)>,
-    pub update_frequency: usize,
     possible_indices: Vec<(usize, usize)>,
     current_indices: Vec<(usize, usize)>,
 }
@@ -16,13 +19,13 @@ pub struct NeighborList {
 impl NeighborList {
     pub fn new(
         cutoff: Float,
+        thickness: Float,
         species: Option<(Specie, Specie)>,
-        update_frequency: usize,
     ) -> NeighborList {
         NeighborList {
             cutoff,
+            thickness,
             species,
-            update_frequency,
             possible_indices: Vec::new(),
             current_indices: Vec::new(),
         }
@@ -47,20 +50,35 @@ impl NeighborList {
             }
         }
         self.possible_indices.shrink_to_fit();
-        self.update(system)
     }
 
+    #[cfg(not(feature = "rayon"))]
     pub fn update(&mut self, system: &System) {
         self.current_indices = self
             .possible_indices
             .iter()
-            .copied()
             .filter(|(i, j)| {
                 let pos_i = system.positions[*i];
                 let pos_j = system.positions[*j];
                 let r = system.cell.distance(&pos_i, &pos_j);
-                r < self.cutoff
+                r < self.cutoff + self.thickness
             })
+            .copied()
+            .collect()
+    }
+
+    #[cfg(feature = "rayon")]
+    pub fn update(&mut self, system: &System) {
+        self.current_indices = self
+            .possible_indices
+            .par_iter()
+            .filter(|(i, j)| {
+                let pos_i = system.positions[*i];
+                let pos_j = system.positions[*j];
+                let r = system.cell.distance(&pos_i, &pos_j);
+                r < self.cutoff + self.thickness
+            })
+            .copied()
             .collect()
     }
 

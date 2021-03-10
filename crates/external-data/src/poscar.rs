@@ -1,28 +1,22 @@
 use std::collections::{HashMap, HashSet};
-use std::io::BufRead;
 use std::ops::Not;
 use std::str::FromStr;
 
 use nalgebra::{Matrix3, Vector3};
 use vasp_poscar::Poscar;
-
 use velvet_core::prelude::*;
 
 use crate::internal::Float;
 
-/// Returns a [`System`](velvet_core::system::System) object initialized from POSCAR formatted data.
-///
-/// # Arguments
-///
-/// * `reader` - File object or buffer to read from.
+/// Constructs a [`System`](velvet_core::system::System) from POSCAR data.
 ///
 /// # Examples
 ///
 /// ```
-/// use velvet_core::system::System;
-/// use velvet_external_data::poscar::load_poscar;
+/// use vasp_poscar::Poscar;
+/// use velvet_external_data::poscar::import_poscar;
 ///
-/// let system = load_poscar("\
+/// let poscar = Poscar::from_reader("\
 ///     Cubic BN
 ///     3.57
 ///     0.0 0.5 0.5
@@ -33,17 +27,13 @@ use crate::internal::Float;
 ///     Direct
 ///     0.00 0.00 0.00
 ///     0.25 0.25 0.25
-///     ".as_bytes());
+///     ".as_bytes())
+///     .unwrap();
 ///
+/// let system = import_poscar(&poscar);
 /// assert_eq!(system.size, 2);
 /// ```
-pub fn load_poscar<R>(reader: R) -> System
-where
-    R: BufRead,
-{
-    // Load the poscar file from a reader.
-    let poscar = Poscar::from_reader(reader).unwrap();
-
+pub fn import_poscar(poscar: &Poscar) -> System {
     // Alias for the system size.
     let size = poscar.num_sites();
 

@@ -4,5 +4,5 @@ mod internal;
 pub mod poscar;
 
 pub mod prelude {
-    pub use super::poscar::*;
+    pub use super::poscar::import_poscar;
 }

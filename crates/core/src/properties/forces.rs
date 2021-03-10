@@ -1,3 +1,6 @@
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+
 use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
@@ -43,25 +46,73 @@ pub struct PairForces;
 impl Property for PairForces {
     type Res = Vec<Vector3<Float>>;
 
+    #[cfg(not(feature = "rayon"))]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         potentials
-            .pair_interactions()
+            .pair_potentials
+            .interactions
             .iter()
             .map(|interaction| {
                 let potential = &interaction.potential;
+                let cutoff = interaction.cutoff;
                 let i = interaction.index_i;
                 let j = interaction.index_j;
                 let pos_i = system.positions[i];
                 let pos_j = system.positions[j];
                 let r = system.cell.distance(&pos_i, &pos_j);
-                let dir = system.cell.direction(&pos_i, &pos_j);
-                (potential.force(r) * dir, i, j)
+                if r < cutoff {
+                    let dir = system.cell.direction(&pos_i, &pos_j);
+                    (potential.force(r) * dir, i, j)
+                } else {
+                    (Vector3::zeros(), i, j)
+                }
             })
             .fold(
                 vec![Vector3::zeros(); system.size],
                 |mut accumulator, (force, i, j)| {
                     accumulator[i] += force;
                     accumulator[j] -= force;
+                    accumulator
+                },
+            )
+    }
+
+    #[cfg(feature = "rayon")]
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        potentials
+            .pair_potentials
+            .interactions
+            .par_iter()
+            .map(|interaction| {
+                let potential = &interaction.potential;
+                let cutoff = interaction.cutoff;
+                let i = interaction.index_i;
+                let j = interaction.index_j;
+                let pos_i = system.positions[i];
+                let pos_j = system.positions[j];
+                let r = system.cell.distance(&pos_i, &pos_j);
+                if r < cutoff {
+                    let dir = system.cell.direction(&pos_i, &pos_j);
+                    (potential.force(r) * dir, i, j)
+                } else {
+                    (Vector3::zeros(), i, j)
+                }
+            })
+            .fold(
+                || vec![Vector3::zeros(); system.size],
+                |mut accumulator, (force, i, j)| {
+                    accumulator[i] += force;
+                    accumulator[j] -= force;
+                    accumulator
+                },
+            )
+            .reduce(
+                || vec![Vector3::zeros(); system.size],
+                |mut accumulator, forces| {
+                    accumulator
+                        .iter_mut()
+                        .zip(forces.iter())
+                        .for_each(|(current, new)| *current += new);
                     accumulator
                 },
             )

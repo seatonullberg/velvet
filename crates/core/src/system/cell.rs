@@ -187,6 +187,11 @@ impl Cell {
         let v = v32.cross(&v43);
         Float::atan2(v32.norm() * v.dot(&v21), u.dot(&v))
     }
+
+    /// Returns the total volume of the cell.
+    pub fn volume(&self) -> Float {
+        (self.a_vector().cross(&self.b_vector())).dot(&self.c_vector())
+    }
 }
 
 #[cfg(test)]
@@ -290,5 +295,12 @@ mod tests {
         let v3 = Vector3::new(-1.176, 0.296, -0.332);
         let v4 = Vector3::new(-1.396, 1.211, 0.219);
         assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), -1.045379, epsilon = 1e-6);
+    }
+
+    #[test]
+    fn volume() {
+        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
+        let volume = 60.0;
+        assert_relative_eq!(cell.volume(), volume, epsilon = 1e-5);
     }
 }

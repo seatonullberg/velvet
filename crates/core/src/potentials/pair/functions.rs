@@ -1,27 +1,8 @@
-//! Potentials which operate on pairs of atoms.
-
-use std::rc::Rc;
-
 use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
+use crate::potentials::pair::PairPotential;
 use crate::potentials::Potential;
-
-/// Shared behavior for pair potentials.
-#[typetag::serde(tag = "type")]
-pub trait PairPotential: Potential {
-    /// Returns the potential energy of an atom in a pair separated by a distance `r`.
-    fn energy(&self, r: Float) -> Float;
-    /// Returns the magnitude of the force acting on an atom separated from another by a distance `r`.
-    fn force(&self, r: Float) -> Float;
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct PairInteraction {
-    pub potential: Rc<dyn PairPotential>,
-    pub index_i: usize,
-    pub index_j: usize,
-}
 
 /// Harmonic style pair potential.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]

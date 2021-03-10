@@ -3,12 +3,11 @@
 pub mod coulomb;
 pub mod pair;
 
-use std::rc::Rc;
-
 use serde::{Deserialize, Serialize};
 
-use crate::neighbors::NeighborList;
-use crate::potentials::pair::{PairInteraction, PairPotential};
+use crate::internal::Float;
+use crate::potentials::pair::{PairPotential, PairPotentials, PairPotentialsBuilder};
+use crate::system::species::Specie;
 use crate::system::System;
 
 /// Base trait for all potentials.
@@ -18,85 +17,57 @@ pub trait Potential: Send + Sync {}
 /// Container type to hold instances of each potential in the system.
 #[derive(Serialize, Deserialize)]
 pub struct Potentials {
-    pair_potentials: Vec<Rc<dyn PairPotential>>,
-    pair_neighbor_lists: Vec<NeighborList>,
-    pair_interactions: Vec<PairInteraction>,
+    pub pair_potentials: PairPotentials,
 }
 
 impl Potentials {
     pub fn setup(&mut self, system: &System) {
         // setup pair potentials
-        self.pair_neighbor_lists
-            .iter_mut()
-            .for_each(|nl| nl.setup(system));
-
-        // force an initial update
-        self.update(system, 0);
+        self.pair_potentials.setup(system);
     }
 
     pub fn update(&mut self, system: &System, iteration: usize) {
-        // update pair potential neighbor lists
-        self.pair_neighbor_lists.iter_mut().for_each(|nl| {
-            if iteration % nl.update_frequency == 0 {
-                nl.update(system)
-            }
-        });
-        // rebuild the pair potential interactions
-        self.pair_interactions = self
-            .pair_potentials
-            .iter()
-            .zip(self.pair_neighbor_lists.iter())
-            .fold(Vec::new(), |mut accumulator, (potential, nl)| {
-                nl.indices().iter().for_each(|(i, j)| {
-                    let interaction = PairInteraction {
-                        potential: potential.clone(),
-                        index_i: *i,
-                        index_j: *j,
-                    };
-                    accumulator.push(interaction);
-                });
-                accumulator
-            });
-    }
-
-    pub fn pair_interactions(&self) -> &Vec<PairInteraction> {
-        &self.pair_interactions
+        // update pair potentials
+        if iteration % self.pair_potentials.update_frequency == 0 {
+            self.pair_potentials.update(system);
+        }
     }
 }
 
 /// Constructor for the [`Potentials`](velvet_core::potentials::Potentials) type.
 pub struct PotentialsBuilder {
-    pair_potentials: Vec<Rc<dyn PairPotential>>,
-    pair_neighbor_lists: Vec<NeighborList>,
-    pair_interactions: Vec<PairInteraction>,
+    pair_potentials_builder: PairPotentialsBuilder,
 }
 
 impl PotentialsBuilder {
     /// Returns a new `PotentialsBuilder`.
     pub fn new() -> PotentialsBuilder {
         PotentialsBuilder {
-            pair_potentials: Vec::new(),
-            pair_neighbor_lists: Vec::new(),
-            pair_interactions: Vec::new(),
+            pair_potentials_builder: PairPotentialsBuilder::new(),
         }
     }
 
-    pub fn with_pair(
+    pub fn with_pair_update_frequency(mut self, update_frequency: usize) -> PotentialsBuilder {
+        self.pair_potentials_builder = self.pair_potentials_builder.with_update_frequency(update_frequency);
+        self
+    }
+
+    pub fn add_pair(
         mut self,
-        potential: Rc<dyn PairPotential>,
-        neighbor_list: NeighborList,
+        potential: Box<dyn PairPotential>,
+        species: (Specie, Specie),
+        cutoff: Float,
+        thickness: Float,
     ) -> PotentialsBuilder {
-        self.pair_potentials.push(potential);
-        self.pair_neighbor_lists.push(neighbor_list);
+        self.pair_potentials_builder =
+            self.pair_potentials_builder
+                .add_pair(potential, species, cutoff, thickness);
         self
     }
 
     pub fn build(self) -> Potentials {
-        Potentials {
-            pair_potentials: self.pair_potentials,
-            pair_neighbor_lists: self.pair_neighbor_lists,
-            pair_interactions: self.pair_interactions,
-        }
+        let pair_potentials = self.pair_potentials_builder.build();
+        Potentials { pair_potentials }
     }
 }
 

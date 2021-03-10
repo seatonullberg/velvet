@@ -21,9 +21,11 @@ typetag = "0.1.6"
 
 hdf5 = { version = "0.7", optional = true }
 hdf5-sys = { version = "0.7", optional = true }
+rayon = { version = "1.5", optional = true }
 
 [dev-dependencies]
 approx = "0.4"
+velvet-test-utils = { path = "../test-utils" }
 
 [features]
 default = []

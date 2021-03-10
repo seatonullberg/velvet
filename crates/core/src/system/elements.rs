@@ -69,18 +69,4 @@ mod tests {
         let hydrogen = Element::from_str("H").unwrap();
         assert_eq!(Element::H, hydrogen)
     }
-
-    #[test]
-    fn compare_invalid() {
-        let hydrogen = Element::H;
-        let helium = Element::He;
-        assert_ne!(hydrogen, helium);
-    }
-
-    #[test]
-    fn compare_valid() {
-        let hydrogen0 = Element::H;
-        let hydrogen1 = Element::H;
-        assert_eq!(hydrogen0, hydrogen1);
-    }
 }

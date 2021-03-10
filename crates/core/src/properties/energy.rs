@@ -1,3 +1,6 @@
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+
 use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
@@ -12,18 +15,48 @@ pub struct PairEnergy;
 impl Property for PairEnergy {
     type Res = Float;
 
+    #[cfg(not(feature = "rayon"))]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         potentials
-            .pair_interactions()
+            .pair_potentials
+            .interactions
             .iter()
             .map(|interaction| {
                 let potential = &interaction.potential;
+                let cutoff = interaction.cutoff;
                 let i = interaction.index_i;
                 let j = interaction.index_j;
                 let pos_i = system.positions[i];
                 let pos_j = system.positions[j];
                 let r = system.cell.distance(&pos_i, &pos_j);
-                potential.energy(r)
+                if r < cutoff {
+                    potential.energy(r)
+                } else {
+                    0.0 as Float
+                }
+            })
+            .sum()
+    }
+
+    #[cfg(feature = "rayon")]
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        potentials
+            .pair_potentials
+            .interactions
+            .par_iter()
+            .map(|interaction| {
+                let potential = &interaction.potential;
+                let cutoff = interaction.cutoff;
+                let i = interaction.index_i;
+                let j = interaction.index_j;
+                let pos_i = system.positions[i];
+                let pos_j = system.positions[j];
+                let r = system.cell.distance(&pos_i, &pos_j);
+                if r < cutoff {
+                    potential.energy(r)
+                } else {
+                    0.0 as Float
+                }
             })
             .sum()
     }
@@ -49,6 +82,7 @@ pub struct KineticEnergy;
 impl IntrinsicProperty for KineticEnergy {
     type Res = Float;
 
+    // NOTE: This function is faster without rayon.
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic_energy: Float = system
             .specie_ids
