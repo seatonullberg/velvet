@@ -2,13 +2,12 @@ extern crate pretty_env_logger;
 
 use std::fs::File;
 use std::io::BufReader;
-use std::rc::Rc;
 
+use vasp_poscar::Poscar;
 use velvet::prelude::*;
-use velvet_core::neighbors::NeighborList;
 
-static TIMESTEPS: usize = 100_000;
-static OUTPUT_INTERVAL: usize = 50;
+static TIMESTEPS: usize = 250_000;
+static OUTPUT_INTERVAL: usize = 100;
 static OUTPUT_FILENAME: &str = "nve.h5";
 
 fn main() {
@@ -17,7 +16,8 @@ fn main() {
     // Load an Ar gas system from a POSCAR formatted file.
     let file = File::open("resources/test/Ar.poscar").unwrap();
     let reader = BufReader::new(file);
-    let mut system = load_poscar(reader);
+    let poscar = Poscar::from_reader(reader).unwrap();
+    let mut system = import_poscar(&poscar);
 
     // Initialize the system temperature using a Boltzmann velocity distribution.
     let boltz = Boltzmann::new(300.0);
@@ -28,9 +28,9 @@ fn main() {
     let argon = Specie::from_element(0, Element::Ar);
 
     // Store all of the system's potentials in a Potentials struct.
-    let neighbor_list = NeighborList::new(8.5, Some((argon, argon)), 3);
     let potentials = PotentialsBuilder::new()
-        .with_pair(Rc::new(lj), neighbor_list)
+        .with_pair_update_frequency(3)
+        .add_pair(Box::new(lj), (argon, argon), 8.5, 1.0)
         .build();
 
     // Initialize a velocity Verlet style integrator.

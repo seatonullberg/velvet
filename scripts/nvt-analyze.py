@@ -4,8 +4,8 @@ import numpy as np
 
 from matplotlib.ticker import FormatStrFormatter
 
-TIMESTEPS = 100000
-OUTPUT_INTERVAL = 50
+TIMESTEPS = 250000
+OUTPUT_INTERVAL = 100
 OUTPUT_FILENAME = "nvt.h5"
 
 if __name__ == "__main__":
@@ -16,6 +16,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     ax.plot(logged_steps, energies, linewidth=0.5)
     ax.set_xlim((0, TIMESTEPS))
+    ax.set_ylim((295, 305))
 
     ax.set_xlabel("Timesteps")
     ax.set_ylabel("Temperature (K)")
