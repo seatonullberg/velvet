@@ -48,7 +48,7 @@ All of the project's completed and proposed features will be documented in this 
 
 ## Potentials <a name="potentials">
 
-- [x] **Lennard-Jones** - [Lennard-Jones](https://en.wikipedia.org/wiki/Lennard-Jones_potential) (12,6) style pairwose interatomic potential.
+- [x] **Lennard-Jones** - [Lennard-Jones](https://en.wikipedia.org/wiki/Lennard-Jones_potential) (12,6) style pairwise interatomic potential.
     - [x] Pair interactions 
 - [x] **Harmonic** - [Harmonic](https://en.wikipedia.org/wiki/Harmonic_oscillator) oscillator style pairwise interatomic potential.
     - [x] Pair interactions
@@ -73,7 +73,7 @@ All of the project's completed and proposed features will be documented in this 
 ## Runtime Performance <a name="runtime-performance">
 
 - [x] **Neighbor Lists** - [Neighbor list](https://en.wikipedia.org/wiki/Verlet_list) buffering of nonbonded interactions.
-- [ ] **Multithreading** - Thread parallelism via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators (optional).
+- [x] **Multithreading** - Thread parallelism via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators (optional).
 - [ ] **SIMD** - Multiple dispatch of single instructions.
 
 ## Temperature Initialization <a name="temperature-initialization">
