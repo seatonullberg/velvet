@@ -48,7 +48,9 @@ impl PotentialsBuilder {
     }
 
     pub fn with_pair_update_frequency(mut self, update_frequency: usize) -> PotentialsBuilder {
-        self.pair_potentials_builder = self.pair_potentials_builder.with_update_frequency(update_frequency);
+        self.pair_potentials_builder = self
+            .pair_potentials_builder
+            .with_update_frequency(update_frequency);
         self
     }
 
@@ -59,9 +61,9 @@ impl PotentialsBuilder {
         cutoff: Float,
         thickness: Float,
     ) -> PotentialsBuilder {
-        self.pair_potentials_builder =
-            self.pair_potentials_builder
-                .add_pair(potential, species, cutoff, thickness);
+        self.pair_potentials_builder = self
+            .pair_potentials_builder
+            .add_pair(potential, species, cutoff, thickness);
         self
     }
 

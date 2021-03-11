@@ -17,11 +17,7 @@ pub struct NeighborList {
 }
 
 impl NeighborList {
-    pub fn new(
-        cutoff: Float,
-        thickness: Float,
-        species: Option<(Specie, Specie)>,
-    ) -> NeighborList {
+    pub fn new(cutoff: Float, thickness: Float, species: Option<(Specie, Specie)>) -> NeighborList {
         NeighborList {
             cutoff,
             thickness,

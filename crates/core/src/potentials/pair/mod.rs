@@ -44,9 +44,9 @@ impl PairPotentials {
 
     pub fn update(&mut self, system: &System) {
         // update neighbor lists
-        self.neighbor_lists.iter_mut().for_each(|nl| {
-            nl.update(system)
-        });
+        self.neighbor_lists
+            .iter_mut()
+            .for_each(|nl| nl.update(system));
         // rebuild interactions
         self.interactions = self.potentials.iter().zip(self.neighbor_lists.iter()).fold(
             Vec::new(),
@@ -61,7 +61,7 @@ impl PairPotentials {
                     accumulator.push(interaction);
                 });
                 accumulator
-            }
+            },
         )
     }
 }

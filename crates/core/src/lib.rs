@@ -15,10 +15,10 @@ extern crate log;
 #[macro_use]
 extern crate strum_macros;
 
-mod internal;
 pub mod config;
 pub mod constants;
 pub mod integrators;
+mod internal;
 pub mod neighbors;
 pub mod outputs;
 pub mod potentials;
