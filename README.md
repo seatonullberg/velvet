@@ -46,6 +46,7 @@ Velvet supports a number of compile time options that can be opted into by using
 
 * `f64` - Sets the underlying storage type to a 64 bit floating point number. Default is 32 bit.
 * `hdf5-output` - Enables HDF5 formatted output. Requires a local installation of `libhdf5`.
+* `rayon` - Enables multithreading via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators.
 
 ## Usage
 
