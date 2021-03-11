@@ -39,7 +39,7 @@ fn nve() {
         epsilon = 15.0
     );
 
-    let temp_target = 150.0;
+    let temp_target = 160.0;
     assert_relative_eq!(
         Temperature.calculate(&mut system, &potentials),
         temp_target,
@@ -79,10 +79,10 @@ fn nvt() {
         epsilon = 25.0
     );
 
-    let temp_target = 300.0;
+    let temp_target = 280.0;
     assert_relative_eq!(
         Temperature.calculate(&system, &potentials),
         temp_target,
-        epsilon = 50.0
+        epsilon = 25.0
     );
 }

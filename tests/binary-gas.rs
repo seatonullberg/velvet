@@ -29,14 +29,14 @@ fn nve() {
     assert_relative_eq!(
         PotentialEnergy.calculate(&mut system, &potentials),
         pe_target,
-        epsilon = 100.0
+        epsilon = 150.0
     );
 
-    let ke_target = 400.0;
+    let ke_target = 425.0;
     assert_relative_eq!(
         KineticEnergy.calculate(&mut system, &potentials),
         ke_target,
-        epsilon = 50.0
+        epsilon = 100.0
     );
 
     let temp_target = 1300.0;
@@ -65,11 +65,11 @@ fn nvt() {
     sim.run(ITERATIONS);
     let (mut system, potentials) = sim.consume();
 
-    let pe_target = -4800.0;
+    let pe_target = -4850.0;
     assert_relative_eq!(
         PotentialEnergy.calculate(&mut system, &potentials),
         pe_target,
-        epsilon = 200.0
+        epsilon = 100.0
     );
 
     let ke_target = 100.0;

@@ -65,11 +65,11 @@ fn nvt() {
     sim.run(ITERATIONS);
     let (mut system, potentials) = sim.consume();
 
-    let pe_target = -5500.0;
+    let pe_target = -5450.0;
     assert_relative_eq!(
         PotentialEnergy.calculate(&mut system, &potentials),
         pe_target,
-        epsilon = 1000.0
+        epsilon = 200.0
     );
 
     let ke_target = 90.0;
@@ -83,6 +83,6 @@ fn nvt() {
     assert_relative_eq!(
         Temperature.calculate(&system, &potentials),
         temp_target,
-        epsilon = 100.0
+        epsilon = 50.0
     );
 }
