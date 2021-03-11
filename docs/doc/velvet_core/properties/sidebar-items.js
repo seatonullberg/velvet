@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["energy",""],["forces",""],["temperature",""]],"trait":[["IntrinsicProperty","Calculates a system-wide property without using the applied potentials."],["Property","Calculates a system-wide property."]]});

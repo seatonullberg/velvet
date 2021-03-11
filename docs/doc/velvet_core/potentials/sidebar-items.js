@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["coulomb",""],["pair","Potentials which operate on pairs of atoms."]],"struct":[["Potentials","Container type to hold instances of each potential in the system."],["PotentialsBuilder","Constructor for the `Potentials` type."]],"trait":[["Potential","Base trait for all potentials."]]});

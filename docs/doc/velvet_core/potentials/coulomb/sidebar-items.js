@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Wolf",""]],"trait":[["CoulombPotential",""]]});

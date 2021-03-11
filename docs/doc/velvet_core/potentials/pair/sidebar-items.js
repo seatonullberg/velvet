@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["functions",""]],"struct":[["PairInteraction",""],["PairPotentials",""],["PairPotentialsBuilder",""]],"trait":[["PairPotential","Shared behavior for pair potentials."]]});

@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["velvet_core"] = [{"text":"impl Strictest for dyn Integrator","synthetic":false,"types":[]},{"text":"impl Strictest for dyn Output","synthetic":false,"types":[]},{"text":"impl Strictest for dyn CoulombPotential","synthetic":false,"types":[]},{"text":"impl Strictest for dyn PairPotential","synthetic":false,"types":[]},{"text":"impl Strictest for dyn Potential","synthetic":false,"types":[]},{"text":"impl Strictest for dyn Propagator","synthetic":false,"types":[]},{"text":"impl Strictest for dyn Thermostat","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

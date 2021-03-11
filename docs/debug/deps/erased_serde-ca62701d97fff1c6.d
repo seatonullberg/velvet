@@ -1,0 +1,12 @@
+/home/seaton/repos/velvet/docs/debug/deps/erased_serde-ca62701d97fff1c6.rmeta: /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/lib.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/macros.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/any.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/de.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/error.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/features_check/mod.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/ser.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/private.rs
+
+/home/seaton/repos/velvet/docs/debug/deps/erased_serde-ca62701d97fff1c6.d: /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/lib.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/macros.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/any.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/de.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/error.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/features_check/mod.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/ser.rs /home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/private.rs
+
+/home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/lib.rs:
+/home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/macros.rs:
+/home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/any.rs:
+/home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/de.rs:
+/home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/error.rs:
+/home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/features_check/mod.rs:
+/home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/ser.rs:
+/home/seaton/.cargo/registry/src/github.com-1ecc6299db9ec823/erased-serde-0.3.13/src/private.rs:

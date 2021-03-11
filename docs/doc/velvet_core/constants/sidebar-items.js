@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["BOLTZMANN","Boltzmann constant in kcal/(mol*K)."],["FOUR_PI_EPSILON_0","Coulomb energy constant: 4 * pi * epsilon0"],["FRAC_2_SQRT_PI","2/sqrt(π)"],["PI","Archimedes' constant (π)"]]});

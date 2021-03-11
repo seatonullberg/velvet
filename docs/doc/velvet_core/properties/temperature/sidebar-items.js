@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Temperature","Instantaneous temperature of the system."]]});
