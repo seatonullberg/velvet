@@ -197,7 +197,7 @@ impl Cell {
 #[cfg(test)]
 mod tests {
     use super::Cell;
-    use crate::constants::PI;
+    use crate::consts::PI;
     use crate::internal::Float;
     use approx::*;
     use nalgebra::Vector3;

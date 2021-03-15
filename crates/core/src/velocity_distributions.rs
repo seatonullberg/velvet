@@ -3,7 +3,7 @@
 use nalgebra::Vector3;
 use rand_distr::{Distribution, Normal};
 
-use crate::constants::BOLTZMANN;
+use crate::consts::BOLTZMANN;
 use crate::internal::Float;
 use crate::properties::temperature::Temperature;
 use crate::properties::IntrinsicProperty;

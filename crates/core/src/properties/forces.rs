@@ -5,7 +5,7 @@ use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
-use crate::potentials::Potentials;
+use crate::potentials::collections::Potentials;
 use crate::properties::Property;
 use crate::system::System;
 

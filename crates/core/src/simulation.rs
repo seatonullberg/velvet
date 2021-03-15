@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::config::Configuration;
-use crate::potentials::Potentials;
+use crate::potentials::collections::Potentials;
 use crate::propagators::Propagator;
 use crate::system::System;
 

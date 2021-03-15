@@ -4,7 +4,7 @@ use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
-use crate::potentials::Potentials;
+use crate::potentials::collections::Potentials;
 use crate::properties::{IntrinsicProperty, Property};
 use crate::system::System;
 
@@ -97,7 +97,7 @@ impl IntrinsicProperty for KineticEnergy {
     }
 }
 
-/// Total energy of the system.
+/// Sum of potential and kinetic energy.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct TotalEnergy;
 

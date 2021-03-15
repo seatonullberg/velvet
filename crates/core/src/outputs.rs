@@ -1,7 +1,7 @@
 #[cfg(feature = "hdf5-output")]
 use crate::internal::Float;
 
-use crate::potentials::Potentials;
+use crate::potentials::collections::Potentials;
 use crate::properties::energy::{KineticEnergy, PairEnergy, PotentialEnergy, TotalEnergy};
 use crate::properties::forces::Forces;
 use crate::properties::temperature::Temperature;

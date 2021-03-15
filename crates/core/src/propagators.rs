@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::integrators::Integrator;
-use crate::potentials::Potentials;
+use crate::potentials::collections::Potentials;
 use crate::system::System;
 use crate::thermostats::Thermostat;
 

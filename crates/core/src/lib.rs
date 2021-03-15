@@ -8,6 +8,8 @@
 //! * `Energy` - Kcal/mole
 //! * `Force` - Kcal/mole-angstrom
 //! * `Temperature` - Kelvin
+#![warn(missing_docs)]
+#![warn(clippy::all)]
 
 extern crate pretty_env_logger;
 #[macro_use]
@@ -16,7 +18,7 @@ extern crate log;
 extern crate strum_macros;
 
 pub mod config;
-pub mod constants;
+pub mod consts;
 pub mod integrators;
 mod internal;
 pub mod neighbors;
@@ -33,9 +35,11 @@ pub mod prelude {
     pub use super::config::{Configuration, ConfigurationBuilder};
     pub use super::integrators::{Integrator, VelocityVerlet};
     pub use super::outputs::*;
-    pub use super::potentials::pair::functions::*;
+    pub use super::potentials::collections::{Potentials, PotentialsBuilder};
+    pub use super::potentials::functions::*;
+    pub use super::potentials::coulomb::CoulombPotential;
     pub use super::potentials::pair::PairPotential;
-    pub use super::potentials::{Potentials, PotentialsBuilder};
+    pub use super::potentials::Potential;
     pub use super::propagators::{MolecularDynamics, Propagator};
     pub use super::properties::energy::*;
     pub use super::properties::forces::*;

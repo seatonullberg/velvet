@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::constants::BOLTZMANN;
+use crate::consts::BOLTZMANN;
 use crate::internal::Float;
 use crate::properties::energy::KineticEnergy;
 use crate::properties::IntrinsicProperty;
