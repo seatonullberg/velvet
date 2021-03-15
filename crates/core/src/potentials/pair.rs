@@ -1,30 +1,17 @@
-use serde::{Deserialize, Serialize};
+//! Implementations of pairwise interaction potentials.
 
 use crate::internal::Float;
-use crate::potentials::pair::PairPotential;
+use crate::potentials::functions::{Harmonic, LennardJones, Mie, Morse};
 use crate::potentials::Potential;
 
-/// Harmonic style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-pub struct Harmonic {
-    k: Float,
-    x0: Float,
+/// Shared behavior for pair potentials.
+#[typetag::serde(tag = "type")]
+pub trait PairPotential: Potential {
+    /// Returns the potential energy of an atom in a pair separated by a distance `r`.
+    fn energy(&self, r: Float) -> Float;
+    /// Returns the magnitude of the force acting on an atom separated from another by a distance `r`.
+    fn force(&self, r: Float) -> Float;
 }
-
-impl Harmonic {
-    /// Returns a new Harmonic style pair potential.
-    ///
-    /// # Arguments
-    ///
-    /// * `k` - Spring constant
-    /// * `x0` - Equilibrium displacement distance
-    pub fn new(k: Float, x0: Float) -> Harmonic {
-        Harmonic { k, x0 }
-    }
-}
-
-#[typetag::serde]
-impl Potential for Harmonic {}
 
 #[typetag::serde]
 impl PairPotential for Harmonic {
@@ -39,28 +26,6 @@ impl PairPotential for Harmonic {
         2.0 * self.k * (r - self.x0)
     }
 }
-
-/// Lennard-Jones style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-pub struct LennardJones {
-    epsilon: Float,
-    sigma: Float,
-}
-
-impl LennardJones {
-    /// Returns a new Lennard-Jones style pair potential.
-    ///
-    /// # Arguments
-    ///
-    /// * `epsilon` - Depth of the potential well
-    /// * `sigma` - Distance at which the pair potential energy is zero
-    pub fn new(epsilon: Float, sigma: Float) -> LennardJones {
-        LennardJones { epsilon, sigma }
-    }
-}
-
-#[typetag::serde]
-impl Potential for LennardJones {}
 
 #[typetag::serde]
 impl PairPotential for LennardJones {
@@ -77,37 +42,6 @@ impl PairPotential for LennardJones {
         self.epsilon * (term_a - term_b)
     }
 }
-
-/// Mie style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-pub struct Mie {
-    epsilon: Float,
-    sigma: Float,
-    gamma_a: Float,
-    gamma_r: Float,
-}
-
-impl Mie {
-    /// Returns a new Mie style pair potential.
-    ///
-    /// # Arguments
-    ///
-    /// * `epsilon` - Depth of the potential well
-    /// * `sigma` - Distance at which the pair potential energy is zero
-    /// * `gamma_a` - Exponent on the attractive term
-    /// * `gamma_r` - Exponent on the repulsive term
-    pub fn new(epsilon: Float, sigma: Float, gamma_a: Float, gamma_r: Float) -> Mie {
-        Mie {
-            epsilon,
-            sigma,
-            gamma_a,
-            gamma_r,
-        }
-    }
-}
-
-#[typetag::serde]
-impl Potential for Mie {}
 
 #[typetag::serde]
 impl PairPotential for Mie {
@@ -129,30 +63,6 @@ impl PairPotential for Mie {
         term_a - term_b
     }
 }
-
-/// Morse style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-pub struct Morse {
-    a: Float,
-    d_e: Float,
-    r_e: Float,
-}
-
-impl Morse {
-    /// Returns a new Morse style pair potential.
-    ///
-    /// # Arguments
-    ///
-    /// * `a` - Width of the potential well
-    /// * `d_e` - Depth of the potential well
-    /// * `r_e` - Equilibrium bond distance
-    pub fn new(a: Float, d_e: Float, r_e: Float) -> Morse {
-        Morse { a, d_e, r_e }
-    }
-}
-
-#[typetag::serde]
-impl Potential for Morse {}
 
 #[typetag::serde]
 impl PairPotential for Morse {

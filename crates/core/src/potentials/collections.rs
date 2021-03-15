@@ -1,34 +1,82 @@
-//! Potentials which operate on pairs of atoms.
-
-pub mod functions;
-
 use serde::{Deserialize, Serialize};
 
 use crate::internal::{self, Float};
 use crate::neighbors::NeighborList;
-use crate::potentials::Potential;
+use crate::potentials::interactions::PairInteraction;
+use crate::potentials::pair::PairPotential;
 use crate::system::species::Specie;
 use crate::system::System;
 
-/// Shared behavior for pair potentials.
-#[typetag::serde(tag = "type")]
-pub trait PairPotential: Potential {
-    /// Returns the potential energy of an atom in a pair separated by a distance `r`.
-    fn energy(&self, r: Float) -> Float;
-    /// Returns the magnitude of the force acting on an atom separated from another by a distance `r`.
-    fn force(&self, r: Float) -> Float;
+/// Container type to hold instances of each potential in the system.
+#[derive(Serialize, Deserialize)]
+pub struct Potentials {
+    pub(crate) pair_potentials: PairPotentials,
+}
+
+impl Potentials {
+    pub fn setup(&mut self, system: &System) {
+        // setup pair potentials
+        self.pair_potentials.setup(system);
+    }
+
+    pub fn update(&mut self, system: &System, iteration: usize) {
+        // update pair potentials
+        if iteration % self.pair_potentials.update_frequency == 0 {
+            self.pair_potentials.update(system);
+        }
+    }
+}
+
+/// Convenient constructor for [`Potentials`].
+pub struct PotentialsBuilder {
+    pair_potentials_builder: PairPotentialsBuilder,
+}
+
+impl PotentialsBuilder {
+    /// Returns a new `PotentialsBuilder`.
+    pub fn new() -> PotentialsBuilder {
+        PotentialsBuilder {
+            pair_potentials_builder: PairPotentialsBuilder::new(),
+        }
+    }
+
+    /// Sets the `update_frequency` field of the underlying [`PairPotentials`] object.
+    pub fn with_pair_update_frequency(mut self, update_frequency: usize) -> PotentialsBuilder {
+        self.pair_potentials_builder = self
+            .pair_potentials_builder
+            .with_update_frequency(update_frequency);
+        self
+    }
+
+    /// Adds a new pair potential to the collection.
+    pub fn add_pair(
+        mut self,
+        potential: Box<dyn PairPotential>,
+        species: (Specie, Specie),
+        cutoff: Float,
+        thickness: Float,
+    ) -> PotentialsBuilder {
+        self.pair_potentials_builder = self
+            .pair_potentials_builder
+            .add_pair(potential, species, cutoff, thickness);
+        self
+    }
+
+    /// Consumes the builder and returns a new [`Potentials`] object.
+    pub fn build(self) -> Potentials {
+        let pair_potentials = self.pair_potentials_builder.build();
+        Potentials { pair_potentials }
+    }
+}
+
+impl Default for PotentialsBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct PairInteraction {
-    pub potential: internal::Rc<dyn PairPotential>,
-    pub cutoff: Float,
-    pub index_i: usize,
-    pub index_j: usize,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct PairPotentials {
+pub(crate) struct PairPotentials {
     pub potentials: Vec<internal::Rc<dyn PairPotential>>,
     pub neighbor_lists: Vec<NeighborList>,
     pub interactions: Vec<PairInteraction>,
@@ -66,7 +114,8 @@ impl PairPotentials {
     }
 }
 
-pub struct PairPotentialsBuilder {
+/// Convenient constructor for [`PairPotentials`].
+pub(crate) struct PairPotentialsBuilder {
     potentials: Vec<internal::Rc<dyn PairPotential>>,
     neighbor_lists: Vec<NeighborList>,
     interactions: Vec<PairInteraction>,
@@ -74,6 +123,7 @@ pub struct PairPotentialsBuilder {
 }
 
 impl PairPotentialsBuilder {
+    /// Returns a new `PairPotentialsBuilder`.
     pub fn new() -> PairPotentialsBuilder {
         PairPotentialsBuilder {
             potentials: Vec::new(),
@@ -83,6 +133,7 @@ impl PairPotentialsBuilder {
         }
     }
 
+    /// Adds a new potential to the collection.
     pub fn add_pair(
         mut self,
         potential: Box<dyn PairPotential>,
@@ -97,11 +148,13 @@ impl PairPotentialsBuilder {
         self
     }
 
+    /// Sets the number of iterations between each call to `update`.
     pub fn with_update_frequency(mut self, update_frequency: usize) -> PairPotentialsBuilder {
         self.update_frequency = update_frequency;
         self
     }
 
+    /// Consumes the builder and returns a new [`PairPotentials`] object.
     pub fn build(self) -> PairPotentials {
         PairPotentials {
             potentials: self.potentials,

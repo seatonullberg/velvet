@@ -1,4 +1,4 @@
-/// Electrostatic interaction potentials.
+/// Implementations of electrostatic interaction potentials.
 
 #[cfg(feature = "f64")]
 use libm::erfc;
@@ -6,12 +6,12 @@ use libm::erfc;
 #[cfg(not(feature = "f64"))]
 use libm::erfcf as erfc;
 
-use serde::{Deserialize, Serialize};
-
-use crate::constants::PI;
+use crate::consts::PI;
 use crate::internal::Float;
+use crate::potentials::functions::Wolf;
 use crate::potentials::Potential;
 
+/// Shared behavior for coulomb potentials.
 #[typetag::serde(tag = "type")]
 pub trait CoulombPotential: Potential {
     fn energy(&self, qi: Float, qj: Float, r: Float) -> Float;
@@ -19,35 +19,24 @@ pub trait CoulombPotential: Potential {
     fn force(&self, qi: Float, qj: Float, r: Float) -> Float;
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-pub struct Wolf {
-    alpha: Float,
-    cutoff: Float,
-}
-
-impl Wolf {
-    pub fn new(alpha: Float, cutoff: Float) -> Wolf {
-        Wolf { alpha, cutoff }
-    }
-}
-
-#[typetag::serde]
-impl Potential for Wolf {}
 
 #[typetag::serde]
 impl CoulombPotential for Wolf {
+    #[inline]
     fn energy(&self, qi: Float, qj: Float, r: Float) -> Float {
         let term_a = erfc(self.alpha * r) / r;
         let term_b = erfc(self.alpha * self.cutoff) / self.cutoff;
         qi * qj * (term_a - term_b)
     }
 
+    #[inline]
     fn energy_self(&self, qi: Float) -> Float {
         let term_a = 0.5 * erfc(self.alpha * self.cutoff) / self.cutoff;
         let term_b = self.alpha / Float::sqrt(PI);
-        -(qi * qi) * (term_a + term_b)
+        -qi.powi(2) * (term_a + term_b)
     }
 
+    #[inline]
     fn force(&self, qi: Float, qj: Float, r: Float) -> Float {
         let r2 = r * r;
         let term_a = -erfc(self.alpha * r) / r2;
