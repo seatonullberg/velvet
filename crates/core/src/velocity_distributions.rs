@@ -1,4 +1,4 @@
-//! Statistical distribution algorithms.
+//! Algorithms to initialize the temperature of a sytem from a velocity distribution.
 
 use nalgebra::Vector3;
 use rand_distr::{Distribution, Normal};

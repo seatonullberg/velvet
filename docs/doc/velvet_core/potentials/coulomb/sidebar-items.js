@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Wolf",""]],"trait":[["CoulombPotential",""]]});
+initSidebarItems({"trait":[["CoulombPotential","Shared behavior for coulomb potentials."]]});

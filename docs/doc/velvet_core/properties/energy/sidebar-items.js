@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["KineticEnergy","Kinetic energy of the whole system"],["PairEnergy","Potential energy due to pairwise potentials."],["PotentialEnergy","Potential energy of the whole system."],["TotalEnergy","Total energy of the system."]]});
+initSidebarItems({"struct":[["KineticEnergy","Kinetic energy of the whole system"],["PairEnergy","Potential energy due to pairwise potentials."],["PotentialEnergy","Potential energy of the whole system."],["TotalEnergy","Sum of potential and kinetic energy."]]});

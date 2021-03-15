@@ -64,12 +64,12 @@
 <span id="61">61</span>
 <span id="62">62</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Statistical distribution algorithms.</span>
+<span class="doccomment">//! Algorithms to initialize the temperature of a sytem from a velocity distribution.</span>
 
 <span class="kw">use</span> <span class="ident">nalgebra</span>::<span class="ident">Vector3</span>;
 <span class="kw">use</span> <span class="ident">rand_distr</span>::{<span class="ident">Distribution</span>, <span class="ident">Normal</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::<span class="ident">BOLTZMANN</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">consts</span>::<span class="ident">BOLTZMANN</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">Float</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">properties</span>::<span class="ident">temperature</span>::<span class="ident">Temperature</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">properties</span>::<span class="ident">IntrinsicProperty</span>;

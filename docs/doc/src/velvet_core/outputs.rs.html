@@ -177,11 +177,15 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Properties which can be output as a result from the simulation.</span>
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hdf5-output&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">Float</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">potentials</span>::<span class="ident">Potentials</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">potentials</span>::<span class="ident">collections</span>::<span class="ident">Potentials</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">properties</span>::<span class="ident">energy</span>::{<span class="ident">KineticEnergy</span>, <span class="ident">PairEnergy</span>, <span class="ident">PotentialEnergy</span>, <span class="ident">TotalEnergy</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">properties</span>::<span class="ident">forces</span>::<span class="ident">Forces</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">properties</span>::<span class="ident">temperature</span>::<span class="ident">Temperature</span>;

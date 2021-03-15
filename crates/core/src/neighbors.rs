@@ -1,3 +1,5 @@
+//! Data structures to improve the efficiency of evaluating short-range interactions.
+
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 

@@ -120,7 +120,7 @@
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">Float</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">potentials</span>::<span class="ident">Potentials</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">potentials</span>::<span class="ident">collections</span>::<span class="ident">Potentials</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">properties</span>::{<span class="ident">IntrinsicProperty</span>, <span class="ident">Property</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">system</span>::<span class="ident">System</span>;
 
@@ -213,7 +213,7 @@
     }
 }
 
-<span class="doccomment">/// Total energy of the system.</span>
+<span class="doccomment">/// Sum of potential and kinetic energy.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TotalEnergy</span>;
 

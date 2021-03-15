@@ -1,3 +1,5 @@
+//! High level abstraction for an atomistic simulation.
+
 use serde::{Deserialize, Serialize};
 
 use crate::config::Configuration;

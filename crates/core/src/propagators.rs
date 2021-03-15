@@ -1,3 +1,5 @@
+//! Algorithms to control the progress of a simulation.
+
 use serde::{Deserialize, Serialize};
 
 use crate::integrators::Integrator;

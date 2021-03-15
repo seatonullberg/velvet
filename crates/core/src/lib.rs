@@ -1,13 +1,13 @@
 //! Core feature library for the Velvet simulation engine.
 //!
-//! Internal unit system follows LAMMPS `real` style.
+//! Internal unit system follows LAMMPS [real](https://lammps.sandia.gov/doc/units.html) style.
 //!
-//! * `Mass` - grams/mole
-//! * `Distance` - angstrom
-//! * `Time` - femtosecond
-//! * `Energy` - Kcal/mole
-//! * `Force` - Kcal/mole-angstrom
-//! * `Temperature` - Kelvin
+//! * `mass` - grams/mole
+//! * `distance` - angstrom
+//! * `time` - femtosecond
+//! * `energy` - Kcal/mole
+//! * `force` - Kcal/mole-angstrom
+//! * `temperature` - Kelvin
 #![warn(missing_docs)]
 #![warn(clippy::all)]
 
@@ -31,6 +31,7 @@ pub mod system;
 pub mod thermostats;
 pub mod velocity_distributions;
 
+/// User facing exports.
 pub mod prelude {
     pub use super::config::{Configuration, ConfigurationBuilder};
     pub use super::integrators::{Integrator, VelocityVerlet};

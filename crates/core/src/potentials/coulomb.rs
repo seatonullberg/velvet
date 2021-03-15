@@ -1,4 +1,4 @@
-/// Implementations of electrostatic interaction potentials.
+//! Implementations of coulombic interaction potentials.
 
 #[cfg(feature = "f64")]
 use libm::erfc;

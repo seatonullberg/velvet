@@ -74,11 +74,15 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! High level abstraction for an atomistic simulation.</span>
+
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">config</span>::<span class="ident">Configuration</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">potentials</span>::<span class="ident">Potentials</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">potentials</span>::<span class="ident">collections</span>::<span class="ident">Potentials</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">propagators</span>::<span class="ident">Propagator</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">system</span>::<span class="ident">System</span>;
 
