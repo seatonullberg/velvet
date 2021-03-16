@@ -1,3 +1,5 @@
+//! Collections of interatomic potentials grouped by interaction type.
+
 use serde::{Deserialize, Serialize};
 
 use crate::internal::{self, Float};
@@ -14,13 +16,11 @@ pub struct Potentials {
 }
 
 impl Potentials {
-    pub fn setup(&mut self, system: &System) {
-        // setup pair potentials
+    pub(crate) fn setup(&mut self, system: &System) {
         self.pair_potentials.setup(system);
     }
 
-    pub fn update(&mut self, system: &System, iteration: usize) {
-        // update pair potentials
+    pub(crate) fn update(&mut self, system: &System, iteration: usize) {
         if iteration % self.pair_potentials.update_frequency == 0 {
             self.pair_potentials.update(system);
         }
@@ -41,6 +41,10 @@ impl PotentialsBuilder {
     }
 
     /// Sets the `update_frequency` field of the underlying [`PairPotentials`] object.
+    ///
+    /// # Arguments
+    ///
+    /// * `update_frequency` - Number of iterations to complete between updates.
     pub fn with_pair_update_frequency(mut self, update_frequency: usize) -> PotentialsBuilder {
         self.pair_potentials_builder = self
             .pair_potentials_builder
@@ -49,6 +53,13 @@ impl PotentialsBuilder {
     }
 
     /// Adds a new pair potential to the collection.
+    ///
+    /// # Arguments
+    ///
+    /// * `potential` - Boxed pair [`PairPotential`] trait object.
+    /// * `species` - Tuple of [`Specie`] objects that the potential applies to.
+    /// * `cutoff` - Cutoff radius.
+    /// * `thickness` - Buffer thickness used to construct a [`NeighborList`].
     pub fn add_pair(
         mut self,
         potential: Box<dyn PairPotential>,

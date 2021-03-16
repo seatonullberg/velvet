@@ -71,6 +71,9 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Implementations of coulombic interaction potentials.</span>
 
@@ -80,16 +83,19 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f64&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">libm</span>::<span class="ident">erfcf</span> <span class="kw">as</span> <span class="ident">erfc</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">Float</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">potentials</span>::<span class="ident">functions</span>::<span class="ident">Wolf</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">potentials</span>::<span class="ident">Potential</span>;
 
 <span class="doccomment">/// Shared behavior for coulomb potentials.</span>
 <span class="attribute">#[<span class="ident">typetag</span>::<span class="ident">serde</span>(<span class="ident">tag</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoulombPotential</span>: <span class="ident">Potential</span> {
+    <span class="doccomment">/// Returns the potential energy of an atom in a pair with charges `qi` and `qj` seperated by a distance `r`.</span>
     <span class="kw">fn</span> <span class="ident">energy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">qi</span>: <span class="ident">Float</span>, <span class="ident">qj</span>: <span class="ident">Float</span>, <span class="ident">r</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span>;
+    <span class="doccomment">/// Returns the potential energy of an atom with charge `qi` interacting with itself.</span>
     <span class="kw">fn</span> <span class="ident">energy_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">qi</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span>;
+    <span class="doccomment">/// Returns the magnitude of the force acting on an atom separated from another by a distance `r` with charges `qi` and `qj`.</span>
     <span class="kw">fn</span> <span class="ident">force</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">qi</span>: <span class="ident">Float</span>, <span class="ident">qj</span>: <span class="ident">Float</span>, <span class="ident">r</span>: <span class="ident">Float</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Float</span>;
 }
 

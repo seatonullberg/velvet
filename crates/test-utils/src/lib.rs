@@ -5,7 +5,7 @@ use vasp_poscar::Poscar;
 use velvet_core::prelude::*;
 use velvet_external_data::poscar::import_poscar;
 
-static UPDATE_FREQUENCY: usize = 3;
+static UPDATE_FREQUENCY: usize = 5;
 
 pub fn argon_system() -> System {
     let file = File::open(resources_path("Ar.poscar")).unwrap();
@@ -79,4 +79,23 @@ pub fn resources_path(filename: &str) -> String {
         env!("CARGO_MANIFEST_DIR"),
         filename
     )
+}
+
+pub fn nve_simulation(mut system: System, potentials: Potentials) -> Simulation {
+    let boltz = Boltzmann::new(300.0);
+    boltz.apply(&mut system);
+    let velocity_verlet = VelocityVerlet::new(0.1);
+    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(NullThermostat));
+    let config = ConfigurationBuilder::default().build();
+    Simulation::new(system, potentials, Box::new(md), config)
+}
+
+pub fn nvt_simulation(mut system: System, potentials: Potentials) -> Simulation {
+    let boltz = Boltzmann::new(300.0);
+    boltz.apply(&mut system);
+    let velocity_verlet = VelocityVerlet::new(0.1);
+    let nose_hoover = NoseHoover::new(300.0, 1.25, 1.0);
+    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
+    let config = ConfigurationBuilder::default().build();
+    Simulation::new(system, potentials, Box::new(md), config)
 }

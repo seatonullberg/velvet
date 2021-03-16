@@ -3,7 +3,7 @@
 pub mod collections;
 pub mod coulomb;
 pub mod functions;
-pub mod interactions;
+pub(crate) mod interactions;
 pub mod pair;
 
 /// Base trait for all potentials.

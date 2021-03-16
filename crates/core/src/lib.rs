@@ -18,7 +18,6 @@ extern crate log;
 extern crate strum_macros;
 
 pub mod config;
-pub mod consts;
 pub mod integrators;
 mod internal;
 pub mod neighbors;

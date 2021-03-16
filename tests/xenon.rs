@@ -7,23 +7,12 @@ static ITERATIONS: usize = 10_000;
 
 #[test]
 fn nve() {
-    // load xenon data
-    let mut system = test_utils::xenon_system();
+    let system = test_utils::xenon_system();
     let potentials = test_utils::xenon_potentials();
+    let mut sim = test_utils::nve_simulation(system, potentials);
 
-    // prepare a NVE simulation
-    let boltz = Boltzmann::new(300.0);
-    boltz.apply(&mut system);
-    let velocity_verlet = VelocityVerlet::new(0.1);
-    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(NullThermostat));
-    let config = ConfigurationBuilder::default().build();
-    let mut sim = Simulation::new(system, potentials, Box::new(md), config);
-
-    // run the simulation and return its components
     sim.run(ITERATIONS);
     let (mut system, potentials) = sim.consume();
-
-    // compare results to values from LAMMPS
 
     let pe_target = -5500.0;
     assert_relative_eq!(
@@ -49,19 +38,10 @@ fn nve() {
 
 #[test]
 fn nvt() {
-    // load xenon data
-    let mut system = test_utils::xenon_system();
+    let system = test_utils::xenon_system();
     let potentials = test_utils::xenon_potentials();
+    let mut sim = test_utils::nvt_simulation(system, potentials);
 
-    // prepare a NVT simulation
-    let boltz = Boltzmann::new(300.0);
-    boltz.apply(&mut system);
-    let velocity_verlet = VelocityVerlet::new(0.1);
-    let nose_hoover = NoseHoover::new(300.0, 1.5, 1.0);
-    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
-    let config = ConfigurationBuilder::default().build();
-
-    let mut sim = Simulation::new(system, potentials, Box::new(md), config);
     sim.run(ITERATIONS);
     let (mut system, potentials) = sim.consume();
 

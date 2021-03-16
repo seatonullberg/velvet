@@ -33,7 +33,7 @@
 
 <span class="doccomment">/// Metadata describing pairwise interactions.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PairInteraction</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PairInteraction</span> {
     <span class="kw">pub</span> <span class="ident">potential</span>: <span class="ident">internal</span>::<span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">PairPotential</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">cutoff</span>: <span class="ident">Float</span>,
     <span class="kw">pub</span> <span class="ident">index_i</span>: <span class="ident">usize</span>,
@@ -42,7 +42,7 @@
 
 <span class="doccomment">/// Metadata describing electrostatic coulomb interactions.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CoulombInteraction</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CoulombInteraction</span> {
     <span class="kw">pub</span> <span class="ident">potential</span>: <span class="ident">internal</span>::<span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CoulombPotential</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">cutoff</span>: <span class="ident">Float</span>,
     <span class="kw">pub</span> <span class="ident">index_i</span>: <span class="ident">usize</span>,
