@@ -1,65 +1,8 @@
-[package]
-name = "velvet"
-version = "0.4.2"
-authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
-edition = "2018"
-repository = "https://github.com/seatonullberg/velvet"
-description = "Classical atomistic simulation engine with a focus on user-friendliness and extensibility"
-license = "MIT"
-keywords = [
-    "chemistry",
-    "materials-science",
-    "molecular-dynamics",
-    "physics",
-]
-categories = [
-    "science",
-    "simulation",
-]
-
 [workspace]
 members = [
-    "crates/cli",
-    "crates/core",
-    "crates/external-data",
-    "crates/test-utils",
+    "crates/velvet",
+    "crates/velvet-cli",
+    "crates/velvet-core",
+    "crates/velvet-external-data",
+    "crates/velvet-test-utils",
 ]
-
-[dependencies]
-velvet-core = { path = "crates/core", version = "0.4.2" }
-velvet-external-data = { path = "crates/external-data", version = "0.1.0" }
-hdf5 = { version = "0.7", optional = true }
-hdf5-sys = { version = "0.7", optional = true }
-
-[dev-dependencies]
-approx = "0.4"
-criterion = "0.3"
-log = "0.4"
-nalgebra = "0.23"
-pretty_env_logger = "0.4"
-vasp-poscar = "0.3.2"
-velvet-test-utils = { path = "crates/test-utils" }
-
-[features]
-default = []
-f64 = [
-    "velvet-core/f64", 
-    "velvet-external-data/f64", 
-    "velvet-test-utils/f64",
-]
-hdf5-output = [
-    "hdf5", 
-    "hdf5-sys",
-    "velvet-core/hdf5-output",
-]
-rayon = [
-    "velvet-core/rayon",
-]
-
-[[bench]]
-name = "argon-benchmarks"
-path = "benches/argon.rs"
-harness = false
-
-[package.metadata.docs.rs]
-features = ["hdf5-sys/static", "hdf5-sys/zlib"]

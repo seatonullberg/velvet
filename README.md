@@ -50,7 +50,7 @@ Velvet supports a number of compile time options that can be opted into by using
 
 ## Usage
 
-The [`examples`](./examples) directory contains examples of how to use the [`velvet`](https://crates.io/crates/velvet) crate to configure simulations directly in code.
+The [`examples`](./crates/velvet/examples) directory contains examples of how to use the [`velvet`](https://crates.io/crates/velvet) crate to configure simulations directly in code.
 The [`scripts`](./scripts) directory contains Python scripts to visualize the results of each example.
 
 ## Roadmap

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["VelocityVerlet","Velocity Verlet integration algorithm."]],"trait":[["Integrator","A numerical integration algorithm."]]});

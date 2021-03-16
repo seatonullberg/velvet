@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Harmonic","Harmonic style pair potential."],["LennardJones","Lennard-Jones style pair potential."],["Mie","Mie style pair potential."],["Morse","Morse style pair potential."],["Wolf","Wolf style coulomb potential."]]});

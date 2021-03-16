@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Berendsen","Berendsen weak coupling thermostat."],["NoseHoover","Nose-Hoover style thermostat."],["NullThermostat","Placeholder thermostat algorithm which applies no temperature controls."]],"trait":[["Thermostat","An algorithm used to control simulation temperature."]]});

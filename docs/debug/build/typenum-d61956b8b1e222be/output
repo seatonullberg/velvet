@@ -1,2 +1,0 @@
-cargo:rustc-env=TYPENUM_BUILD_CONSTS=/home/seaton/repos/velvet/docs/debug/build/typenum-d61956b8b1e222be/out/consts.rs
-cargo:rustc-env=TYPENUM_BUILD_OP=/home/seaton/repos/velvet/docs/debug/build/typenum-d61956b8b1e222be/out/op.rs

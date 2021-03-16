@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["BOLTZMANN",""],["FOUR_PI_EPSILON_0",""],["FRAC_2_SQRT_PI","2/sqrt(π)"],["PI","Archimedes' constant (π)"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Potentials","Container type to hold instances of each potential in the system."],["PotentialsBuilder","Convenient constructor for [`Potentials`]."]]});

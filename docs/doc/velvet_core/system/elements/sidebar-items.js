@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Element","Every element on the periodic table."]]});

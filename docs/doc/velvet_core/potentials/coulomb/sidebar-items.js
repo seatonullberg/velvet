@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["CoulombPotential","Shared behavior for coulomb potentials."]]});

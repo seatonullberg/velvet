@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["PairPotential","Shared behavior for pair potentials."]]});

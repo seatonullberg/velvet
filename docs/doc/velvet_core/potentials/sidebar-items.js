@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["collections","Collections of interatomic potentials grouped by interaction type."],["coulomb","Implementations of coulombic interaction potentials."],["functions","Interatomic potential functions."],["pair","Implementations of pairwise interaction potentials."]],"trait":[["Potential","Base trait for all potentials."]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Forces","Force acting on each atom in the system."],["PairForces","Force acting on each atom in the system due to pairwise potentials."]]});
