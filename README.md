@@ -31,13 +31,13 @@ To build Velvet you will need to have Rust's compiler and package manager instal
 ```bash
 $ git clone https://github.com/seatonullberg/velvet && cd velvet
 ```
-2. Check that all tests pass
+2. Build in release mode.
 ```bash
-$ cargo test --workspace
+$ cargo build --release --workspace
 ```
-3. Build in release mode
+2. Check that all tests pass. Release mode is required to efficiently run integration tests.
 ```bash
-$ cargo build --release
+$ cargo test --release --workspace
 ```
 
 #### Optional Features
@@ -46,7 +46,7 @@ Velvet supports a number of compile time options that can be opted into by using
 
 * `f64` - Sets the underlying storage type to a 64 bit floating point number. Default is 32 bit.
 * `hdf5-output` - Enables HDF5 formatted output. Requires a local installation of `libhdf5`.
-* `rayon` - Enables multithreading via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators.
+* `rayon` - Enables multithreading with [rayon](https://github.com/rayon-rs/rayon) parallel iterators.
 
 ## Usage
 
