@@ -1,4 +1,5 @@
-//! Velvet is a classical atomistic simulation engine with a focus on user-friendliness and extensibility. 
+//! Velvet is an open-source classical atomistic simulation engine written in Rust, with a focus on user-friendliness and extensibility.
+//!
 //! This project is largely a learning exercise, but as development continues I hope to accomplish the following goals:
 //!
 //! * Extensibility via user-defined plugin modules
@@ -8,10 +9,18 @@
 //! * Visualization tools to analyze simulation results
 //! * Support importing and exporting data in popular external formats
 
-pub use velvet_core as core;
-pub use velvet_external_data as external_data;
-
+/// `use velvet::prelude::*;` to import common components.
 pub mod prelude {
-    pub use super::core::prelude::*;
-    pub use super::external_data::prelude::*;
+    pub use velvet_core::prelude::*;
+    pub use velvet_external_data::prelude::*;
+}
+
+pub mod core {
+    //! Core feature library for the Velvet simulation engine.
+    pub use velvet_core::*;
+}
+
+pub mod external_data {
+    //! Utilities to import and export data in external formats.
+    pub use velvet_external_data::*;
 }
