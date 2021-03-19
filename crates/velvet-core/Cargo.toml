@@ -18,6 +18,7 @@ serde = {version = "1.0", features = ["derive", "rc"]}
 strum = "0.20"
 strum_macros = "0.20"
 typetag = "0.1.6"
+uuid = { version = "0.8", features = ["serde", "v4"] }
 
 hdf5 = { version = "0.7", optional = true }
 hdf5-sys = { version = "0.7", optional = true }

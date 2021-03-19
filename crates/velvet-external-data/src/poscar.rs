@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::ops::Not;
 use std::str::FromStr;
 
@@ -52,19 +52,18 @@ pub fn import_poscar(poscar: &Poscar) -> System {
     );
     let cell = Cell::from_matrix(matrix);
 
-    let species: HashMap<usize, Specie> = match poscar.group_symbols() {
+    let species: Vec<Specie> = match poscar.group_symbols() {
         Some(symbols) => symbols
-            .enumerate()
-            .fold(HashMap::new(), |mut acc, (i, symbol)| {
+            .fold(Vec::new(), |mut accumulator, symbol| {
                 let element = Element::from_str(symbol).unwrap();
-                let specie = Specie::from_element(i, element);
-                acc.insert(i, specie);
-                acc
+                let specie = Specie::from_element(element);
+                accumulator.push(specie);
+                accumulator
             }),
         None => panic!("Missing species."),
     };
 
-    let specie_ids: Vec<usize> = match poscar.site_symbols() {
+    let specie_indices: Vec<usize> = match poscar.site_symbols() {
         Some(symbols) => {
             let mut id = 0;
             let mut scanned_symbols = HashSet::new();
@@ -106,7 +105,7 @@ pub fn import_poscar(poscar: &Poscar) -> System {
         size,
         cell,
         species,
-        specie_ids,
+        specie_indices,
         positions,
         velocities,
     }

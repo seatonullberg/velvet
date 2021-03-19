@@ -17,46 +17,56 @@ impl Property for PairEnergy {
 
     #[cfg(not(feature = "rayon"))]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        potentials
-            .pair_potentials
-            .interactions
+        let pair_potentials = &potentials.pair_potentials.potentials;
+        let neighbor_lists = &potentials.pair_potentials.neighbor_lists;
+        let cutoffs = &potentials.pair_potentials.cutoffs;
+        
+        pair_potentials
             .iter()
-            .map(|interaction| {
-                let potential = &interaction.potential;
-                let cutoff = interaction.cutoff;
-                let i = interaction.index_i;
-                let j = interaction.index_j;
-                let pos_i = system.positions[i];
-                let pos_j = system.positions[j];
-                let r = system.cell.distance(&pos_i, &pos_j);
-                if r < cutoff {
-                    potential.energy(r)
-                } else {
-                    0.0 as Float
-                }
+            .zip(neighbor_lists.iter())
+            .zip(cutoffs.iter())
+            .map(|((pot, nl), &cut)| -> Float {
+                nl.indices()
+                    .iter()
+                    .map(|(i, j)| {
+                        let pos_i = &system.positions[*i];
+                        let pos_j = &system.positions[*j];
+                        let r = system.cell.distance(&pos_i, &pos_j);
+                        if r < cut {
+                            pot.energy(r)
+                        } else {
+                            0.0 as Float
+                        }
+                    })
+                    .sum()
             })
             .sum()
     }
 
     #[cfg(feature = "rayon")]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        potentials
-            .pair_potentials
-            .interactions
-            .par_iter()
-            .map(|interaction| {
-                let potential = &interaction.potential;
-                let cutoff = interaction.cutoff;
-                let i = interaction.index_i;
-                let j = interaction.index_j;
-                let pos_i = system.positions[i];
-                let pos_j = system.positions[j];
-                let r = system.cell.distance(&pos_i, &pos_j);
-                if r < cutoff {
-                    potential.energy(r)
-                } else {
-                    0.0 as Float
-                }
+        let pair_potentials = &potentials.pair_potentials.potentials;
+        let neighbor_lists = &potentials.pair_potentials.neighbor_lists;
+        let cutoffs = &potentials.pair_potentials.cutoffs;
+        
+        pair_potentials
+            .iter()
+            .zip(neighbor_lists.iter())
+            .zip(cutoffs.iter())
+            .map(|((pot, nl), &cut)| -> Float {
+                nl.indices()
+                    .par_iter()
+                    .map(|(i, j)| {
+                        let pos_i = &system.positions[*i];
+                        let pos_j = &system.positions[*j];
+                        let r = system.cell.distance(&pos_i, &pos_j);
+                        if r < cut {
+                            pot.energy(r)
+                        } else {
+                            0.0 as Float
+                        }
+                    })
+                    .sum()
             })
             .sum()
     }
@@ -85,11 +95,11 @@ impl IntrinsicProperty for KineticEnergy {
     // NOTE: This function is faster without rayon.
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic_energy: Float = system
-            .specie_ids
+            .specie_indices
             .iter()
             .zip(system.velocities.iter())
             .map(|(id, vel)| {
-                let sp = system.species[id];
+                let sp = system.species[*id];
                 0.5 * sp.mass() * vel.norm_squared()
             })
             .sum();

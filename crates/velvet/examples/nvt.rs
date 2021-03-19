@@ -25,7 +25,7 @@ fn main() {
 
     // Initialize a Lennard-Jones style pair potential between all Ar-Ar pairs.
     let lj = LennardJones::new(4.184, 3.4);
-    let argon = Specie::from_element(0, Element::Ar);
+    let argon = Specie::from_element(Element::Ar);
 
     // Store all of the system's potentials in a Potentials struct.
     let potentials = PotentialsBuilder::new()

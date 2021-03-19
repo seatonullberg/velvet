@@ -43,7 +43,7 @@ impl Element {
         }
     }
 
-    /// Returns the atomic mass of the element in amu.
+    /// Returns the electronic charge of the element as a multiple of electron charge.
     pub const fn charge(&self) -> Float {
         match self {
             Element::H => 1.0,
@@ -57,6 +57,21 @@ impl Element {
             Element::Xe => 0.0,
         }
     }
+
+    /// Returns the atomic number of the element.
+    pub const fn number(&self) -> u8 {
+        match self {
+            Element::H => 1,
+            Element::He => 2,
+            Element::B => 5,
+            Element::N => 7,
+            Element::F => 9,
+            Element::Na => 11,
+            Element::Cl => 17,
+            Element::Ar => 18,
+            Element::Xe => 54,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -65,8 +80,14 @@ mod tests {
     use std::str::FromStr;
 
     #[test]
-    fn from_str() {
+    fn from_str_valid() {
         let hydrogen = Element::from_str("H").unwrap();
         assert_eq!(Element::H, hydrogen)
+    }
+
+    #[test]
+    #[should_panic]
+    fn from_str_invalid() {
+        let element = Element::from_str("not a valid symbol").unwrap();
     }
 }

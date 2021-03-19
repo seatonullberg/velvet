@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::internal::{self, Float};
 use crate::neighbors::NeighborList;
-use crate::potentials::interactions::PairInteraction;
 use crate::potentials::pair::PairPotential;
 use crate::system::species::Specie;
 use crate::system::System;
@@ -90,7 +89,7 @@ impl Default for PotentialsBuilder {
 pub(crate) struct PairPotentials {
     pub potentials: Vec<internal::Rc<dyn PairPotential>>,
     pub neighbor_lists: Vec<NeighborList>,
-    pub interactions: Vec<PairInteraction>,
+    pub cutoffs: Vec<Float>,
     pub update_frequency: usize,
 }
 
@@ -106,22 +105,6 @@ impl PairPotentials {
         self.neighbor_lists
             .iter_mut()
             .for_each(|nl| nl.update(system));
-        // rebuild interactions
-        self.interactions = self.potentials.iter().zip(self.neighbor_lists.iter()).fold(
-            Vec::new(),
-            |mut accumulator, (potential, nl)| {
-                nl.indices().iter().for_each(|(i, j)| {
-                    let interaction = PairInteraction {
-                        potential: potential.clone(),
-                        cutoff: nl.cutoff,
-                        index_i: *i,
-                        index_j: *j,
-                    };
-                    accumulator.push(interaction);
-                });
-                accumulator
-            },
-        )
     }
 }
 
@@ -129,7 +112,7 @@ impl PairPotentials {
 pub(crate) struct PairPotentialsBuilder {
     potentials: Vec<internal::Rc<dyn PairPotential>>,
     neighbor_lists: Vec<NeighborList>,
-    interactions: Vec<PairInteraction>,
+    cutoffs: Vec<Float>,
     update_frequency: usize,
 }
 
@@ -139,7 +122,7 @@ impl PairPotentialsBuilder {
         PairPotentialsBuilder {
             potentials: Vec::new(),
             neighbor_lists: Vec::new(),
-            interactions: Vec::new(),
+            cutoffs: Vec::new(),
             update_frequency: 1,
         }
     }
@@ -154,8 +137,9 @@ impl PairPotentialsBuilder {
     ) -> PairPotentialsBuilder {
         let potential = internal::Rc::from(potential);
         self.potentials.push(potential);
-        let neighbor_list = NeighborList::new(cutoff, thickness, Some(species));
+        let neighbor_list = NeighborList::new(cutoff + thickness, Some(species));
         self.neighbor_lists.push(neighbor_list);
+        self.cutoffs.push(cutoff);
         self
     }
 
@@ -170,7 +154,7 @@ impl PairPotentialsBuilder {
         PairPotentials {
             potentials: self.potentials,
             neighbor_lists: self.neighbor_lists,
-            interactions: self.interactions,
+            cutoffs: self.cutoffs,
             update_frequency: self.update_frequency,
         }
     }

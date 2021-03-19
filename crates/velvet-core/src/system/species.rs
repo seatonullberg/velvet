@@ -1,26 +1,31 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::internal::Float;
 use crate::system::elements::Element;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Specie {
-    id: usize,
+    id: u128,
     mass: Float,
     charge: Float,
 }
 
 impl Specie {
-    pub fn new(id: usize, mass: Float, charge: Float) -> Specie {
-        Specie { id, mass, charge }
+    pub fn new(mass: Float, charge: Float) -> Specie {
+        Specie { id: Uuid::new_v4().as_u128(), mass, charge }
     }
 
-    pub fn from_element(id: usize, element: Element) -> Specie {
+    pub fn from_element(element: Element) -> Specie {
         Specie {
-            id,
+            id: element.number() as u128,
             mass: element.mass(),
             charge: element.charge(),
         }
+    }
+
+    pub fn id(&self) -> u128 {
+        self.id
     }
 
     pub fn mass(&self) -> Float {
@@ -46,22 +51,25 @@ mod tests {
     #[test]
     fn from_element() {
         let element = Element::H;
-        let specie = Specie::from_element(0, element);
+        let specie = Specie::from_element(element);
         assert_eq!(specie.mass(), element.mass());
         assert_eq!(specie.charge(), element.charge());
+        assert_eq!(specie.id(), element.number() as u128);
     }
 
     #[test]
-    fn compare_invalid() {
-        let s0 = Specie::from_element(0, Element::H);
-        let s1 = Specie::from_element(1, Element::H);
-        assert_ne!(s0, s1);
+    fn compare_equivalent() {
+        let hydrogen1 = Specie::from_element(Element::H);
+        let hydrogen2 = Specie::from_element(Element::H);
+        assert_eq!(hydrogen1, hydrogen2);
     }
 
     #[test]
-    fn compare_valid() {
-        let s0 = Specie::from_element(0, Element::H);
-        let s1 = Specie::from_element(0, Element::H);
-        assert_eq!(s0, s1);
+    fn compare_nonequivalent() {
+        let hydrogen = Specie::from_element(Element::H);
+        let helium = Specie::from_element(Element::He);
+        assert_ne!(hydrogen, helium);
+        let specie = Specie::new(hydrogen.mass(), hydrogen.charge());
+        assert_ne!(specie, hydrogen);
     }
 }
