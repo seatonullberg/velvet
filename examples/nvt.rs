@@ -14,7 +14,7 @@ fn main() {
     pretty_env_logger::init();
 
     // Load an Ar gas system from a POSCAR formatted file.
-    let file = File::open("../../resources/test/Ar.poscar").unwrap();
+    let file = File::open("resources/test/Ar.poscar").unwrap();
     let reader = BufReader::new(file);
     let poscar = Poscar::from_reader(reader).unwrap();
     let mut system = import_poscar(&poscar);
