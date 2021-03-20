@@ -26,7 +26,7 @@ impl Property for PairForces {
             .iter()
             .zip(neighbor_lists.iter())
             .zip(cutoffs.iter())
-            .map(|((pot, nl), &cut)| {
+            .map(|((pot, nl), &cut)| -> Vec<(Vector3<Float>, usize, usize)> {
                 nl.indices()
                     .iter()
                     .map(move |(i, j)| {
@@ -35,14 +35,15 @@ impl Property for PairForces {
                         let r = system.cell.distance(&pos_i, &pos_j);
                         if r < cut {
                             let dir = system.cell.direction(&pos_i, &pos_j);
-                            (pot.force(r) * dir, i, j)
+                            (pot.force(r) * dir, *i, *j)
                         } else {
-                            (Vector3::zeros(), i, j)
+                            (Vector3::zeros(), *i, *j)
                         }
                     })
+                    .collect()
             })
             .fold(vec![Vector3::zeros(); system.size], |mut accumulator, forces_metadata| {
-                forces_metadata
+                forces_metadata.iter()
                     .for_each(|(force, i, j)| {
                         accumulator[*i] += force;
                         accumulator[*j] -= force;

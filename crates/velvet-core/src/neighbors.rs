@@ -48,26 +48,11 @@ impl NeighborList {
         self.possible_indices.shrink_to_fit();
     }
 
-    #[cfg(not(feature = "rayon"))]
+    // TODO: implement rayon version
     pub fn update(&mut self, system: &System) {
         self.current_indices = self
             .possible_indices
             .iter()
-            .filter(|(i, j)| {
-                let pos_i = system.positions[*i];
-                let pos_j = system.positions[*j];
-                let r = system.cell.distance(&pos_i, &pos_j);
-                r < self.cutoff
-            })
-            .copied()
-            .collect()
-    }
-
-    #[cfg(feature = "rayon")]
-    pub fn update(&mut self, system: &System) {
-        self.current_indices = self
-            .possible_indices
-            .par_iter()
             .filter(|(i, j)| {
                 let pos_i = system.positions[*i];
                 let pos_j = system.positions[*j];
