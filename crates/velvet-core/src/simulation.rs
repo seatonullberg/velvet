@@ -30,9 +30,10 @@ impl Simulation {
         }
     }
 
+    // TODO: refactor HDF5 output to comply with new trait structure
     pub fn run(&mut self, steps: usize) {
         #[cfg(feature = "hdf5-output")]
-        let file = hdf5::File::create(self.config.output_filename()).unwrap();
+        let file = hdf5::File::create(self.config.hdf5_output_filename()).unwrap();
 
         // setup potentials
         self.potentials.setup(&self.system);
@@ -54,15 +55,16 @@ impl Simulation {
             if i % self.config.output_interval() == 0 || i == steps - 1 {
                 info!("Results for timestep: {}", i);
 
+                for out in self.config.outputs() {
+                    out.output(&self.system, &self.potentials);
+                }
+
                 #[cfg(feature = "hdf5-output")]
                 let group = file.create_group(&format!("{}", i)).unwrap();
 
-                for out in self.config.outputs() {
-                    #[cfg(not(feature = "hdf5-output"))]
-                    out.output(&self.system, &self.potentials);
-
-                    #[cfg(feature = "hdf5-output")]
-                    out.output(&self.system, &self.potentials, &group);
+                #[cfg(feature = "hdf5-output")]
+                for out in self.config.hdf5_outputs() {
+                    out.output_hdf5(&self.system, &self.potentials, &group);
                 }
             }
         }

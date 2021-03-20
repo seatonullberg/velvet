@@ -3,22 +3,28 @@
 use serde::{Deserialize, Serialize};
 
 use crate::outputs::Output;
+#[cfg(feature = "hdf5-output")]
+use crate::outputs::hdf5::Hdf5Output;
 
 /// High-level configuration options.
 #[derive(Serialize, Deserialize)]
 pub struct Configuration {
-    threads: usize,
+    // default options
     outputs: Vec<Box<dyn Output>>,
     output_interval: usize,
-    output_filename: String,
+
+    // hdf5 options
+    #[cfg(feature = "hdf5-output")]
+    hdf5_output_filename: String,
+    #[cfg(feature = "hdf5-output")]
+    hdf5_outputs: Vec<Box<dyn Hdf5Output>>,
+
+    // rayon options
+    #[cfg(feature = "rayon")]
+    n_threads: usize,
 }
 
 impl Configuration {
-    /// Returns the number of threads in the threadpool.
-    pub fn threads(&self) -> usize {
-        self.threads
-    }
-
     /// Returns an iterator over the outputs.
     pub fn outputs(&self) -> impl Iterator<Item = &Box<dyn Output>> {
         self.outputs.iter()
@@ -28,19 +34,38 @@ impl Configuration {
     pub fn output_interval(&self) -> usize {
         self.output_interval
     }
-
+    
     /// Returns the filename of the HDF5 formatted output file.
-    pub fn output_filename(&self) -> String {
-        self.output_filename.clone()
+    #[cfg(feature = "hdf5-output")]
+    pub fn hdf5_output_filename(&self) -> String {
+        self.hdf5_output_filename.clone()
+    }
+
+    /// Returns an iterator over the HDF5 outputs
+    #[cfg(feature = "hdf5-output")]
+    pub fn hdf5_outputs(&self) -> impl Iterator<Item = &Box<dyn Hdf5Output>> {
+        self.hdf5_outputs.iter()
+    }
+
+    /// Returns the number of threads in the threadpool.
+    #[cfg(feature = "rayon")]
+    pub fn n_threads(&self) -> usize {
+        self.n_threads
     }
 }
 
 /// Constructor for the [`Configuration`](velvet_core::config::Configuration) type.
 pub struct ConfigurationBuilder {
-    threads: Option<usize>,
     outputs: Vec<Box<dyn Output>>,
     output_interval: Option<usize>,
-    output_filename: Option<String>,
+
+    #[cfg(feature = "hdf5-output")]
+    hdf5_output_filename: Option<String>,
+    #[cfg(feature = "hdf5-output")]
+    hdf5_outputs: Vec<Box<dyn Hdf5Output>>,
+
+    #[cfg(feature = "rayon")]
+    n_threads: Option<usize>,
 }
 
 impl Default for ConfigurationBuilder {
@@ -53,22 +78,22 @@ impl ConfigurationBuilder {
     /// Returns a new `ConfigurationBuilder`.
     pub fn new() -> ConfigurationBuilder {
         ConfigurationBuilder {
-            threads: None,
             outputs: Vec::new(),
             output_interval: None,
-            output_filename: None,
+
+            #[cfg(feature = "hdf5-output")]
+            hdf5_output_filename: None,
+            #[cfg(feature = "hdf5-output")]
+            hdf5_outputs: Vec::new(),
+            
+            #[cfg(feature = "rayon")]
+            n_threads: None,
         }
     }
 
-    /// Sets the size of the threadpool.
-    pub fn with_threads(mut self, threads: usize) -> ConfigurationBuilder {
-        self.threads = Some(threads);
-        self
-    }
-
     /// Adds an output to the configuration.
-    pub fn with_output(mut self, output: Box<dyn Output>) -> ConfigurationBuilder {
-        self.outputs.push(output);
+    pub fn add_output<T: Output + 'static>(mut self, output: T) -> ConfigurationBuilder {
+        self.outputs.push(Box::new(output));
         self
     }
 
@@ -79,28 +104,50 @@ impl ConfigurationBuilder {
     }
 
     /// Sets the filename of the HDF5 formatted output file.
-    pub fn with_output_filename(mut self, filename: String) -> ConfigurationBuilder {
-        self.output_filename = Some(filename);
+    #[cfg(feature = "hdf5-output")]
+    pub fn with_hdf5_output_filename(mut self, filename: String) -> ConfigurationBuilder {
+        self.hdf5_output_filename = Some(filename);
+        self
+    }
+
+    /// Adds an HDF5 formatted output to the configuration
+    #[cfg(feature = "hdf5-output")]
+    pub fn add_hdf5_output<T: Hdf5Output + 'static>(mut self, output: T) -> ConfigurationBuilder {
+        self.hdf5_outputs.push(Box::new(output));
+        self
+    }
+
+    /// Sets the size of the threadpool.
+    #[cfg(feature = "rayon")]
+    pub fn with_n_threads(mut self, n_threads: usize) -> ConfigurationBuilder {
+        self.n_threads = Some(n_threads);
         self
     }
 
     /// Returns an initialized `Configuration`.
     pub fn build(self) -> Configuration {
-        let threads = self.threads.unwrap_or(1);
-
         let outputs = self.outputs;
+        let output_interval = self.output_interval.unwrap_or(1); // TODO: this is a terrible default
 
-        let output_interval = self.output_interval.unwrap_or(1);
-
-        let output_filename = self
-            .output_filename
+        #[cfg(feature = "hdf5-output")]
+        let hdf5_output_filename = self
+            .hdf5_output_filename
             .unwrap_or_else(|| "velvet.h5".to_string());
+        #[cfg(feature = "hdf5-output")]
+        let hdf5_outputs = self.hdf5_outputs;
 
+        #[cfg(feature = "rayon")]
+        let n_threads = self.n_threads.unwrap_or(1); // TODO: use num_cpus crate to determine optimal thread count
+        
         Configuration {
-            threads,
             outputs,
             output_interval,
-            output_filename,
+            #[cfg(feature = "hdf5-output")]
+            hdf5_output_filename,
+            #[cfg(feature = "hdf5-output")]
+            hdf5_outputs,
+            #[cfg(feature = "rayon")]
+            n_threads,
         }
     }
 }

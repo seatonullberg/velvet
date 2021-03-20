@@ -8,7 +8,7 @@ use velvet::prelude::*;
 
 static TIMESTEPS: usize = 250_000;
 static OUTPUT_INTERVAL: usize = 100;
-static OUTPUT_FILENAME: &str = "nve.h5";
+static HDF5_OUTPUT_FILENAME: &str = "nve.h5";
 
 fn main() {
     pretty_env_logger::init();
@@ -41,13 +41,14 @@ fn main() {
 
     // Initialize a configuration.
     let config = ConfigurationBuilder::new()
-        .with_output_filename(OUTPUT_FILENAME.to_string())
         .with_output_interval(OUTPUT_INTERVAL)
-        .with_output(Box::new(PotentialEnergy))
-        .with_output(Box::new(KineticEnergy))
-        .with_output(Box::new(TotalEnergy))
-        .with_output(Box::new(Temperature))
+        .add_output(PotentialEnergy)
+        .add_output(KineticEnergy)
+        .add_output(TotalEnergy)
+        .add_output(Temperature)
         .build();
+        
+    // TODO: optional HDF5 output configuration
 
     // Run the simulation.
     let mut sim = Simulation::new(system, potentials, Box::new(md), config);

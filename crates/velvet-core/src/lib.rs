@@ -8,6 +8,7 @@
 //! * `energy` - Kcal/mole
 //! * `force` - Kcal/mole-angstrom
 //! * `temperature` - Kelvin
+
 #![warn(missing_docs)]
 #![warn(clippy::all)]
 
@@ -35,6 +36,8 @@ pub mod prelude {
     pub use super::config::{Configuration, ConfigurationBuilder};
     pub use super::integrators::{Integrator, VelocityVerlet};
     pub use super::outputs::*;
+    #[cfg(feature = "hdf5-output")]
+    pub use super::outputs::hdf5::*;
     pub use super::potentials::collections::{Potentials, PotentialsBuilder};
     pub use super::potentials::functions::*;
     pub use super::potentials::coulomb::CoulombPotential;
