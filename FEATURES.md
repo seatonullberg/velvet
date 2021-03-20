@@ -45,7 +45,7 @@ All of the project's completed and proposed features will be documented in this 
 
 ### Outputs <a name="data-formats-outputs">
 
-✔️ **HDF5** - Write results in [HDF5](https://www.hdfgroup.org/solutions/hdf5/) format with (optional) `libhdf5` dependency.
+✔️ **HDF5** - Write results in [HDF5](https://www.hdfgroup.org/solutions/hdf5/) format (optional).
 
 🚧 **CBOR** - Serialize simulation configurations as binary [CBOR](https://cbor.io/) data.
 
@@ -83,7 +83,7 @@ All of the project's completed and proposed features will be documented in this 
 
 ✔️ **Neighbor Lists** - [Neighbor list](https://en.wikipedia.org/wiki/Verlet_list) buffering of nonbonded interactions.
 
-✔️ **Multithreading** - Thread parallelism via [`rayon`](https://github.com/rayon-rs/rayon) parallel iterators (optional).
+✔️ **Multithreading** - Thread parallelism via [rayon](https://github.com/rayon-rs/rayon) parallel iterators (optional).
 
 🚧 **SIMD** - Multiple dispatch of single instructions.
 
