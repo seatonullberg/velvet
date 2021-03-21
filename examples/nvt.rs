@@ -40,7 +40,7 @@ fn main() {
     let nose_hoover = NoseHoover::new(300.0, 1.25, 1.0);
 
     // Run MD with a Nose-Hoover thermostat to simulate the NVT ensemble.
-    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(nose_hoover));
+    let md = MolecularDynamics::new(velocity_verlet, nose_hoover);
 
     // Initialize a configuration.
     let config = ConfigurationBuilder::new()
@@ -54,6 +54,6 @@ fn main() {
     // TODO: optional HDF5 output configuration
 
     // Run the simulation.
-    let mut sim = Simulation::new(system, potentials, Box::new(md), config);
+    let mut sim = Simulation::new(system, potentials, md, config);
     sim.run(TIMESTEPS);
 }

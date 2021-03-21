@@ -88,6 +88,6 @@ mod tests {
     #[test]
     #[should_panic]
     fn from_str_invalid() {
-        let element = Element::from_str("not a valid symbol").unwrap();
+        let _ = Element::from_str("not a valid symbol").unwrap();
     }
 }

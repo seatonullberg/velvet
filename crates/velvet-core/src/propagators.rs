@@ -20,13 +20,14 @@ pub struct MolecularDynamics {
 }
 
 impl MolecularDynamics {
-    pub fn new(
-        integrator: Box<dyn Integrator>,
-        thermostat: Box<dyn Thermostat>,
-    ) -> MolecularDynamics {
+    pub fn new<I, T>(integrator: I, thermostat: T) -> MolecularDynamics 
+    where
+        I: Integrator + 'static,
+        T: Thermostat + 'static,
+    {
         MolecularDynamics {
-            integrator,
-            thermostat,
+            integrator: Box::new(integrator),
+            thermostat: Box::new(thermostat),
         }
     }
 }

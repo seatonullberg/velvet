@@ -37,7 +37,7 @@ fn main() {
     let velocity_verlet = VelocityVerlet::new(0.1);
 
     // Run MD with no thermostat to simulate the NVE ensemble.
-    let md = MolecularDynamics::new(Box::new(velocity_verlet), Box::new(NullThermostat));
+    let md = MolecularDynamics::new(velocity_verlet, NullThermostat);
 
     // Initialize a configuration.
     let config = ConfigurationBuilder::new()
@@ -51,6 +51,6 @@ fn main() {
     // TODO: optional HDF5 output configuration
 
     // Run the simulation.
-    let mut sim = Simulation::new(system, potentials, Box::new(md), config);
+    let mut sim = Simulation::new(system, potentials, md, config);
     sim.run(TIMESTEPS);
 }

@@ -16,16 +16,19 @@ pub struct Simulation {
 }
 
 impl Simulation {
-    pub fn new(
+    pub fn new<P>(
         system: System,
         potentials: Potentials,
-        propagator: Box<dyn Propagator>,
+        propagator: P,
         config: Configuration,
-    ) -> Simulation {
+    ) -> Simulation 
+    where
+        P: Propagator + 'static,
+    {
         Simulation {
             system,
             potentials,
-            propagator,
+            propagator: Box::new(propagator),
             config,
         }
     }
