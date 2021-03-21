@@ -9,8 +9,10 @@ use crate::properties::temperature::Temperature;
 use crate::properties::Property;
 use crate::system::System;
 
+/// Shared behavior to write a simulation result to an HDF5 file.
 #[typetag::serde(tag = "type")]
 pub trait Hdf5Output {
+    /// Writes the HDF5 formatted output.
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group);
 }
 

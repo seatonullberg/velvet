@@ -18,10 +18,6 @@ pub struct Configuration {
     hdf5_output_filename: String,
     #[cfg(feature = "hdf5-output")]
     hdf5_outputs: Vec<Box<dyn Hdf5Output>>,
-
-    // rayon options
-    #[cfg(feature = "rayon")]
-    n_threads: usize,
 }
 
 impl Configuration {
@@ -46,12 +42,6 @@ impl Configuration {
     pub fn hdf5_outputs(&self) -> impl Iterator<Item = &dyn Hdf5Output> {
         self.hdf5_outputs.iter().map(|x| x.as_ref())
     }
-
-    /// Returns the number of threads in the threadpool.
-    #[cfg(feature = "rayon")]
-    pub fn n_threads(&self) -> usize {
-        self.n_threads
-    }
 }
 
 /// Constructor for the [`Configuration`](velvet_core::config::Configuration) type.
@@ -63,9 +53,6 @@ pub struct ConfigurationBuilder {
     hdf5_output_filename: Option<String>,
     #[cfg(feature = "hdf5-output")]
     hdf5_outputs: Vec<Box<dyn Hdf5Output>>,
-
-    #[cfg(feature = "rayon")]
-    n_threads: Option<usize>,
 }
 
 impl Default for ConfigurationBuilder {
@@ -85,9 +72,6 @@ impl ConfigurationBuilder {
             hdf5_output_filename: None,
             #[cfg(feature = "hdf5-output")]
             hdf5_outputs: Vec::new(),
-            
-            #[cfg(feature = "rayon")]
-            n_threads: None,
         }
     }
 
@@ -117,13 +101,6 @@ impl ConfigurationBuilder {
         self
     }
 
-    /// Sets the size of the threadpool.
-    #[cfg(feature = "rayon")]
-    pub fn with_n_threads(mut self, n_threads: usize) -> ConfigurationBuilder {
-        self.n_threads = Some(n_threads);
-        self
-    }
-
     /// Returns an initialized `Configuration`.
     pub fn build(self) -> Configuration {
         let outputs = self.outputs;
@@ -135,9 +112,6 @@ impl ConfigurationBuilder {
             .unwrap_or_else(|| "velvet.h5".to_string());
         #[cfg(feature = "hdf5-output")]
         let hdf5_outputs = self.hdf5_outputs;
-
-        #[cfg(feature = "rayon")]
-        let n_threads = self.n_threads.unwrap_or(1); // TODO: use num_cpus crate to determine optimal thread count
         
         Configuration {
             outputs,
@@ -146,8 +120,6 @@ impl ConfigurationBuilder {
             hdf5_output_filename,
             #[cfg(feature = "hdf5-output")]
             hdf5_outputs,
-            #[cfg(feature = "rayon")]
-            n_threads,
         }
     }
 }

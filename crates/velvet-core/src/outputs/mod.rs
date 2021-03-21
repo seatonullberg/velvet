@@ -10,8 +10,10 @@ use crate::properties::temperature::Temperature;
 use crate::properties::Property;
 use crate::system::System;
 
+/// Shared behavior to log a simulation result.
 #[typetag::serde(tag = "type")]
 pub trait Output {
+    /// Logs the output.
     fn output(&self, system: &System, potentials: &Potentials);
 }
 

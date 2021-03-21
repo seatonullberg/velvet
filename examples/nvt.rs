@@ -43,15 +43,25 @@ fn main() {
     let md = MolecularDynamics::new(velocity_verlet, nose_hoover);
 
     // Initialize a configuration.
-    let config = ConfigurationBuilder::new()
+    let mut config_builder = ConfigurationBuilder::new()
         .with_output_interval(OUTPUT_INTERVAL)
         .add_output(PotentialEnergy)
         .add_output(KineticEnergy)
         .add_output(TotalEnergy)
-        .add_output(Temperature)
-        .build();
-    
-    // TODO: optional HDF5 output configuration
+        .add_output(Temperature);
+
+    // Add HDF5 outputs if the feature is enabled.
+    #[cfg(feature = "hdf5-output")] {
+        config_builder = config_builder
+            .with_hdf5_output_filename(HDF5_OUTPUT_FILENAME.to_string())
+            .add_hdf5_output(PotentialEnergy)
+            .add_hdf5_output(KineticEnergy)
+            .add_hdf5_output(TotalEnergy)
+            .add_hdf5_output(Temperature);
+    }
+
+    // Build the configuration
+    let config = config_builder.build();
 
     // Run the simulation.
     let mut sim = Simulation::new(system, potentials, md, config);
