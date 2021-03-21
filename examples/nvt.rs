@@ -30,7 +30,7 @@ fn main() {
     // Store all of the system's potentials in a Potentials struct.
     let potentials = PotentialsBuilder::new()
         .with_pair_update_frequency(3)
-        .add_pair(Box::new(lj), (argon, argon), 8.5, 1.0)
+        .add_pair(lj, (argon, argon), 8.5, 1.0)
         .build();
 
     // Initialize a velocity Verlet style integrator.

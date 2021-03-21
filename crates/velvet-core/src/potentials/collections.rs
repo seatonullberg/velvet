@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::internal::{self, Float};
+use crate::internal::Float;
 use crate::neighbors::NeighborList;
 use crate::potentials::pair::PairPotential;
 use crate::system::species::Specie;
@@ -55,17 +55,20 @@ impl PotentialsBuilder {
     ///
     /// # Arguments
     ///
-    /// * `potential` - Boxed pair [`PairPotential`] trait object.
+    /// * `potential` - [`PairPotential`] trait object.
     /// * `species` - Tuple of [`Specie`] objects that the potential applies to.
     /// * `cutoff` - Cutoff radius.
     /// * `thickness` - Buffer thickness used to construct a [`NeighborList`].
-    pub fn add_pair(
+    pub fn add_pair<P>(
         mut self,
-        potential: Box<dyn PairPotential>,
+        potential: P,
         species: (Specie, Specie),
         cutoff: Float,
         thickness: Float,
-    ) -> PotentialsBuilder {
+    ) -> PotentialsBuilder 
+    where
+        P: PairPotential + 'static,
+    {
         self.pair_potentials_builder = self
             .pair_potentials_builder
             .add_pair(potential, species, cutoff, thickness);
@@ -87,7 +90,7 @@ impl Default for PotentialsBuilder {
 
 #[derive(Serialize, Deserialize)]
 pub(crate) struct PairPotentials {
-    pub potentials: Vec<internal::Rc<dyn PairPotential>>,
+    pub potentials: Vec<Box<dyn PairPotential>>,
     pub neighbor_lists: Vec<NeighborList>,
     pub cutoffs: Vec<Float>,
     pub update_frequency: usize,
@@ -110,7 +113,7 @@ impl PairPotentials {
 
 /// Convenient constructor for [`PairPotentials`].
 pub(crate) struct PairPotentialsBuilder {
-    potentials: Vec<internal::Rc<dyn PairPotential>>,
+    potentials: Vec<Box<dyn PairPotential>>,
     neighbor_lists: Vec<NeighborList>,
     cutoffs: Vec<Float>,
     update_frequency: usize,
@@ -128,14 +131,17 @@ impl PairPotentialsBuilder {
     }
 
     /// Adds a new potential to the collection.
-    pub fn add_pair(
+    pub fn add_pair<P>(
         mut self,
-        potential: Box<dyn PairPotential>,
+        potential: P,
         species: (Specie, Specie),
         cutoff: Float,
         thickness: Float,
-    ) -> PairPotentialsBuilder {
-        let potential = internal::Rc::from(potential);
+    ) -> PairPotentialsBuilder 
+    where
+        P: PairPotential + 'static,
+    {
+        let potential = Box::new(potential);
         self.potentials.push(potential);
         let neighbor_list = NeighborList::new(cutoff + thickness, Some(species));
         self.neighbor_lists.push(neighbor_list);

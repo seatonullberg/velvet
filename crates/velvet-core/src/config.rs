@@ -26,8 +26,8 @@ pub struct Configuration {
 
 impl Configuration {
     /// Returns an iterator over the outputs.
-    pub fn outputs(&self) -> impl Iterator<Item = &Box<dyn Output>> {
-        self.outputs.iter()
+    pub fn outputs(&self) -> impl Iterator<Item = &dyn Output> {
+        self.outputs.iter().map(|x| x.as_ref())
     }
 
     /// Returns the number of steps between each output call.
@@ -43,8 +43,8 @@ impl Configuration {
 
     /// Returns an iterator over the HDF5 outputs
     #[cfg(feature = "hdf5-output")]
-    pub fn hdf5_outputs(&self) -> impl Iterator<Item = &Box<dyn Hdf5Output>> {
-        self.hdf5_outputs.iter()
+    pub fn hdf5_outputs(&self) -> impl Iterator<Item = &dyn Hdf5Output> {
+        self.hdf5_outputs.iter().map(|x| x.as_ref())
     }
 
     /// Returns the number of threads in the threadpool.
