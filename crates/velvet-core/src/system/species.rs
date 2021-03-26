@@ -1,9 +1,12 @@
+//! Representation of a simulated particle.
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::internal::Float;
 use crate::system::elements::Element;
 
+/// Representation of a simulated particle.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Specie {
     id: u128,
@@ -12,10 +15,22 @@ pub struct Specie {
 }
 
 impl Specie {
+    /// Returns a new [`Specie`].
     pub fn new(mass: Float, charge: Float) -> Specie {
         Specie { id: Uuid::new_v4().as_u128(), mass, charge }
     }
 
+    /// Constructs a [`Specie`] from an [`Element`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    ///
+    /// let specie = Specie::from_element(Element::Na);
+    /// assert_eq!(specie.mass(), Element::Na.mass());
+    /// assert_eq!(specie.charge(), Element::Na.charge());
+    /// ```
     pub fn from_element(element: Element) -> Specie {
         Specie {
             id: element.number() as u128,
@@ -24,14 +39,17 @@ impl Specie {
         }
     }
 
+    /// Returns the specie ID.
     pub fn id(&self) -> u128 {
         self.id
     }
 
+    /// Returns the specie's mass.
     pub fn mass(&self) -> Float {
         self.mass
     }
 
+    /// Returns the specie's electronic charge.
     pub fn charge(&self) -> Float {
         self.charge
     }

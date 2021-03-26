@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
 
-/// Matrix representation of a 3D bounding box.
+/// Bounding box of the simulation environment.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Cell {
     matrix: Matrix3<Float>,
@@ -13,16 +13,19 @@ pub struct Cell {
 }
 
 impl Cell {
-    /// Returns a new cell initialized from triclinic lattice parameters.
+    /// Constructs a [`Cell`] from triclinic lattice parameters.
     ///
-    /// # Arguments
+    /// # Examples
     ///
-    /// * `a` - Length of the `a` vector
-    /// * `b` - Length of the `b` vector
-    /// * `c` - Length of the `c` vector
-    /// * `alpha` - Angle betwen the `b` and `c` vectors (degrees)
-    /// * `beta` - Angle between the `a` and `c` vectors (degrees)
-    /// * `gamma` - Angle between the `a` and `b` vectors (degrees)
+    /// ```
+    /// use velvet_core::prelude::*;
+    ///
+    /// // orthorhombic cell
+    /// let cell = Cell::triclinic(1.0, 2.0, 3.0, 90.0, 90.0, 90.0);
+    /// assert_eq!(cell.a(), 1.0);
+    /// assert_eq!(cell.b(), 2.0);
+    /// assert_eq!(cell.c(), 3.0);
+    /// ```
     pub fn triclinic(
         a: Float,
         b: Float,
@@ -31,24 +34,31 @@ impl Cell {
         beta: Float,
         gamma: Float,
     ) -> Cell {
-        let cos_alpha = alpha.to_radians().cos();
-        let cos_beta = beta.to_radians().cos();
-        let (sin_gamma, cos_gamma) = gamma.to_radians().sin_cos();
-
-        let b_x = b * cos_gamma;
-        let b_y = b * sin_gamma;
-
-        let c_x = c * cos_beta;
-        let c_y = c * (cos_alpha - cos_beta * cos_gamma) / sin_gamma;
-        let c_z = Float::sqrt(c * c - c_y * c_y - c_x * c_x);
-
-        let matrix = Matrix3::new(a, b_x, c_x, 0.0, b_y, c_y, 0.0, 0.0, c_z);
+        let matrix = cell_matrix(a, b, c, alpha, beta, gamma);
         let inv_matrix = matrix.try_inverse().unwrap();
-
         Cell { matrix, inv_matrix }
     }
 
-    /// Returns a new cell initialized from a 3x3 matrix.
+    /// Constructs a [`Cell`] from cubic lattice parameters.
+    ///
+    /// # Examples
+    /// 
+    /// ```
+    /// use velvet_core::prelude::*;
+    ///
+    /// let a0 = 4.0;
+    /// let cell = Cell::cubic(a0);
+    /// assert_eq!(cell.a(), a0);
+    /// assert_eq!(cell.b(), a0);
+    /// assert_eq!(cell.c(), a0);
+    /// ```
+    pub fn cubic(a: Float) -> Cell {
+        let matrix = cell_matrix(a, a, a, 90.0, 90.0, 90.0);
+        let inv_matrix = matrix.try_inverse().unwrap();
+        Cell { matrix, inv_matrix }
+    }
+
+    /// Constructs a [`Cell`] from a 3x3 matrix.
     pub fn from_matrix(matrix: Matrix3<Float>) -> Cell {
         let inv_matrix = matrix.try_inverse().unwrap();
         Cell { matrix, inv_matrix }
@@ -118,16 +128,61 @@ impl Cell {
     }
 
     /// Converts a cartesian position to a fractional position.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use nalgebra::Vector3;
+    /// use approx::*;
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// let cart = Vector3::new(2.0, 2.0, 2.0);
+    /// let frac = cell.fractional(&cart);
+    /// assert_relative_eq!(frac[0], 0.5);
+    /// assert_relative_eq!(frac[1], 0.5);
+    /// assert_relative_eq!(frac[2], 0.5);
+    /// ```
     pub fn fractional(&self, cartesian: &Vector3<Float>) -> Vector3<Float> {
         self.inv_matrix * cartesian
     }
 
     /// Converts a fractional position to a cartesian position.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use nalgebra::Vector3;
+    /// use approx::*;
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// let frac = Vector3::new(0.5, 0.5, 0.5);
+    /// let cart = cell.cartesian(&frac);
+    /// assert_relative_eq!(cart[0], 2.0);
+    /// assert_relative_eq!(cart[1], 2.0);
+    /// assert_relative_eq!(cart[2], 2.0);
+    /// ```
     pub fn cartesian(&self, fractional: &Vector3<Float>) -> Vector3<Float> {
         self.matrix * fractional
     }
 
     /// Wraps a position vector into the cell obeying periodic boundary conditions.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use nalgebra::Vector3;
+    /// use approx::*; 
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// let mut vec = Vector3::new(1.0, 5.0, 1.0);
+    /// cell.wrap_vector(&mut vec);
+    /// assert_relative_eq!(vec[0], 1.0, epsilon=1e-6);
+    /// assert_relative_eq!(vec[1], 1.0, epsilon=1e-6);
+    /// assert_relative_eq!(vec[2], 1.0, epsilon=1e-6);
+    /// ```
     pub fn wrap_vector(&self, vector: &mut Vector3<Float>) {
         let mut fractional = self.fractional(vector);
         fractional[0] -= Float::floor(fractional[0]);
@@ -137,6 +192,21 @@ impl Cell {
     }
 
     /// Finds the image of a position vector in the cell obeying periodic boundary conditions.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use nalgebra::Vector3;
+    /// use approx::*; 
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// let mut vec = Vector3::new(1.0, 3.0, 1.0);
+    /// cell.vector_image(&mut vec);
+    /// assert_relative_eq!(vec[0], 1.0, epsilon=1e-6);
+    /// assert_relative_eq!(vec[1], -1.0, epsilon=1e-6);
+    /// assert_relative_eq!(vec[2], 1.0, epsilon=1e-6);
+    /// ```
     pub fn vector_image(&self, vector: &mut Vector3<Float>) {
         let mut fractional = self.fractional(vector);
         fractional[0] -= Float::round(fractional[0]);
@@ -146,6 +216,22 @@ impl Cell {
     }
 
     /// Returns the unit vector path between `v1` and `v2` obeying periodic boundary conditions.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use nalgebra::Vector3;
+    /// use approx::*; 
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// let v1 = Vector3::new(0.0, 0.0, 0.0);
+    /// let v2 = Vector3::new(1.5, 0.0, 0.0);
+    /// let dir = cell.direction(&v1, &v2);
+    /// assert_relative_eq!(dir[0], 1.0, epsilon=1e-6);
+    /// assert_relative_eq!(dir[1], 0.0, epsilon=1e-6);
+    /// assert_relative_eq!(dir[2], 0.0, epsilon=1e-6);
+    /// ```
     pub fn direction(&self, v1: &Vector3<Float>, v2: &Vector3<Float>) -> Vector3<Float> {
         let mut d = v2 - v1;
         self.vector_image(&mut d);
@@ -153,6 +239,20 @@ impl Cell {
     }
 
     /// Returns the distance between `v1` and `v2` obeying periodic boundary conditions.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use nalgebra::Vector3;
+    /// use approx::*; 
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// let v1 = Vector3::new(0.0, 0.0, 0.0);
+    /// let v2 = Vector3::new(1.5, 0.0, 0.0);
+    /// let dist = cell.distance(&v1, &v2);
+    /// assert_relative_eq!(dist, 1.5, epsilon=1e-6);
+    /// ```
     pub fn distance(&self, v1: &Vector3<Float>, v2: &Vector3<Float>) -> Float {
         let mut d = v2 - v1;
         self.vector_image(&mut d);
@@ -160,6 +260,21 @@ impl Cell {
     }
 
     /// Returns the angle between `v1`, `v2` and `v3` obeying periodic boundary conditions.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use nalgebra::Vector3;
+    /// use approx::*; 
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// let v1 = Vector3::new(0.0, 0.0, 0.0);
+    /// let v2 = Vector3::new(1.0, 0.0, 0.0);
+    /// let v3 = Vector3::new(1.5, 0.0, 0.0);
+    /// let angle = cell.angle(&v1, &v2, &v3);
+    /// assert_relative_eq!(angle, 3.14159, epsilon=1e-5);
+    /// ```
     pub fn angle(&self, v1: &Vector3<Float>, v2: &Vector3<Float>, v3: &Vector3<Float>) -> Float {
         let mut v12 = v1 - v2;
         self.vector_image(&mut v12);
@@ -169,6 +284,22 @@ impl Cell {
     }
 
     /// Returns the dihedral angle between `v1`, `v2`, `v3`, and `v4`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use nalgebra::Vector3;
+    /// use approx::*; 
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// let v1 = Vector3::new(0.0, 0.0, 0.0);
+    /// let v2 = Vector3::new(0.5, 0.0, 0.0);
+    /// let v3 = Vector3::new(1.0, 0.5, 0.0);
+    /// let v4 = Vector3::new(1.5, 0.5, 0.0);
+    /// let angle = cell.dihedral(&v1, &v2, &v3, &v4);
+    /// assert_relative_eq!(angle, 3.14159, epsilon=1e-5);
+    /// ```
     pub fn dihedral(
         &self,
         v1: &Vector3<Float>,
@@ -189,9 +320,34 @@ impl Cell {
     }
 
     /// Returns the total volume of the cell.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use velvet_core::prelude::*;
+    /// use approx::*;
+    ///
+    /// let cell = Cell::cubic(4.0);
+    /// assert_relative_eq!(cell.volume(), 64.0);
+    /// ```
     pub fn volume(&self) -> Float {
         (self.a_vector().cross(&self.b_vector())).dot(&self.c_vector())
     }
+}
+
+fn cell_matrix(a: Float, b: Float, c: Float, alpha: Float, beta: Float, gamma: Float) -> Matrix3<Float> {
+    let cos_alpha = alpha.to_radians().cos();
+    let cos_beta = beta.to_radians().cos();
+    let (sin_gamma, cos_gamma) = gamma.to_radians().sin_cos();
+
+    let b_x = b * cos_gamma;
+    let b_y = b * sin_gamma;
+
+    let c_x = c * cos_beta;
+    let c_y = c * (cos_alpha - cos_beta * cos_gamma) / sin_gamma;
+    let c_z = Float::sqrt(c * c - c_y * c_y - c_x * c_x);
+
+    Matrix3::new(a, b_x, c_x, 0.0, b_y, c_y, 0.0, 0.0, c_z)
 }
 
 #[cfg(test)]
@@ -203,7 +359,7 @@ mod tests {
     use nalgebra::Vector3;
 
     #[test]
-    fn new() {
+    fn triclinic() {
         let cell = Cell::triclinic(3.0, 4.0, 5.0, 80.0, 90.0, 110.0);
         assert_eq!(cell.a_vector(), Vector3::new(3.0, 0.0, 0.0));
         assert_eq!(cell.b_vector()[2], 0.0);
@@ -215,6 +371,21 @@ mod tests {
         assert_relative_eq!(cell.alpha(), 80.0);
         assert_relative_eq!(cell.beta(), 90.0);
         assert_relative_eq!(cell.gamma(), 110.0);
+    }
+
+    #[test]
+    fn cubic() {
+        let a0 = 4.0;
+        let angle = 90.0;
+        let cell = Cell::cubic(a0);
+        
+        assert_relative_eq!(cell.a(), a0);
+        assert_relative_eq!(cell.b(), a0);
+        assert_relative_eq!(cell.c(), a0);
+
+        assert_relative_eq!(cell.alpha(), angle);
+        assert_relative_eq!(cell.beta(), angle);
+        assert_relative_eq!(cell.gamma(), angle);
     }
 
     #[test]
