@@ -1,13 +1,13 @@
-use serde::{Deserialize, Serialize};
+//! Instantaneous temperature of the system.
 
-use crate::internal::Float;
 use crate::internal::consts::BOLTZMANN;
+use crate::internal::Float;
 use crate::properties::energy::KineticEnergy;
 use crate::properties::IntrinsicProperty;
 use crate::system::System;
 
 /// Instantaneous temperature of the system.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Temperature;
 
 impl IntrinsicProperty for Temperature {
@@ -19,5 +19,9 @@ impl IntrinsicProperty for Temperature {
         // support is added for degrees of freedom beyond just 3D particles.
         let dof = (system.size * 3) as Float;
         2.0 * kinetic / (dof * BOLTZMANN)
+    }
+
+    fn name(&self) -> String {
+        "temperature".to_string()
     }
 }

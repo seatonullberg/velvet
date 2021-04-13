@@ -1,13 +1,12 @@
 //! Representation of a simulated particle.
 
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::internal::Float;
 use crate::system::elements::Element;
 
 /// Representation of a simulated particle.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Specie {
     id: u128,
     mass: Float,
@@ -17,7 +16,11 @@ pub struct Specie {
 impl Specie {
     /// Returns a new [`Specie`].
     pub fn new(mass: Float, charge: Float) -> Specie {
-        Specie { id: Uuid::new_v4().as_u128(), mass, charge }
+        Specie {
+            id: Uuid::new_v4().as_u128(),
+            mass,
+            charge,
+        }
     }
 
     /// Constructs a [`Specie`] from an [`Element`].

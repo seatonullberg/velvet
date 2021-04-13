@@ -86,7 +86,7 @@ pub fn nve_simulation(mut system: System, potentials: Potentials) -> Simulation 
     boltz.apply(&mut system);
     let velocity_verlet = VelocityVerlet::new(0.1);
     let md = MolecularDynamics::new(velocity_verlet, NullThermostat);
-    let config = ConfigurationBuilder::default().build();
+    let config = ConfigurationBuilder::new().build();
     Simulation::new(system, potentials, md, config)
 }
 
@@ -96,6 +96,6 @@ pub fn nvt_simulation(mut system: System, potentials: Potentials) -> Simulation 
     let velocity_verlet = VelocityVerlet::new(0.1);
     let nose_hoover = NoseHoover::new(300.0, 1.25, 1.0);
     let md = MolecularDynamics::new(velocity_verlet, nose_hoover);
-    let config = ConfigurationBuilder::default().build();
+    let config = ConfigurationBuilder::new().build();
     Simulation::new(system, potentials, md, config)
 }

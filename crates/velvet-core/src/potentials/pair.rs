@@ -5,7 +5,6 @@ use crate::potentials::functions::{Harmonic, LennardJones, Mie, Morse};
 use crate::potentials::Potential;
 
 /// Shared behavior for pair potentials.
-#[typetag::serde(tag = "type")]
 pub trait PairPotential: Potential {
     /// Returns the potential energy of an atom in a pair separated by a distance `r`.
     fn energy(&self, r: Float) -> Float;
@@ -13,7 +12,6 @@ pub trait PairPotential: Potential {
     fn force(&self, r: Float) -> Float;
 }
 
-#[typetag::serde]
 impl PairPotential for Harmonic {
     #[inline]
     fn energy(&self, r: Float) -> Float {
@@ -27,7 +25,6 @@ impl PairPotential for Harmonic {
     }
 }
 
-#[typetag::serde]
 impl PairPotential for LennardJones {
     #[inline]
     fn energy(&self, r: Float) -> Float {
@@ -43,7 +40,6 @@ impl PairPotential for LennardJones {
     }
 }
 
-#[typetag::serde]
 impl PairPotential for Mie {
     #[inline]
     fn energy(&self, r: Float) -> Float {
@@ -64,7 +60,6 @@ impl PairPotential for Mie {
     }
 }
 
-#[typetag::serde]
 impl PairPotential for Morse {
     #[inline]
     fn energy(&self, r: Float) -> Float {

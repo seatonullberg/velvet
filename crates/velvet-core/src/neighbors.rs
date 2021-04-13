@@ -3,13 +3,11 @@
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use serde::{Deserialize, Serialize};
-
 use crate::internal::Float;
 use crate::system::species::Specie;
 use crate::system::System;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug)]
 pub struct NeighborList {
     pub cutoff: Float,
     species: Option<(Specie, Specie)>,

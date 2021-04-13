@@ -1,14 +1,11 @@
 //! High level abstraction for an atomistic simulation.
 
-use serde::{Deserialize, Serialize};
-
 use crate::config::Configuration;
 use crate::potentials::collections::Potentials;
 use crate::propagators::Propagator;
 use crate::system::System;
 
 /// High level abstraction for an atomistic simulation.
-#[derive(Serialize, Deserialize)]
 pub struct Simulation {
     system: System,
     potentials: Potentials,
@@ -23,7 +20,7 @@ impl Simulation {
         potentials: Potentials,
         propagator: P,
         config: Configuration,
-    ) -> Simulation 
+    ) -> Simulation
     where
         P: Propagator + 'static,
     {
@@ -43,12 +40,7 @@ impl Simulation {
         // setup propagation
         self.propagator.setup(&mut self.system, &self.potentials);
 
-        // setup HDF5 output file
-        #[cfg(feature = "hdf5-output")]
-        let file = hdf5::File::create(self.config.hdf5_output_filename()).unwrap();
-
         // start iteration loop
-        info!("Starting iteration loop...");
         for i in 0..steps {
             // do one propagation step
             self.propagator
@@ -57,25 +49,31 @@ impl Simulation {
             // update the potentials
             self.potentials.update(&self.system, i);
 
-            // output results
-            if i % self.config.output_interval() == 0 || i == steps - 1 {
-                info!("Results for timestep: {}", i);
-
-                // log the standard outputs
-                for out in self.config.outputs() {
-                    out.output(&self.system, &self.potentials);
+            // raw outputs
+            for group in self.config.raw_output_groups() {
+                let should_output = i % group.interval == 0 || i == steps - 1;
+                let destination = group.destination.as_mut();
+                for output in group.outputs.iter() {
+                    if should_output {
+                        output.output_raw(&self.system, &self.potentials, destination)
+                    }
                 }
+            }
 
-                // write the HDF5 outputs to file
-                #[cfg(feature = "hdf5-output")]
-                let group = file.create_group(&format!("{}", i)).unwrap();
-                #[cfg(feature = "hdf5-output")]
-                for out in self.config.hdf5_outputs() {
-                    out.output_hdf5(&self.system, &self.potentials, &group);
+            // HDF5 outputs
+            #[cfg(feature = "hdf5-output")]
+            {
+                for group in self.config.hdf5_output_groups() {
+                    let should_output = i % group.interval == 0 || i == steps - 1;
+                    let g = group.file_handle.create_group(&format!("{}", i)).unwrap();
+                    for output in group.outputs.iter() {
+                        if should_output {
+                            output.output_hdf5(&self.system, &self.potentials, &g)
+                        }
+                    }
                 }
             }
         }
-        info!("Iteration loop complete ({} iterations).", steps);
     }
 
     /// Consume the simulation and return its [`System`] and [`Potentials`].

@@ -1,11 +1,9 @@
 //! Elemental properties.
 
-use serde::{Deserialize, Serialize};
-
 use crate::internal::Float;
 
 /// Every element on the periodic table.
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize, EnumString, Hash, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, EnumString, Hash, Eq)]
 pub enum Element {
     /// Hydrogen
     H,

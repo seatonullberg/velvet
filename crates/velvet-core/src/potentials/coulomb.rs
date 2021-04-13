@@ -6,13 +6,12 @@ use libm::erfc;
 #[cfg(not(feature = "f64"))]
 use libm::erfcf as erfc;
 
-use crate::internal::Float;
 use crate::internal::consts::PI;
+use crate::internal::Float;
 use crate::potentials::functions::Wolf;
 use crate::potentials::Potential;
 
 /// Shared behavior for coulomb potentials.
-#[typetag::serde(tag = "type")]
 pub trait CoulombPotential: Potential {
     /// Returns the potential energy of an atom in a pair with charges `qi` and `qj` seperated by a distance `r`.
     fn energy(&self, qi: Float, qj: Float, r: Float) -> Float;
@@ -22,8 +21,6 @@ pub trait CoulombPotential: Potential {
     fn force(&self, qi: Float, qj: Float, r: Float) -> Float;
 }
 
-
-#[typetag::serde]
 impl CoulombPotential for Wolf {
     #[inline]
     fn energy(&self, qi: Float, qj: Float, r: Float) -> Float {

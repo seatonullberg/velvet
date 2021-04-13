@@ -1,7 +1,5 @@
 //! Collections of interatomic potentials grouped by interaction type.
 
-use serde::{Deserialize, Serialize};
-
 use crate::internal::Float;
 use crate::neighbors::NeighborList;
 use crate::potentials::pair::PairPotential;
@@ -9,7 +7,6 @@ use crate::system::species::Specie;
 use crate::system::System;
 
 /// Container type to hold instances of each potential in the system.
-#[derive(Serialize, Deserialize)]
 pub struct Potentials {
     pub(crate) pair_potentials: PairPotentials,
 }
@@ -65,7 +62,7 @@ impl PotentialsBuilder {
         species: (Specie, Specie),
         cutoff: Float,
         thickness: Float,
-    ) -> PotentialsBuilder 
+    ) -> PotentialsBuilder
     where
         P: PairPotential + 'static,
     {
@@ -88,7 +85,6 @@ impl Default for PotentialsBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize)]
 pub(crate) struct PairPotentials {
     pub potentials: Vec<Box<dyn PairPotential>>,
     pub neighbor_lists: Vec<NeighborList>,
@@ -137,7 +133,7 @@ impl PairPotentialsBuilder {
         species: (Specie, Specie),
         cutoff: Float,
         thickness: Float,
-    ) -> PairPotentialsBuilder 
+    ) -> PairPotentialsBuilder
     where
         P: PairPotential + 'static,
     {

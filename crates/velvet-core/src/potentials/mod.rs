@@ -6,5 +6,4 @@ pub mod functions;
 pub mod pair;
 
 /// Base trait for all potentials.
-#[typetag::serde(tag = "type")]
 pub trait Potential: Send + Sync {}

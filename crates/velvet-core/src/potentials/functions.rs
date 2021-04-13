@@ -1,12 +1,10 @@
 //! Interatomic potential functions.
 
-use serde::{Deserialize, Serialize};
-
 use crate::internal::Float;
 use crate::potentials::Potential;
 
 /// Harmonic style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Harmonic {
     /// Spring constant.
     pub k: Float,
@@ -21,11 +19,10 @@ impl Harmonic {
     }
 }
 
-#[typetag::serde]
 impl Potential for Harmonic {}
 
 /// Lennard-Jones style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct LennardJones {
     /// Depth of the potential well.
     pub epsilon: Float,
@@ -40,11 +37,10 @@ impl LennardJones {
     }
 }
 
-#[typetag::serde]
 impl Potential for LennardJones {}
 
 /// Mie style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Mie {
     /// Depth of the potential well.
     pub epsilon: Float,
@@ -68,11 +64,10 @@ impl Mie {
     }
 }
 
-#[typetag::serde]
 impl Potential for Mie {}
 
 /// Morse style pair potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Morse {
     /// Width of the potential well.
     pub a: Float,
@@ -89,11 +84,10 @@ impl Morse {
     }
 }
 
-#[typetag::serde]
 impl Potential for Morse {}
 
 /// Wolf style coulomb potential.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct Wolf {
     /// Damping parameter.
     pub alpha: Float,
@@ -108,5 +102,4 @@ impl Wolf {
     }
 }
 
-#[typetag::serde]
 impl Potential for Wolf {}

@@ -1,125 +1,63 @@
 //! User defined configuration options.
 
-use serde::{Deserialize, Serialize};
-
-use crate::outputs::Output;
 #[cfg(feature = "hdf5-output")]
-use crate::outputs::hdf5::Hdf5Output;
+use crate::outputs::hdf5::Hdf5OutputGroup;
+use crate::outputs::raw::RawOutputGroup;
 
 /// High-level configuration options.
-#[derive(Serialize, Deserialize)]
 pub struct Configuration {
-    // default options
-    outputs: Vec<Box<dyn Output>>,
-    output_interval: usize,
-
-    // hdf5 options
+    raw_output_groups: Vec<RawOutputGroup>,
     #[cfg(feature = "hdf5-output")]
-    hdf5_output_filename: String,
-    #[cfg(feature = "hdf5-output")]
-    hdf5_outputs: Vec<Box<dyn Hdf5Output>>,
+    hdf5_output_groups: Vec<Hdf5OutputGroup>,
 }
 
 impl Configuration {
-    /// Returns an iterator over the outputs.
-    pub fn outputs(&self) -> impl Iterator<Item = &dyn Output> {
-        self.outputs.iter().map(|x| x.as_ref())
+    /// Returns an iterator over the raw output groups.
+    pub fn raw_output_groups(&mut self) -> impl Iterator<Item = &mut RawOutputGroup> {
+        self.raw_output_groups.iter_mut()
     }
 
-    /// Returns the number of steps between each output call.
-    pub fn output_interval(&self) -> usize {
-        self.output_interval
-    }
-    
-    /// Returns the filename of the HDF5 formatted output file.
+    /// Returns an iterator over the HDF5 output groups.
     #[cfg(feature = "hdf5-output")]
-    pub fn hdf5_output_filename(&self) -> String {
-        self.hdf5_output_filename.clone()
-    }
-
-    /// Returns an iterator over the HDF5 outputs
-    #[cfg(feature = "hdf5-output")]
-    pub fn hdf5_outputs(&self) -> impl Iterator<Item = &dyn Hdf5Output> {
-        self.hdf5_outputs.iter().map(|x| x.as_ref())
+    pub fn hdf5_output_groups(&mut self) -> impl Iterator<Item = &mut Hdf5OutputGroup> {
+        self.hdf5_output_groups.iter_mut()
     }
 }
 
 /// Constructor for the [`Configuration`](velvet_core::config::Configuration) type.
 pub struct ConfigurationBuilder {
-    outputs: Vec<Box<dyn Output>>,
-    output_interval: Option<usize>,
-
+    raw_output_groups: Vec<RawOutputGroup>,
     #[cfg(feature = "hdf5-output")]
-    hdf5_output_filename: Option<String>,
-    #[cfg(feature = "hdf5-output")]
-    hdf5_outputs: Vec<Box<dyn Hdf5Output>>,
-}
-
-impl Default for ConfigurationBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
+    hdf5_output_groups: Vec<Hdf5OutputGroup>,
 }
 
 impl ConfigurationBuilder {
     /// Returns a new `ConfigurationBuilder`.
     pub fn new() -> ConfigurationBuilder {
         ConfigurationBuilder {
-            outputs: Vec::new(),
-            output_interval: None,
-
+            raw_output_groups: Vec::new(),
             #[cfg(feature = "hdf5-output")]
-            hdf5_output_filename: None,
-            #[cfg(feature = "hdf5-output")]
-            hdf5_outputs: Vec::new(),
+            hdf5_output_groups: Vec::new(),
         }
     }
 
-    /// Adds an output to the configuration.
-    pub fn add_output<T: Output + 'static>(mut self, output: T) -> ConfigurationBuilder {
-        self.outputs.push(Box::new(output));
+    pub fn raw_output_group(mut self, group: RawOutputGroup) -> ConfigurationBuilder {
+        self.raw_output_groups.push(group);
         self
     }
 
-    /// Sets the number of steps between output calls.
-    pub fn with_output_interval(mut self, interval: usize) -> ConfigurationBuilder {
-        self.output_interval = Some(interval);
-        self
-    }
-
-    /// Sets the filename of the HDF5 formatted output file.
     #[cfg(feature = "hdf5-output")]
-    pub fn with_hdf5_output_filename(mut self, filename: String) -> ConfigurationBuilder {
-        self.hdf5_output_filename = Some(filename);
-        self
-    }
-
-    /// Adds an HDF5 formatted output to the configuration
-    #[cfg(feature = "hdf5-output")]
-    pub fn add_hdf5_output<T: Hdf5Output + 'static>(mut self, output: T) -> ConfigurationBuilder {
-        self.hdf5_outputs.push(Box::new(output));
+    pub fn hdf5_output_group(mut self, group: Hdf5OutputGroup) -> ConfigurationBuilder {
+        self.hdf5_output_groups.push(group);
         self
     }
 
     /// Returns an initialized `Configuration`.
     pub fn build(self) -> Configuration {
-        let outputs = self.outputs;
-        let output_interval = self.output_interval.unwrap_or(1); // TODO: this is a terrible default
-
-        #[cfg(feature = "hdf5-output")]
-        let hdf5_output_filename = self
-            .hdf5_output_filename
-            .unwrap_or_else(|| "velvet.h5".to_string());
-        #[cfg(feature = "hdf5-output")]
-        let hdf5_outputs = self.hdf5_outputs;
-        
         Configuration {
-            outputs,
-            output_interval,
+            raw_output_groups: self.raw_output_groups,
             #[cfg(feature = "hdf5-output")]
-            hdf5_output_filename,
-            #[cfg(feature = "hdf5-output")]
-            hdf5_outputs,
+            hdf5_output_groups: self.hdf5_output_groups,
         }
     }
 }

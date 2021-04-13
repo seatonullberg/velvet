@@ -1,0 +1,71 @@
+// Molecular dynamics simulation of a gaseous mixture in the NVT ensemble.
+
+use std::fs::File;
+use std::io::BufReader;
+
+use vasp_poscar::Poscar;
+use velvet::prelude::*;
+
+fn main() {
+    // Load the argon/xenon gas system from a POSCAR formatted file.
+    let file = File::open("resources/test/ArXe.poscar").unwrap();
+    let reader = BufReader::new(file);
+    let poscar = Poscar::from_reader(reader).unwrap();
+    let mut system = import_poscar(&poscar);
+
+    // Initialize the system temperature using a Boltzmann velocity distribution.
+    let boltz = Boltzmann::new(300.0);
+    boltz.apply(&mut system);
+
+    // Initialize Lennard-Jones style pair potentials between each pair of species.
+    let argon = Specie::from_element(Element::Ar);
+    let xenon = Specie::from_element(Element::Xe);
+    let lj_argon_argon = LennardJones::new(4.184, 3.4);
+    let lj_xenon_xenon = LennardJones::new(7.824, 4.57);
+    let lj_argon_xenon = LennardJones::new(6.276, 4.0);
+
+    // Store all of the system's potentials in a Potentials struct.
+    let cutoff = 12.0;
+    let thickness = 1.5;
+    let potentials = PotentialsBuilder::new()
+        .with_pair_update_frequency(3)
+        .add_pair(lj_argon_argon, (argon, argon), cutoff, thickness)
+        .add_pair(lj_xenon_xenon, (xenon, xenon), cutoff, thickness)
+        .add_pair(lj_argon_xenon, (argon, xenon), cutoff, thickness)
+        .build();
+
+    // Initialize a velocity Verlet style integrator.
+    let velocity_verlet = VelocityVerlet::new(0.1);
+
+    // Initialize a Nose-Hoover style thermostat.
+    let nose_hoover = NoseHoover::new(300.0, 1.25, 1.0);
+
+    // Run MD with a Nose-Hoover thermostat to simulate the NVT ensemble.
+    let md = MolecularDynamics::new(velocity_verlet, nose_hoover);
+
+    // Create an output group which writes scalar properties to stderr (the default destination).
+    let stderr_group = RawOutputGroupBuilder::new()
+        .interval(100)
+        .output(PotentialEnergy)
+        .output(KineticEnergy)
+        .output(TotalEnergy)
+        .output(Temperature)
+        .build();
+
+    // Create an output group which writes the forces acting on each atom to a text file.
+    let file_group = RawOutputGroupBuilder::new()
+        .destination(File::create("binary-gas-forces.txt").unwrap())
+        .interval(500)
+        .output(Forces)
+        .build();
+
+    // Build the configuration.
+    let config = ConfigurationBuilder::new()
+        .raw_output_group(stderr_group)
+        .raw_output_group(file_group)
+        .build();
+
+    // Run the simulation.
+    let mut sim = Simulation::new(system, potentials, md, config);
+    sim.run(250_000);
+}

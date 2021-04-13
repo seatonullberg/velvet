@@ -3,8 +3,8 @@
 use nalgebra::Vector3;
 use rand_distr::{Distribution, Normal};
 
-use crate::internal::Float;
 use crate::internal::consts::BOLTZMANN;
+use crate::internal::Float;
 use crate::properties::temperature::Temperature;
 use crate::properties::IntrinsicProperty;
 use crate::system::System;

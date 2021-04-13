@@ -53,13 +53,12 @@ pub fn import_poscar(poscar: &Poscar) -> System {
     let cell = Cell::from_matrix(matrix);
 
     let species: Vec<Specie> = match poscar.group_symbols() {
-        Some(symbols) => symbols
-            .fold(Vec::new(), |mut accumulator, symbol| {
-                let element = Element::from_str(symbol).unwrap();
-                let specie = Specie::from_element(element);
-                accumulator.push(specie);
-                accumulator
-            }),
+        Some(symbols) => symbols.fold(Vec::new(), |mut accumulator, symbol| {
+            let element = Element::from_str(symbol).unwrap();
+            let specie = Specie::from_element(element);
+            accumulator.push(specie);
+            accumulator
+        }),
         None => panic!("Missing species."),
     };
 

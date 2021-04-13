@@ -1,12 +1,11 @@
 //! Bounding box of the simulation environment.
 
 use nalgebra::{Matrix3, Vector3};
-use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
 
 /// Bounding box of the simulation environment.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct Cell {
     matrix: Matrix3<Float>,
     inv_matrix: Matrix3<Float>,
@@ -42,7 +41,7 @@ impl Cell {
     /// Constructs a [`Cell`] from cubic lattice parameters.
     ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use velvet_core::prelude::*;
     ///
@@ -174,7 +173,7 @@ impl Cell {
     /// ```
     /// use velvet_core::prelude::*;
     /// use nalgebra::Vector3;
-    /// use approx::*; 
+    /// use approx::*;
     ///
     /// let cell = Cell::cubic(4.0);
     /// let mut vec = Vector3::new(1.0, 5.0, 1.0);
@@ -198,7 +197,7 @@ impl Cell {
     /// ```
     /// use velvet_core::prelude::*;
     /// use nalgebra::Vector3;
-    /// use approx::*; 
+    /// use approx::*;
     ///
     /// let cell = Cell::cubic(4.0);
     /// let mut vec = Vector3::new(1.0, 3.0, 1.0);
@@ -222,7 +221,7 @@ impl Cell {
     /// ```
     /// use velvet_core::prelude::*;
     /// use nalgebra::Vector3;
-    /// use approx::*; 
+    /// use approx::*;
     ///
     /// let cell = Cell::cubic(4.0);
     /// let v1 = Vector3::new(0.0, 0.0, 0.0);
@@ -245,7 +244,7 @@ impl Cell {
     /// ```
     /// use velvet_core::prelude::*;
     /// use nalgebra::Vector3;
-    /// use approx::*; 
+    /// use approx::*;
     ///
     /// let cell = Cell::cubic(4.0);
     /// let v1 = Vector3::new(0.0, 0.0, 0.0);
@@ -266,7 +265,7 @@ impl Cell {
     /// ```
     /// use velvet_core::prelude::*;
     /// use nalgebra::Vector3;
-    /// use approx::*; 
+    /// use approx::*;
     ///
     /// let cell = Cell::cubic(4.0);
     /// let v1 = Vector3::new(0.0, 0.0, 0.0);
@@ -290,7 +289,7 @@ impl Cell {
     /// ```
     /// use velvet_core::prelude::*;
     /// use nalgebra::Vector3;
-    /// use approx::*; 
+    /// use approx::*;
     ///
     /// let cell = Cell::cubic(4.0);
     /// let v1 = Vector3::new(0.0, 0.0, 0.0);
@@ -335,7 +334,14 @@ impl Cell {
     }
 }
 
-fn cell_matrix(a: Float, b: Float, c: Float, alpha: Float, beta: Float, gamma: Float) -> Matrix3<Float> {
+fn cell_matrix(
+    a: Float,
+    b: Float,
+    c: Float,
+    alpha: Float,
+    beta: Float,
+    gamma: Float,
+) -> Matrix3<Float> {
     let cos_alpha = alpha.to_radians().cos();
     let cos_beta = beta.to_radians().cos();
     let (sin_gamma, cos_gamma) = gamma.to_radians().sin_cos();
@@ -353,8 +359,8 @@ fn cell_matrix(a: Float, b: Float, c: Float, alpha: Float, beta: Float, gamma: F
 #[cfg(test)]
 mod tests {
     use super::Cell;
-    use crate::internal::Float;
     use crate::internal::consts::PI;
+    use crate::internal::Float;
     use approx::*;
     use nalgebra::Vector3;
 
@@ -378,7 +384,7 @@ mod tests {
         let a0 = 4.0;
         let angle = 90.0;
         let cell = Cell::cubic(a0);
-        
+
         assert_relative_eq!(cell.a(), a0);
         assert_relative_eq!(cell.b(), a0);
         assert_relative_eq!(cell.c(), a0);

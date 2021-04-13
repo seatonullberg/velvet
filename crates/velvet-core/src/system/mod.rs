@@ -5,14 +5,13 @@ pub mod elements;
 pub mod species;
 
 use nalgebra::Vector3;
-use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
 use crate::system::cell::Cell;
 use crate::system::species::Specie;
 
 /// Collection of atomic properties and bonding information.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct System {
     /// Number of atoms in the system.
     pub size: usize,

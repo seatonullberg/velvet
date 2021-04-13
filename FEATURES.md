@@ -10,7 +10,7 @@ All of the project's completed and proposed features will be documented in this 
   * [Outputs](#data-formats-outputs)
 * [Integration Algorithms](#integration-algorithms)
 * [Potentials](#potentials)
-* [Propogation Techniques](#propogation-techniques)
+* [Propagation Techniques](#propagation-techniques)
 * [Runtime Performance](#runtime-performance)
 * [Temperature Initialization](#temperature-initialization)
 * [Thermostats](#thermostats)
@@ -71,7 +71,7 @@ All of the project's completed and proposed features will be documented in this 
 
 🚧 **Cosine** - [Cosine](https://lammps.sandia.gov/doc/angle_cosine.html) angle potential. 
 
-## Propogation Techniques <a name="propogation-techniques">
+## Propagation Techniques <a name="propagation-techniques">
 
 ✔️ **Molecular Dynamics** - Timestep integration based propagation.
 

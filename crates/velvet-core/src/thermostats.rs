@@ -1,7 +1,6 @@
 //! Algorithms to control the temperature of a simulation.
 
 use nalgebra::Vector3;
-use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
 use crate::properties::temperature::Temperature;
@@ -9,7 +8,6 @@ use crate::properties::IntrinsicProperty;
 use crate::system::System;
 
 /// An algorithm used to control simulation temperature.
-#[typetag::serde(tag = "type")]
 pub trait Thermostat: Send + Sync {
     /// Prepare the thermostat to run.
     fn setup(&mut self, _: &System) {}
@@ -20,14 +18,13 @@ pub trait Thermostat: Send + Sync {
 }
 
 /// Placeholder thermostat algorithm which applies no temperature controls.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct NullThermostat;
 
-#[typetag::serde]
 impl Thermostat for NullThermostat {}
 
 /// Berendsen weak coupling thermostat.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct Berendsen {
     target: Float,
     tau: Float,
@@ -45,7 +42,6 @@ impl Berendsen {
     }
 }
 
-#[typetag::serde]
 impl Thermostat for Berendsen {
     fn post_integrate(&mut self, system: &mut System) {
         let temperature = Temperature.calculate_intrinsic(system);
@@ -61,7 +57,7 @@ impl Thermostat for Berendsen {
 }
 
 /// Nose-Hoover style thermostat.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct NoseHoover {
     target: Float,
     freq: Float,
@@ -91,7 +87,6 @@ impl NoseHoover {
     }
 }
 
-#[typetag::serde]
 impl Thermostat for NoseHoover {
     fn setup(&mut self, system: &System) {
         self.temperature = Temperature.calculate_intrinsic(system);

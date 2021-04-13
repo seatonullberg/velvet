@@ -10,13 +10,56 @@ use crate::properties::Property;
 use crate::system::System;
 
 /// Shared behavior to write a simulation result to an HDF5 file.
-#[typetag::serde(tag = "type")]
 pub trait Hdf5Output {
     /// Writes the HDF5 formatted output.
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group);
 }
 
-#[typetag::serde]
+pub struct Hdf5OutputGroup {
+    pub file_handle: hdf5::File,
+    pub interval: usize,
+    pub outputs: Vec<Box<dyn Hdf5Output>>,
+}
+
+pub struct Hdf5OutputGroupBuilder {
+    filename: String,
+    interval: usize,
+    outputs: Vec<Box<dyn Hdf5Output>>,
+}
+
+impl Hdf5OutputGroupBuilder {
+    pub fn new() -> Hdf5OutputGroupBuilder {
+        Hdf5OutputGroupBuilder {
+            filename: "velvet.h5".to_string(),
+            interval: 1,
+            outputs: Vec::new(),
+        }
+    }
+
+    pub fn filename(&mut self, filename: Into<String>) -> Hdf5OutputGroupBuilder {
+        self.filename = filename.into();
+        self
+    }
+
+    pub fn interval(&mut self, interval: usize) -> Hdf5OutputGroupBuilder {
+        self.interval = interval;
+        self
+    }
+
+    pub fn output(&mut self, output: T) -> Hdf5OutputGroupBuilder {
+        self.outputs.push(Box::new(output));
+        self
+    }
+
+    pub fn build(self) -> Hdf5OutputGroup {
+        Hdf5OutputGroup {
+            file_handle: hdf5::File::create(self.filename).unwrap(),
+            interval: self.interval,
+            outputs: self.outputs,
+        }
+    }
+}
+
 impl Hdf5Output for Forces {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let forces = self.calculate(system, potentials);
@@ -29,7 +72,6 @@ impl Hdf5Output for Forces {
     }
 }
 
-#[typetag::serde]
 impl Hdf5Output for KineticEnergy {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
@@ -41,7 +83,6 @@ impl Hdf5Output for KineticEnergy {
     }
 }
 
-#[typetag::serde]
 impl Hdf5Output for PotentialEnergy {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
@@ -53,7 +94,6 @@ impl Hdf5Output for PotentialEnergy {
     }
 }
 
-#[typetag::serde]
 impl Hdf5Output for TotalEnergy {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
@@ -65,7 +105,6 @@ impl Hdf5Output for TotalEnergy {
     }
 }
 
-#[typetag::serde]
 impl Hdf5Output for PairEnergy {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
@@ -77,7 +116,6 @@ impl Hdf5Output for PairEnergy {
     }
 }
 
-#[typetag::serde]
 impl Hdf5Output for Temperature {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let temperature = self.calculate(system, potentials);

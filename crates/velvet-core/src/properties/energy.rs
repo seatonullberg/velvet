@@ -1,7 +1,7 @@
+//! Types of energy that can be evaluated.
+
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
-
-use serde::{Deserialize, Serialize};
 
 use crate::internal::Float;
 use crate::potentials::collections::Potentials;
@@ -9,7 +9,7 @@ use crate::properties::{IntrinsicProperty, Property};
 use crate::system::System;
 
 /// Potential energy due to pairwise potentials.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct PairEnergy;
 
 impl Property for PairEnergy {
@@ -20,7 +20,7 @@ impl Property for PairEnergy {
         let pair_potentials = &potentials.pair_potentials.potentials;
         let neighbor_lists = &potentials.pair_potentials.neighbor_lists;
         let cutoffs = &potentials.pair_potentials.cutoffs;
-        
+
         pair_potentials
             .iter()
             .zip(neighbor_lists.iter())
@@ -48,7 +48,7 @@ impl Property for PairEnergy {
         let pair_potentials = &potentials.pair_potentials.potentials;
         let neighbor_lists = &potentials.pair_potentials.neighbor_lists;
         let cutoffs = &potentials.pair_potentials.cutoffs;
-        
+
         pair_potentials
             .iter()
             .zip(neighbor_lists.iter())
@@ -70,10 +70,14 @@ impl Property for PairEnergy {
             })
             .sum()
     }
+
+    fn name(&self) -> String {
+        "pair_energy".to_string()
+    }
 }
 
 /// Potential energy of the whole system.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct PotentialEnergy;
 
 impl Property for PotentialEnergy {
@@ -83,10 +87,14 @@ impl Property for PotentialEnergy {
         let pair_energy = PairEnergy.calculate(system, potentials);
         pair_energy
     }
+
+    fn name(&self) -> String {
+        "potential_energy".to_string()
+    }
 }
 
 /// Kinetic energy of the whole system
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct KineticEnergy;
 
 impl IntrinsicProperty for KineticEnergy {
@@ -105,10 +113,14 @@ impl IntrinsicProperty for KineticEnergy {
             .sum();
         kinetic_energy
     }
+
+    fn name(&self) -> String {
+        "kinetic_energy".to_string()
+    }
 }
 
 /// Sum of potential and kinetic energy.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug)]
 pub struct TotalEnergy;
 
 impl Property for TotalEnergy {
@@ -118,5 +130,9 @@ impl Property for TotalEnergy {
         let kinetic = KineticEnergy.calculate(system, potentials);
         let potential = PotentialEnergy.calculate(system, potentials);
         kinetic + potential
+    }
+
+    fn name(&self) -> String {
+        "total_energy".to_string()
     }
 }
