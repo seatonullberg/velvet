@@ -1,7 +1,7 @@
 //! Algorithms to control the progress of a simulation.
 
 use crate::integrators::Integrator;
-use crate::potentials::collections::Potentials;
+use crate::potentials::Potentials;
 use crate::system::System;
 use crate::thermostats::Thermostat;
 

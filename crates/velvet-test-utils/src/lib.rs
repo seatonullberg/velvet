@@ -25,8 +25,8 @@ pub fn argon_potentials() -> Potentials {
     let thickness = 1.0;
     let lj = LennardJones::new(4.184, 3.4);
     PotentialsBuilder::new()
-        .with_pair_update_frequency(UPDATE_FREQUENCY)
-        .add_pair(lj, (argon, argon), cutoff, thickness)
+        .pair_update_frequency(UPDATE_FREQUENCY)
+        .pair(lj, (argon, argon), cutoff, thickness)
         .build()
 }
 
@@ -39,10 +39,10 @@ pub fn binary_gas_potentials() -> Potentials {
     let lj1 = LennardJones::new(7.824, 4.57);
     let lj2 = LennardJones::new(6.276, 4.0);
     PotentialsBuilder::new()
-        .with_pair_update_frequency(UPDATE_FREQUENCY)
-        .add_pair(lj0, (argon, argon), cutoff, thickness)
-        .add_pair(lj1, (xenon, xenon), cutoff, thickness)
-        .add_pair(lj2, (argon, xenon), cutoff, thickness)
+        .pair_update_frequency(UPDATE_FREQUENCY)
+        .pair(lj0, (argon, argon), cutoff, thickness)
+        .pair(lj1, (xenon, xenon), cutoff, thickness)
+        .pair(lj2, (argon, xenon), cutoff, thickness)
         .build()
 }
 
@@ -52,8 +52,8 @@ pub fn xenon_potentials() -> Potentials {
     let thickness = 1.5;
     let lj = LennardJones::new(7.824, 4.57);
     PotentialsBuilder::new()
-        .with_pair_update_frequency(UPDATE_FREQUENCY)
-        .add_pair(lj, (xenon, xenon), cutoff, thickness)
+        .pair_update_frequency(UPDATE_FREQUENCY)
+        .pair(lj, (xenon, xenon), cutoff, thickness)
         .build()
 }
 

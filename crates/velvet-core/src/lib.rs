@@ -36,7 +36,6 @@ pub mod prelude {
     pub use super::outputs::hdf5::*;
     pub use super::outputs::raw::*;
     pub use super::outputs::*;
-    pub use super::potentials::collections::*;
     pub use super::potentials::coulomb::*;
     pub use super::potentials::functions::*;
     pub use super::potentials::pair::*;

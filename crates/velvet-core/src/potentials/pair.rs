@@ -1,8 +1,11 @@
-//! Implementations of pairwise interaction potentials.
+//! Potentials which describe pairwise nonbonded interactions..
 
 use crate::internal::Float;
+use crate::neighbors::NeighborList;
 use crate::potentials::functions::{Harmonic, LennardJones, Mie, Morse};
 use crate::potentials::Potential;
+use crate::system::particle::ParticleType;
+use crate::system::System;
 
 /// Shared behavior for pair potentials.
 pub trait PairPotential: Potential {
@@ -73,6 +76,89 @@ impl PairPotential for Morse {
         let term_a = Float::exp(-self.a * (r - self.r_e));
         let term_b = Float::exp(-2.0 * self.a * (r - self.r_e));
         2.0 * self.a * self.d_e * (term_a - term_b)
+    }
+}
+
+pub(crate) struct PairPotentials {
+    pub potentials: Vec<Box<dyn PairPotential>>,
+    pub neighbor_lists: Vec<NeighborList>,
+    pub cutoffs: Vec<Float>,
+    pub update_frequency: usize,
+}
+
+impl PairPotentials {
+    pub fn setup(&mut self, system: &System) {
+        self.neighbor_lists
+            .iter_mut()
+            .for_each(|nl| nl.setup(system));
+    }
+
+    pub fn update(&mut self, system: &System) {
+        // update neighbor lists
+        self.neighbor_lists
+            .iter_mut()
+            .for_each(|nl| nl.update(system));
+    }
+}
+
+/// Convenient constructor for [`PairPotentials`].
+pub(crate) struct PairPotentialsBuilder {
+    potentials: Vec<Box<dyn PairPotential>>,
+    neighbor_lists: Vec<NeighborList>,
+    cutoffs: Vec<Float>,
+    update_frequency: usize,
+}
+
+impl PairPotentialsBuilder {
+    /// Returns a new `PairPotentialsBuilder`.
+    pub fn new() -> PairPotentialsBuilder {
+        PairPotentialsBuilder {
+            potentials: Vec::new(),
+            neighbor_lists: Vec::new(),
+            cutoffs: Vec::new(),
+            update_frequency: 1,
+        }
+    }
+
+    /// Adds a new potential to the collection.
+    pub fn pair<P>(
+        mut self,
+        potential: P,
+        particle_types: (ParticleType, ParticleType),
+        cutoff: Float,
+        thickness: Float,
+    ) -> PairPotentialsBuilder
+    where
+        P: PairPotential + 'static,
+    {
+        let potential = Box::new(potential);
+        self.potentials.push(potential);
+        let neighbor_list = NeighborList::new(cutoff + thickness, Some(particle_types));
+        self.neighbor_lists.push(neighbor_list);
+        self.cutoffs.push(cutoff);
+        self
+    }
+
+    /// Sets the number of iterations between each call to `update`.
+    pub fn update_frequency(mut self, freq: usize) -> PairPotentialsBuilder {
+        self.update_frequency = freq;
+        self
+    }
+
+    /// Consumes the builder and returns a new [`PairPotentials`] object.
+    pub fn build(self) -> PairPotentials {
+        PairPotentials {
+            potentials: self.potentials,
+            neighbor_lists: self.neighbor_lists,
+            cutoffs: self.cutoffs,
+            update_frequency: self.update_frequency,
+        }
+    }
+}
+
+impl Default for PairPotentialsBuilder {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

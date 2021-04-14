@@ -3,7 +3,7 @@
 use nalgebra::Vector3;
 
 use crate::internal::Float;
-use crate::potentials::collections::Potentials;
+use crate::potentials::Potentials;
 use crate::properties::forces::Forces;
 use crate::properties::Property;
 use crate::system::System;

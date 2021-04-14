@@ -21,10 +21,10 @@ fn main() {
     let cutoff = 12.0;
     let thickness = 1.5;
     let potentials = PotentialsBuilder::new()
-        .with_pair_update_frequency(3)
-        .add_pair(lj_argon_argon, (argon, argon), cutoff, thickness)
-        .add_pair(lj_xenon_xenon, (xenon, xenon), cutoff, thickness)
-        .add_pair(lj_argon_xenon, (argon, xenon), cutoff, thickness)
+        .pair_update_frequency(3)
+        .pair(lj_argon_argon, (argon, argon), cutoff, thickness)
+        .pair(lj_xenon_xenon, (xenon, xenon), cutoff, thickness)
+        .pair(lj_argon_xenon, (argon, xenon), cutoff, thickness)
         .build();
 
     // Initialize a velocity Verlet style integrator.

@@ -1,7 +1,7 @@
 //! High level abstraction for an atomistic simulation.
 
 use crate::config::Configuration;
-use crate::potentials::collections::Potentials;
+use crate::potentials::Potentials;
 use crate::propagators::Propagator;
 use crate::system::System;
 

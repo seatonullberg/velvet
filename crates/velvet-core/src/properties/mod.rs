@@ -4,7 +4,7 @@ pub mod energy;
 pub mod forces;
 pub mod temperature;
 
-use crate::potentials::collections::Potentials;
+use crate::potentials::Potentials;
 use crate::system::System;
 
 /// Calculates a system-wide property.

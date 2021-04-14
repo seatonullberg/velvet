@@ -4,7 +4,7 @@
 use rayon::prelude::*;
 
 use crate::internal::Float;
-use crate::potentials::collections::Potentials;
+use crate::potentials::Potentials;
 use crate::properties::{IntrinsicProperty, Property};
 use crate::system::System;
 
