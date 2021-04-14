@@ -3,9 +3,6 @@
 use std::io::Write;
 
 use crate::potentials::collections::Potentials;
-use crate::properties::energy::{KineticEnergy, PairEnergy, PotentialEnergy, TotalEnergy};
-use crate::properties::forces::Forces;
-use crate::properties::temperature::Temperature;
 use crate::properties::Property;
 use crate::system::System;
 
@@ -60,56 +57,16 @@ impl RawOutputGroupBuilder {
     }
 }
 
-impl RawOutput for Forces {
-    fn output_raw(&self, system: &System, potentials: &Potentials, writer: &mut dyn Write) {
-        let forces = self.calculate(system, potentials);
-        writer
-            .write_all(format!("Forces: {:#?}\n", forces).as_bytes())
-            .unwrap()
-    }
-}
+// This issue: https://github.com/rust-lang/rust/issues/20400
+// prevents me from specializing the impl block by the trait's associated type.
+// Ideally I will have separate impl blocks for Property<Res=Float> and Property<Res=Vector3<Float>>
+// in order to make the formatting more appropriate.
 
-impl RawOutput for KineticEnergy {
+impl<T: Property> RawOutput for T {
     fn output_raw(&self, system: &System, potentials: &Potentials, writer: &mut dyn Write) {
-        let ke = self.calculate(system, potentials);
+        let res = self.calculate(system, potentials);
         writer
-            .write_all(format!("Kinetic Energy: {:#?}\n", ke).as_bytes())
-            .unwrap()
-    }
-}
-
-impl RawOutput for PotentialEnergy {
-    fn output_raw(&self, system: &System, potentials: &Potentials, writer: &mut dyn Write) {
-        let pe = self.calculate(system, potentials);
-        writer
-            .write_all(format!("Potential Energy: {:#?}\n", pe).as_bytes())
-            .unwrap()
-    }
-}
-
-impl RawOutput for TotalEnergy {
-    fn output_raw(&self, system: &System, potentials: &Potentials, writer: &mut dyn Write) {
-        let etotal = self.calculate(system, potentials);
-        writer
-            .write_all(format!("Total Energy: {:#?}\n", etotal).as_bytes())
-            .unwrap()
-    }
-}
-
-impl RawOutput for PairEnergy {
-    fn output_raw(&self, system: &System, potentials: &Potentials, writer: &mut dyn Write) {
-        let epair = self.calculate(system, potentials);
-        writer
-            .write_all(format!("Pair Energy: {:#?}\n", epair).as_bytes())
-            .unwrap()
-    }
-}
-
-impl RawOutput for Temperature {
-    fn output_raw(&self, system: &System, potentials: &Potentials, writer: &mut dyn Write) {
-        let temp = self.calculate(system, potentials);
-        writer
-            .write_all(format!("Temperature: {:#?}\n", temp).as_bytes())
+            .write_all(format!("{:#?}: {:#?}\n", self.name(), res).as_bytes())
             .unwrap()
     }
 }

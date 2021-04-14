@@ -41,18 +41,20 @@ impl ConfigurationBuilder {
         }
     }
 
+    /// Adds a raw output group to the configuration.
     pub fn raw_output_group(mut self, group: RawOutputGroup) -> ConfigurationBuilder {
         self.raw_output_groups.push(group);
         self
     }
 
     #[cfg(feature = "hdf5-output")]
+    /// Adds an HDF5 output group to the configuration.
     pub fn hdf5_output_group(mut self, group: Hdf5OutputGroup) -> ConfigurationBuilder {
         self.hdf5_output_groups.push(group);
         self
     }
 
-    /// Returns an initialized `Configuration`.
+    /// Returns an initialized [`Configuration`].
     pub fn build(self) -> Configuration {
         Configuration {
             raw_output_groups: self.raw_output_groups,

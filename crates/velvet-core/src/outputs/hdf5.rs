@@ -60,12 +60,17 @@ impl Hdf5OutputGroupBuilder {
     }
 }
 
+// This issue: https://github.com/rust-lang/rust/issues/20400
+// prevents me from specializing the impl block by the trait's associated type.
+// Ideally I will have separate impl blocks for Property<Res=Float> and Property<Res=Vector3<Float>>
+// in order to make the formatting more appropriate.
+
 impl Hdf5Output for Forces {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let forces = self.calculate(system, potentials);
         let dataset = group
             .new_dataset::<[Float; 3]>()
-            .create("forces", system.size)
+            .create(self.name(), system.size)
             .unwrap();
         let arr: Vec<[Float; 3]> = forces.iter().map(|x| [x[0], x[1], x[2]]).collect();
         dataset.write(arr.as_slice()).unwrap()
@@ -77,7 +82,7 @@ impl Hdf5Output for KineticEnergy {
         let energy = self.calculate(system, potentials);
         let dataset = group
             .new_dataset::<Float>()
-            .create("kinetic_energy", 1)
+            .create(self.name(), 1)
             .unwrap();
         dataset.write(&[energy]).unwrap();
     }
@@ -88,7 +93,7 @@ impl Hdf5Output for PotentialEnergy {
         let energy = self.calculate(system, potentials);
         let dataset = group
             .new_dataset::<Float>()
-            .create("potential_energy", 1)
+            .create(self.name(), 1)
             .unwrap();
         dataset.write(&[energy]).unwrap();
     }
@@ -99,7 +104,7 @@ impl Hdf5Output for TotalEnergy {
         let energy = self.calculate(system, potentials);
         let dataset = group
             .new_dataset::<Float>()
-            .create("total_energy", 1)
+            .create(self.name(), 1)
             .unwrap();
         dataset.write(&[energy]).unwrap();
     }
@@ -110,7 +115,7 @@ impl Hdf5Output for PairEnergy {
         let energy = self.calculate(system, potentials);
         let dataset = group
             .new_dataset::<Float>()
-            .create("pair_energy", 1)
+            .create(self.name(), 1)
             .unwrap();
         dataset.write(&[energy]).unwrap();
     }
@@ -121,7 +126,7 @@ impl Hdf5Output for Temperature {
         let temperature = self.calculate(system, potentials);
         let dataset = group
             .new_dataset::<Float>()
-            .create("temperature", 1)
+            .create(self.name(), 1)
             .unwrap();
         dataset.write(&[temperature]).unwrap();
     }

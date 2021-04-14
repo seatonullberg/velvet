@@ -9,7 +9,7 @@ edition = "2018"
 
 [dependencies]
 libm = "0.2"
-nalgebra = "0.23"
+nalgebra = "0.26"
 rand = "0.7"
 rand_distr = "0.3"
 strum = "0.20"
