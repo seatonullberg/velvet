@@ -52,17 +52,17 @@ pub fn import_poscar(poscar: &Poscar) -> System {
     );
     let cell = Cell::from_matrix(matrix);
 
-    let species: Vec<Specie> = match poscar.group_symbols() {
+    let particle_types: Vec<ParticleType> = match poscar.group_symbols() {
         Some(symbols) => symbols.fold(Vec::new(), |mut accumulator, symbol| {
             let element = Element::from_str(symbol).unwrap();
-            let specie = Specie::from_element(element);
-            accumulator.push(specie);
+            let pt = ParticleType::from_element(element);
+            accumulator.push(pt);
             accumulator
         }),
-        None => panic!("Missing species."),
+        None => panic!("Missing particle types."),
     };
 
-    let specie_indices: Vec<usize> = match poscar.site_symbols() {
+    let particle_type_map: Vec<usize> = match poscar.site_symbols() {
         Some(symbols) => {
             let mut id = 0;
             let mut scanned_symbols = HashSet::new();
@@ -82,7 +82,7 @@ pub fn import_poscar(poscar: &Poscar) -> System {
                 })
                 .collect()
         }
-        None => panic!("Missing specie ids."),
+        None => panic!("Missing particle type map."),
     };
 
     // Set system positions.
@@ -103,8 +103,8 @@ pub fn import_poscar(poscar: &Poscar) -> System {
     System {
         size,
         cell,
-        species,
-        specie_indices,
+        particle_types,
+        particle_type_map,
         positions,
         velocities,
     }

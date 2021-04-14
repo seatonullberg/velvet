@@ -4,22 +4,25 @@
 use rayon::prelude::*;
 
 use crate::internal::Float;
-use crate::system::species::Specie;
+use crate::system::particle::ParticleType;
 use crate::system::System;
 
 #[derive(Clone, Debug)]
 pub struct NeighborList {
     pub cutoff: Float,
-    species: Option<(Specie, Specie)>,
+    particle_types: Option<(ParticleType, ParticleType)>,
     possible_indices: Vec<(usize, usize)>,
     current_indices: Vec<(usize, usize)>,
 }
 
 impl NeighborList {
-    pub fn new(cutoff: Float, species: Option<(Specie, Specie)>) -> NeighborList {
+    pub fn new(
+        cutoff: Float,
+        particle_types: Option<(ParticleType, ParticleType)>,
+    ) -> NeighborList {
         NeighborList {
             cutoff,
-            species,
+            particle_types,
             possible_indices: Vec::new(),
             current_indices: Vec::new(),
         }
@@ -28,14 +31,14 @@ impl NeighborList {
     pub fn setup(&mut self, system: &System) {
         self.possible_indices = Vec::with_capacity(system.size * system.size);
         for i in 0..system.size {
-            let sp_i = system.species[system.specie_indices[i]];
+            let pt_i = system.particle_types[system.particle_type_map[i]];
             for j in (i + 1)..system.size {
-                let sp_j = system.species[system.specie_indices[j]];
-                match self.species {
-                    Some(species) => {
-                        if (sp_i, sp_j) == species {
+                let pt_j = system.particle_types[system.particle_type_map[j]];
+                match self.particle_types {
+                    Some(particle_types) => {
+                        if (pt_i, pt_j) == particle_types {
                             self.possible_indices.push((i, j))
-                        } else if (sp_j, sp_i) == species {
+                        } else if (pt_j, pt_i) == particle_types {
                             self.possible_indices.push((j, i))
                         }
                     }

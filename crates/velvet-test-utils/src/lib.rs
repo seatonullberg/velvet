@@ -36,7 +36,7 @@ pub fn xenon_system() -> System {
 }
 
 pub fn argon_potentials() -> Potentials {
-    let argon = Specie::from_element(Element::Ar);
+    let argon = ParticleType::from_element(Element::Ar);
     let cutoff = 8.5;
     let thickness = 1.0;
     let lj = LennardJones::new(4.184, 3.4);
@@ -47,8 +47,8 @@ pub fn argon_potentials() -> Potentials {
 }
 
 pub fn binary_gas_potentials() -> Potentials {
-    let argon = Specie::from_element(Element::Ar);
-    let xenon = Specie::from_element(Element::Xe);
+    let argon = ParticleType::from_element(Element::Ar);
+    let xenon = ParticleType::from_element(Element::Xe);
     let cutoff = 12.0;
     let thickness = 1.5;
     let lj0 = LennardJones::new(4.184, 3.4);
@@ -63,7 +63,7 @@ pub fn binary_gas_potentials() -> Potentials {
 }
 
 pub fn xenon_potentials() -> Potentials {
-    let xenon = Specie::from_element(Element::Xe);
+    let xenon = ParticleType::from_element(Element::Xe);
     let cutoff = 12.0;
     let thickness = 1.5;
     let lj = LennardJones::new(7.824, 4.57);

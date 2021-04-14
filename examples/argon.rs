@@ -18,7 +18,7 @@ fn main() {
     boltz.apply(&mut system);
 
     // Initialize a Lennard-Jones style pair potential between all Ar-Ar pairs.
-    let argon = Specie::from_element(Element::Ar);
+    let argon = ParticleType::from_element(Element::Ar);
     let lj = LennardJones::new(4.184, 3.4);
 
     // Store all of the system's potentials in a Potentials struct.

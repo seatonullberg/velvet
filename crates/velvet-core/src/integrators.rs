@@ -57,8 +57,8 @@ impl Integrator for VelocityVerlet {
         let forces = Forces.calculate(system, potentials);
         let new_accelerations: Vec<Vector3<Float>> = forces
             .iter()
-            .zip(system.specie_indices.iter())
-            .map(|(f, id)| f / system.species[*id].mass())
+            .zip(system.particle_type_map.iter())
+            .map(|(f, idx)| f / system.particle_types[*idx].mass())
             .collect();
 
         system

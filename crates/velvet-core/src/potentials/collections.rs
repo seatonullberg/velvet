@@ -3,7 +3,7 @@
 use crate::internal::Float;
 use crate::neighbors::NeighborList;
 use crate::potentials::pair::PairPotential;
-use crate::system::species::Specie;
+use crate::system::particle::ParticleType;
 use crate::system::System;
 
 /// Container type to hold instances of each potential in the system.
@@ -53,22 +53,22 @@ impl PotentialsBuilder {
     /// # Arguments
     ///
     /// * `potential` - [`PairPotential`] trait object.
-    /// * `species` - Tuple of [`Specie`] objects that the potential applies to.
+    /// * `particle_types` - Tuple of [`ParticleTypes`] objects that the potential applies to.
     /// * `cutoff` - Cutoff radius.
     /// * `thickness` - Buffer thickness used to construct a [`NeighborList`].
     pub fn add_pair<P>(
         mut self,
         potential: P,
-        species: (Specie, Specie),
+        particle_types: (ParticleType, ParticleType),
         cutoff: Float,
         thickness: Float,
     ) -> PotentialsBuilder
     where
         P: PairPotential + 'static,
     {
-        self.pair_potentials_builder = self
-            .pair_potentials_builder
-            .add_pair(potential, species, cutoff, thickness);
+        self.pair_potentials_builder =
+            self.pair_potentials_builder
+                .add_pair(potential, particle_types, cutoff, thickness);
         self
     }
 
@@ -130,7 +130,7 @@ impl PairPotentialsBuilder {
     pub fn add_pair<P>(
         mut self,
         potential: P,
-        species: (Specie, Specie),
+        particle_types: (ParticleType, ParticleType),
         cutoff: Float,
         thickness: Float,
     ) -> PairPotentialsBuilder
@@ -139,7 +139,7 @@ impl PairPotentialsBuilder {
     {
         let potential = Box::new(potential);
         self.potentials.push(potential);
-        let neighbor_list = NeighborList::new(cutoff + thickness, Some(species));
+        let neighbor_list = NeighborList::new(cutoff + thickness, Some(particle_types));
         self.neighbor_lists.push(neighbor_list);
         self.cutoffs.push(cutoff);
         self

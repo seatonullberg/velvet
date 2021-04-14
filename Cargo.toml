@@ -28,6 +28,7 @@ members = [
 [dependencies]
 velvet-core = { path = "crates/velvet-core", version = "0.4.2" }
 velvet-external-data = { path = "crates/velvet-external-data", version = "0.1.0" }
+
 hdf5 = { version = "0.7", optional = true }
 hdf5-sys = { version = "0.7", optional = true }
 

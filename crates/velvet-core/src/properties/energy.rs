@@ -103,12 +103,12 @@ impl IntrinsicProperty for KineticEnergy {
     // NOTE: This function is faster without rayon.
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic_energy: Float = system
-            .specie_indices
+            .particle_type_map
             .iter()
             .zip(system.velocities.iter())
-            .map(|(id, vel)| {
-                let sp = system.species[*id];
-                0.5 * sp.mass() * vel.norm_squared()
+            .map(|(idx, vel)| {
+                let pt = system.particle_types[*idx];
+                0.5 * pt.mass() * vel.norm_squared()
             })
             .sum();
         kinetic_energy

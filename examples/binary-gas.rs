@@ -17,9 +17,9 @@ fn main() {
     let boltz = Boltzmann::new(300.0);
     boltz.apply(&mut system);
 
-    // Initialize Lennard-Jones style pair potentials between each pair of species.
-    let argon = Specie::from_element(Element::Ar);
-    let xenon = Specie::from_element(Element::Xe);
+    // Initialize Lennard-Jones style pair potentials between each pair of particle types.
+    let argon = ParticleType::from_element(Element::Ar);
+    let xenon = ParticleType::from_element(Element::Xe);
     let lj_argon_argon = LennardJones::new(4.184, 3.4);
     let lj_xenon_xenon = LennardJones::new(7.824, 4.57);
     let lj_argon_xenon = LennardJones::new(6.276, 4.0);
