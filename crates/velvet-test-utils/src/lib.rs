@@ -1,38 +1,22 @@
-use std::fs::File;
-use std::io::BufReader;
-
-use vasp_poscar::Poscar;
 use velvet_core::prelude::*;
-use velvet_external_data::poscar::import_poscar;
+use velvet_external_data::prelude::*;
 
 static UPDATE_FREQUENCY: usize = 5;
 
 pub fn argon_system() -> System {
-    let file = File::open(resources_path("Ar.poscar")).unwrap();
-    let reader = BufReader::new(file);
-    let poscar = Poscar::from_reader(reader).unwrap();
-    import_poscar(&poscar)
+    Poscar.parse_system_from_file(resources_path("Ar.poscar"))
 }
 
 pub fn binary_gas_system() -> System {
-    let file = File::open(resources_path("ArXe.poscar")).unwrap();
-    let reader = BufReader::new(file);
-    let poscar = Poscar::from_reader(reader).unwrap();
-    import_poscar(&poscar)
+    Poscar.parse_system_from_file(resources_path("ArXe.poscar"))
 }
 
 pub fn rocksalt_system() -> System {
-    let file = File::open(resources_path("NaCl.poscar")).unwrap();
-    let reader = BufReader::new(file);
-    let poscar = Poscar::from_reader(reader).unwrap();
-    import_poscar(&poscar)
+    Poscar.parse_system_from_file(resources_path("NaCl.poscar"))
 }
 
 pub fn xenon_system() -> System {
-    let file = File::open(resources_path("Xe.poscar")).unwrap();
-    let reader = BufReader::new(file);
-    let poscar = Poscar::from_reader(reader).unwrap();
-    import_poscar(&poscar)
+    Poscar.parse_system_from_file(resources_path("Xe.poscar"))
 }
 
 pub fn argon_potentials() -> Potentials {

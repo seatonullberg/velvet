@@ -80,10 +80,7 @@ impl Hdf5Output for Forces {
 impl Hdf5Output for KineticEnergy {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
-        let dataset = group
-            .new_dataset::<Float>()
-            .create(self.name(), 1)
-            .unwrap();
+        let dataset = group.new_dataset::<Float>().create(self.name(), 1).unwrap();
         dataset.write(&[energy]).unwrap();
     }
 }
@@ -91,10 +88,7 @@ impl Hdf5Output for KineticEnergy {
 impl Hdf5Output for PotentialEnergy {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
-        let dataset = group
-            .new_dataset::<Float>()
-            .create(self.name(), 1)
-            .unwrap();
+        let dataset = group.new_dataset::<Float>().create(self.name(), 1).unwrap();
         dataset.write(&[energy]).unwrap();
     }
 }
@@ -102,10 +96,7 @@ impl Hdf5Output for PotentialEnergy {
 impl Hdf5Output for TotalEnergy {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
-        let dataset = group
-            .new_dataset::<Float>()
-            .create(self.name(), 1)
-            .unwrap();
+        let dataset = group.new_dataset::<Float>().create(self.name(), 1).unwrap();
         dataset.write(&[energy]).unwrap();
     }
 }
@@ -113,10 +104,7 @@ impl Hdf5Output for TotalEnergy {
 impl Hdf5Output for PairEnergy {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let energy = self.calculate(system, potentials);
-        let dataset = group
-            .new_dataset::<Float>()
-            .create(self.name(), 1)
-            .unwrap();
+        let dataset = group.new_dataset::<Float>().create(self.name(), 1).unwrap();
         dataset.write(&[energy]).unwrap();
     }
 }
@@ -124,10 +112,7 @@ impl Hdf5Output for PairEnergy {
 impl Hdf5Output for Temperature {
     fn output_hdf5(&self, system: &System, potentials: &Potentials, group: &hdf5::Group) {
         let temperature = self.calculate(system, potentials);
-        let dataset = group
-            .new_dataset::<Float>()
-            .create(self.name(), 1)
-            .unwrap();
+        let dataset = group.new_dataset::<Float>().create(self.name(), 1).unwrap();
         dataset.write(&[temperature]).unwrap();
     }
 }

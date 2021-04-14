@@ -1,16 +1,8 @@
-use std::fs::File;
-use std::io::BufReader;
-
-use vasp_poscar::Poscar;
-use velvet_external_data::poscar::import_poscar;
 use velvet_test_utils as test_utils;
 
 #[test]
 fn import_argon() {
-    let file = File::open(test_utils::resources_path("Ar.poscar")).unwrap();
-    let reader = BufReader::new(file);
-    let poscar = Poscar::from_reader(reader).unwrap();
-    let system = import_poscar(&poscar);
+    let system = test_utils::argon_system();
 
     let a0 = 16.922316;
     let alpha = 90.0;

@@ -1,17 +1,10 @@
 // Molecular dynamics simulation of a gaseous mixture in the NVT ensemble.
 
-use std::fs::File;
-use std::io::BufReader;
-
-use vasp_poscar::Poscar;
 use velvet::prelude::*;
 
 fn main() {
     // Load the argon/xenon gas system from a POSCAR formatted file.
-    let file = File::open("resources/test/ArXe.poscar").unwrap();
-    let reader = BufReader::new(file);
-    let poscar = Poscar::from_reader(reader).unwrap();
-    let mut system = import_poscar(&poscar);
+    let mut system = Poscar.parse_system_from_file("resources/test/ArXe.poscar");
 
     // Initialize the system temperature using a Boltzmann velocity distribution.
     let boltz = Boltzmann::new(300.0);
@@ -54,7 +47,7 @@ fn main() {
 
     // Create an output group which writes the forces acting on each atom to a text file.
     let file_group = RawOutputGroupBuilder::new()
-        .destination(File::create("binary-gas-forces.txt").unwrap())
+        .destination(std::fs::File::create("binary-gas-forces.txt").unwrap())
         .interval(500)
         .output(Forces)
         .build();
