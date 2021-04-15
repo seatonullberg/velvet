@@ -11,8 +11,8 @@ pub fn binary_gas_system() -> System {
     Poscar.parse_system_from_file(resources_path("ArXe.poscar"))
 }
 
-pub fn rocksalt_system() -> System {
-    Poscar.parse_system_from_file(resources_path("NaCl.poscar"))
+pub fn magnesium_oxide_system() -> System {
+    Poscar.parse_system_from_file(resources_path("MgO.poscar"))
 }
 
 pub fn xenon_system() -> System {
