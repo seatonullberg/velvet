@@ -20,16 +20,17 @@ All of the project's completed and proposed features will be documented in this 
 
 ✔️ **Forces** - Force acting on each atom in the system.
 
-✔️ **Potential Energy** - Total potential energy of the system.
-
 ✔️ **Kinetic Energy** - Total kinetic energy in the system.
 
-✔️ **Total Energy** - Summation of potential and kinetic energy in the system.
+✔️ **Potential Energy** - Total potential energy of the system.
 
 ✔️ **Temperature** - Instantaneous temperature of the system.
 
+✔️ **Total Energy** - Summation of potential and kinetic energy in the system.
+
 🚧 **Stress Tensor** - 3x3 tensor defining the system's stress state.
 
+🚧 **Volume** - Total volume of the simulation cell.
 
 ## Data Formats <a name="data-formats">
 
@@ -47,7 +48,7 @@ All of the project's completed and proposed features will be documented in this 
 
 ✔️ **HDF5** - Write results in [HDF5](https://www.hdfgroup.org/solutions/hdf5/) format (optional).
 
-🚧 **CBOR** - Serialize simulation configurations as binary [CBOR](https://cbor.io/) data.
+🚧 **CSV** - Write results in CSV format (optional).
 
 ## Integration Algorithms <a name="integration-algorithms">
 
@@ -58,32 +59,32 @@ All of the project's completed and proposed features will be documented in this 
 🚧 **Verlet** - [Verlet](https://en.wikipedia.org/wiki/Verlet_integration) (without velocity) style integration algorithm.
 
 ## Potentials <a name="potentials">
+ 
+✔️ **Harmonic** - [Harmonic](https://en.wikipedia.org/wiki/Harmonic_oscillator) oscillator style pairwise interatomic potential.
 
 ✔️ **Lennard-Jones** - [Lennard-Jones](https://en.wikipedia.org/wiki/Lennard-Jones_potential) (12,6) style pairwise interatomic potential.
-
-✔️ **Harmonic** - [Harmonic](https://en.wikipedia.org/wiki/Harmonic_oscillator) oscillator style pairwise interatomic potential.
 
 ✔️ **Mie** - [Mie](https://lammps.sandia.gov/doc/pair_mie.html) (1903) style pairwise interatomic potential.
 
 ✔️ **Morse** - [Morse](https://en.wikipedia.org/wiki/Morse_potential) (1929) style pairwise interatomic potential.
 
-🚧 **Wolf Summation** - [Wolf](https://en.wikipedia.org/wiki/Wolf_summation) (1999) computationally efficient summation method for electroatatic interactions. 
+🚧 **Cosine** - [Cosine](https://lammps.sandia.gov/doc/angle_cosine.html) angle potential.
 
-🚧 **Cosine** - [Cosine](https://lammps.sandia.gov/doc/angle_cosine.html) angle potential. 
+🚧 **Wolf Summation** - [Wolf](https://en.wikipedia.org/wiki/Wolf_summation) (1999) computationally efficient summation method for electroatatic interactions.  
 
 ## Propagation Techniques <a name="propagation-techniques">
 
 ✔️ **Molecular Dynamics** - Timestep integration based propagation.
 
-🚧 **Monte Carlo** - Stochastic movement based propagation.
-
 🚧 **Energy Minimization** - Numerical minimization of the system's energy to optimize positions and/or system size.
+
+🚧 **Monte Carlo** - Stochastic movement based propagation.
 
 ## Runtime Performance <a name="runtime-performance">
 
-✔️ **Neighbor Lists** - [Neighbor list](https://en.wikipedia.org/wiki/Verlet_list) buffering of nonbonded interactions.
-
 ✔️ **Multithreading** - Thread parallelism via [rayon](https://github.com/rayon-rs/rayon) parallel iterators (optional).
+
+✔️ **Neighbor Lists** - [Neighbor list](https://en.wikipedia.org/wiki/Verlet_list) buffering of nonbonded interactions.
 
 🚧 **SIMD** - Multiple dispatch of single instructions.
 
@@ -95,8 +96,8 @@ All of the project's completed and proposed features will be documented in this 
 
 ## Thermostats <a name="thermostats">
 
-🚧 **Andersen** - [Andersen](http://www.sklogwiki.org/SklogWiki/index.php/Andersen_thermostat) (1980) Boltzmann statistics based velocity reassignment thermostat.
-
 ✔️ **Berendsen** - [Berendsen](https://en.wikipedia.org/wiki/Berendsen_thermostat) (1984) velocity rescale thermostat.
 
 ✔️ **Nose-Hoover** - [Nose-Hoover](https://en.wikipedia.org/wiki/Nos%C3%A9%E2%80%93Hoover_thermostat) (1984) deterministic thermostat.
+
+🚧 **Andersen** - [Andersen](http://www.sklogwiki.org/SklogWiki/index.php/Andersen_thermostat) (1980) Boltzmann statistics based velocity reassignment thermostat.
