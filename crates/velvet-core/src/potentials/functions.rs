@@ -3,6 +3,22 @@
 use crate::internal::Float;
 use crate::potentials::Potential;
 
+#[derive(Clone, Copy, Debug)]
+pub struct Buckingham {
+    pub a: Float,
+    pub rho: Float,
+    pub c: Float,
+}
+
+impl Buckingham {
+    /// Returns a new Buckingham style potential
+    pub fn new(a: Float, rho: Float, c: Float) -> Buckingham {
+        Buckingham {a, rho, c}
+    }
+}
+
+impl Potential for Buckingham {}
+
 /// Harmonic style pair potential.
 #[derive(Clone, Copy, Debug)]
 pub struct Harmonic {
