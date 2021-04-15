@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Neighbor list optimization.
-* `Specie` struct for custom atom types.
+* `Particle` struct for custom atom types.
+* Support for grouped outputs.
 
 ## [0.4.1] - 2021-02-12
 
