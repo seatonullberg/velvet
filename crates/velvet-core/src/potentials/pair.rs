@@ -18,17 +18,16 @@ pub trait PairPotential: Potential {
 impl PairPotential for Buckingham {
     #[inline]
     fn energy(&self, r: Float) -> Float {
-        self.a * Float::exp(-r/self.rho) - (self.c / r.powi(6))
+        self.a * Float::exp(-r / self.rho) - (self.c / r.powi(6))
     }
 
     #[inline]
     fn force(&self, r: Float) -> Float {
         let term_a = (6.0 * self.c) / r.powi(7);
-        let term_b = (self.a * Float::exp(-r/self.rho)) / self.rho;
+        let term_b = (self.a * Float::exp(-r / self.rho)) / self.rho;
         term_a - term_b
     }
 }
-
 
 impl PairPotential for Harmonic {
     #[inline]
@@ -196,20 +195,20 @@ mod tests {
         // test r0 energy and force
         let r0_energy = 4714.886378;
         let r0_force = -2326.716166;
-        assert_relative_eq!(r0_energy, buckingham.energy(r0), epsilon=1e-5);
-        assert_relative_eq!(r0_force, buckingham.force(r0), epsilon=1e-5);
+        assert_relative_eq!(r0_energy, buckingham.energy(r0), epsilon = 1e-5);
+        assert_relative_eq!(r0_force, buckingham.force(r0), epsilon = 1e-5);
 
         // test r1 energy and force
         let r1_energy = 3677.231912;
         let r1_force = -1834.709706;
-        assert_relative_eq!(r1_energy, buckingham.energy(r1), epsilon=1e-5);
-        assert_relative_eq!(r1_force, buckingham.force(r1), epsilon=1e-5);
+        assert_relative_eq!(r1_energy, buckingham.energy(r1), epsilon = 1e-5);
+        assert_relative_eq!(r1_force, buckingham.force(r1), epsilon = 1e-5);
 
         // test r2 energy and force
         let r2_energy = 2864.638369;
         let r2_force = -1431.540944;
-        assert_relative_eq!(r2_energy, buckingham.energy(r2), epsilon=1e-5);
-        assert_relative_eq!(r2_force, buckingham.force(r2), epsilon=1e-5);
+        assert_relative_eq!(r2_energy, buckingham.energy(r2), epsilon = 1e-5);
+        assert_relative_eq!(r2_force, buckingham.force(r2), epsilon = 1e-5);
     }
 
     #[test]

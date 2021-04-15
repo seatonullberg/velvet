@@ -1,70 +1,60 @@
 //! Potentials which describe Coulombic electrostatic interactions.
 
-#[cfg(feature = "f64")]
-use libm::erfc;
-
-#[cfg(not(feature = "f64"))]
-use libm::erfcf as erfc;
-
-use crate::internal::consts::PI;
+use crate::internal::consts::COULOMB;
 use crate::internal::Float;
-use crate::potentials::functions::Wolf;
+use crate::potentials::functions::StandardCoulombic;
 use crate::potentials::Potential;
 
-/// Shared behavior for coulomb potentials.
+/// Shared behavior for Coulombic potentials.
 pub trait CoulombPotential: Potential {
     /// Returns the potential energy of an atom in a pair with charges `qi` and `qj` seperated by a distance `r`.
     fn energy(&self, qi: Float, qj: Float, r: Float) -> Float;
-    /// Returns the potential energy of an atom with charge `qi` interacting with itself.
-    fn energy_self(&self, qi: Float) -> Float;
     /// Returns the magnitude of the force acting on an atom separated from another by a distance `r` with charges `qi` and `qj`.
     fn force(&self, qi: Float, qj: Float, r: Float) -> Float;
 }
 
-impl CoulombPotential for Wolf {
-    #[inline]
+impl CoulombPotential for StandardCoulombic {
     fn energy(&self, qi: Float, qj: Float, r: Float) -> Float {
-        let term_a = erfc(self.alpha * r) / r;
-        let term_b = erfc(self.alpha * self.cutoff) / self.cutoff;
-        qi * qj * (term_a - term_b)
+        (COULOMB * qi * qj) / (self.dielectric * r)
     }
 
-    #[inline]
-    fn energy_self(&self, qi: Float) -> Float {
-        let term_a = 0.5 * erfc(self.alpha * self.cutoff) / self.cutoff;
-        let term_b = self.alpha / Float::sqrt(PI);
-        -qi.powi(2) * (term_a + term_b)
-    }
-
-    #[inline]
     fn force(&self, qi: Float, qj: Float, r: Float) -> Float {
-        let r2 = r * r;
-        let term_a = -erfc(self.alpha * r) / r2;
-        let term_b =
-            2.0 * self.alpha * Float::exp(-(self.alpha * self.alpha * r2)) / (Float::sqrt(PI) * r);
-        qi * qj * (term_a - term_b)
+        -(COULOMB * qi * qj) / (self.dielectric * r.powi(2))
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{CoulombPotential, Wolf};
+    use super::{CoulombPotential, StandardCoulombic};
     use approx::*;
 
     #[test]
-    fn wolf() {
-        let wolf = Wolf::new(0.25, 8.0);
+    fn standard_coulombic() {
+        // initialize the potential
+        let dielectric = 1.0;
+        let coulombic = StandardCoulombic::new(dielectric);
+        let qi = 2.0;
+        let qj = 3.0;
+        let r0 = 1.0;
+        let r1 = 2.5;
+        let r2 = 5.0;
 
-        let energy_wolf = wolf.energy(1.0, -1.0, 1.5);
-        let energy_target = -0.396671;
-        assert_relative_eq!(energy_wolf, energy_target, epsilon = 1e-5);
+        // test r0 energy and force
+        let r0_energy = 1992.3816;
+        let r0_force = -1992.3816;
+        assert_relative_eq!(r0_energy, coulombic.energy(qi, qj, r0), epsilon = 1e-3);
+        assert_relative_eq!(r0_force, coulombic.force(qi, qj, r0), epsilon = 1e-3);
 
-        let force_wolf = wolf.force(1.0, -1.0, 1.5);
-        let force_target = 0.428229;
-        assert_relative_eq!(force_wolf, force_target, epsilon = 1e-5);
+        // test r1 energy and force
+        let r1_energy = 796.95264;
+        let r1_force = -318.781056;
+        assert_relative_eq!(r1_energy, coulombic.energy(qi, qj, r1), epsilon = 1e-3);
+        assert_relative_eq!(r1_force, coulombic.force(qi, qj, r1), epsilon = 1e-3);
 
-        let energy_self_wolf = wolf.energy_self(1.0);
-        let energy_self_target = -0.141340;
-        assert_relative_eq!(energy_self_wolf, energy_self_target, epsilon = 1e-5);
+        // test r2 energy and force
+        let r2_energy = 398.47632;
+        let r2_force = -79.695264;
+        assert_relative_eq!(r2_energy, coulombic.energy(qi, qj, r2), epsilon = 1e-3);
+        assert_relative_eq!(r2_force, coulombic.force(qi, qj, r2), epsilon = 1e-3);
     }
 }

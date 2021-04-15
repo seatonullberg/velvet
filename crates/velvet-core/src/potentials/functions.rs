@@ -3,23 +3,27 @@
 use crate::internal::Float;
 use crate::potentials::Potential;
 
+/// [Buckingham](https://lammps.sandia.gov/doc/pair_buck.html#description) potential.
 #[derive(Clone, Copy, Debug)]
 pub struct Buckingham {
+    /// Energy units.
     pub a: Float,
+    /// Distance units.
     pub rho: Float,
+    /// Energy units.
     pub c: Float,
 }
 
 impl Buckingham {
-    /// Returns a new Buckingham style potential
+    /// Returns a new [`Buckingham`] potential.
     pub fn new(a: Float, rho: Float, c: Float) -> Buckingham {
-        Buckingham {a, rho, c}
+        Buckingham { a, rho, c }
     }
 }
 
 impl Potential for Buckingham {}
 
-/// Harmonic style pair potential.
+/// [Harmonic](https://lammps.sandia.gov/doc/bond_harmonic.html#description) oscillator potential.
 #[derive(Clone, Copy, Debug)]
 pub struct Harmonic {
     /// Spring constant.
@@ -29,7 +33,7 @@ pub struct Harmonic {
 }
 
 impl Harmonic {
-    /// Returns a new Harmonic style pair potential.
+    /// Returns a new [`Harmonic`] potential.
     pub fn new(k: Float, x0: Float) -> Harmonic {
         Harmonic { k, x0 }
     }
@@ -37,7 +41,7 @@ impl Harmonic {
 
 impl Potential for Harmonic {}
 
-/// Lennard-Jones style pair potential.
+/// [Lennard-Jones](https://lammps.sandia.gov/doc/pair_lj.html#description) 12/6 potential.
 #[derive(Clone, Copy, Debug)]
 pub struct LennardJones {
     /// Depth of the potential well.
@@ -47,7 +51,7 @@ pub struct LennardJones {
 }
 
 impl LennardJones {
-    /// Returns a new Lennard-Jones style pair potential.
+    /// Returns a new [`Lennard-Jones`] potential.
     pub fn new(epsilon: Float, sigma: Float) -> LennardJones {
         LennardJones { epsilon, sigma }
     }
@@ -55,7 +59,7 @@ impl LennardJones {
 
 impl Potential for LennardJones {}
 
-/// Mie style pair potential.
+/// [Mie](https://lammps.sandia.gov/doc/pair_mie.html#description) potential.
 #[derive(Clone, Copy, Debug)]
 pub struct Mie {
     /// Depth of the potential well.
@@ -69,7 +73,7 @@ pub struct Mie {
 }
 
 impl Mie {
-    /// Returns a new Mie style pair potential.
+    /// Returns a new [`Mie`] potential.
     pub fn new(epsilon: Float, sigma: Float, gamma_a: Float, gamma_r: Float) -> Mie {
         Mie {
             epsilon,
@@ -82,7 +86,7 @@ impl Mie {
 
 impl Potential for Mie {}
 
-/// Morse style pair potential.
+/// [Morse](https://lammps.sandia.gov/doc/pair_morse.html#description) potential.
 #[derive(Clone, Copy, Debug)]
 pub struct Morse {
     /// Width of the potential well.
@@ -94,7 +98,7 @@ pub struct Morse {
 }
 
 impl Morse {
-    /// Returns a new Morse style pair potential.
+    /// Returns a new [`Morse`] potential.
     pub fn new(a: Float, d_e: Float, r_e: Float) -> Morse {
         Morse { a, d_e, r_e }
     }
@@ -102,20 +106,18 @@ impl Morse {
 
 impl Potential for Morse {}
 
-/// Wolf style coulomb potential.
+/// Standard [Coulombic](https://lammps.sandia.gov/doc/pair_coul.html#description) potential.
 #[derive(Clone, Copy, Debug)]
-pub struct Wolf {
-    /// Damping parameter.
-    pub alpha: Float,
-    /// Cutoff radius.
-    pub cutoff: Float,
+pub struct StandardCoulombic {
+    /// Dielectric constant (unitless).
+    pub dielectric: Float,
 }
 
-impl Wolf {
-    /// Returns a new Wolf style coulomb potential.
-    pub fn new(alpha: Float, cutoff: Float) -> Wolf {
-        Wolf { alpha, cutoff }
+impl StandardCoulombic {
+    /// Returns a new [`StandardCoulombic`] potential.
+    pub fn new(dielectric: Float) -> StandardCoulombic {
+        StandardCoulombic { dielectric }
     }
 }
 
-impl Potential for Wolf {}
+impl Potential for StandardCoulombic {}

@@ -11,4 +11,5 @@ pub mod consts {
     pub use std::f64::consts::{FRAC_2_SQRT_PI, PI};
 
     pub const BOLTZMANN: super::Float = 0.001985875;
+    pub const COULOMB: super::Float = 332.0636;
 }
