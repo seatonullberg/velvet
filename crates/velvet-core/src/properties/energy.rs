@@ -46,17 +46,17 @@ impl Property for PairEnergy {
     #[cfg(feature = "rayon")]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let pair_potentials = &potentials.pair_potentials.potentials;
-        let neighbor_lists = &potentials.pair_potentials.neighbor_lists;
+        let selections = &potentials.pair_potentials.selections;
         let cutoffs = &potentials.pair_potentials.cutoffs;
 
         pair_potentials
             .iter()
-            .zip(neighbor_lists.iter())
+            .zip(selections.iter())
             .zip(cutoffs.iter())
-            .map(|((pot, nl), &cut)| -> Float {
-                nl.indices()
-                    .par_iter()
-                    .map(|(i, j)| {
+            .map(|((pot, select), &cut)| -> Float {
+                select
+                    .par_indices()
+                    .map(|[i, j]| {
                         let pos_i = &system.positions[*i];
                         let pos_j = &system.positions[*j];
                         let r = system.cell.distance(&pos_i, &pos_j);
