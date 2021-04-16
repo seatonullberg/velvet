@@ -13,10 +13,14 @@ pub enum Element {
     B,
     /// Nitrogen
     N,
+    /// Oxygen
+    O,
     /// Fluorine
     F,
     /// Sodium
     Na,
+    /// Magnesium
+    Mg,
     /// Chlorine
     Cl,
     /// Argon
@@ -33,8 +37,10 @@ impl Element {
             Element::He => 4.0026,
             Element::B => 10.811,
             Element::N => 14.0067,
+            Element::O => 15.999,
             Element::F => 18.998,
             Element::Na => 22.989,
+            Element::Mg => 24.305,
             Element::Cl => 35.453,
             Element::Ar => 39.948,
             Element::Xe => 131.293,
@@ -48,8 +54,10 @@ impl Element {
             Element::He => 0.0,
             Element::B => 3.0,
             Element::N => -3.0,
+            Element::O => -2.0,
             Element::F => -1.0,
             Element::Na => 1.0,
+            Element::Mg => 2.0,
             Element::Cl => -1.0,
             Element::Ar => 0.0,
             Element::Xe => 0.0,
@@ -63,8 +71,10 @@ impl Element {
             Element::He => 2,
             Element::B => 5,
             Element::N => 7,
+            Element::O => 8,
             Element::F => 9,
             Element::Na => 11,
+            Element::Mg => 12,
             Element::Cl => 17,
             Element::Ar => 18,
             Element::Xe => 54,

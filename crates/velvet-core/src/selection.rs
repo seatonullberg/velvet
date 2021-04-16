@@ -3,12 +3,12 @@
 use std::marker::PhantomData;
 
 use crate::internal::Float;
-use crate::system::System;
 use crate::system::particle::ParticleType;
+use crate::system::System;
 
 /// Generic representation of a query of the system's indices.
-pub struct Selection<SFn, SArgs, UFn, UArgs, const N: usize> 
-where 
+pub struct Selection<SFn, SArgs, UFn, UArgs, const N: usize>
+where
     SFn: Fn(&System, SArgs) -> Vec<[usize; N]>,
     UFn: Fn(&System, &[[usize; N]], UArgs) -> Vec<[usize; N]>,
 {
@@ -20,8 +20,8 @@ where
     update_args: PhantomData<UArgs>,
 }
 
-impl<SFn, SArgs, UFn, UArgs, const N: usize> Selection<SFn, SArgs, UFn, UArgs, N> 
-where 
+impl<SFn, SArgs, UFn, UArgs, const N: usize> Selection<SFn, SArgs, UFn, UArgs, N>
+where
     SFn: Fn(&System, SArgs) -> Vec<[usize; N]>,
     UFn: Fn(&System, &[[usize; N]], UArgs) -> Vec<[usize; N]>,
 {
@@ -48,12 +48,17 @@ where
     }
 
     /// Returns an iterator over the selection's current indices.
-    pub fn indices(&self) -> impl Iterator<Item=&[usize; N]> {
+    pub fn indices(&self) -> impl Iterator<Item = &[usize; N]> {
         self.current_indices.iter()
     }
 }
 
-pub(crate) fn setup_pairs_by_particle_type(system: &System, particle_types: (ParticleType, ParticleType)) -> Vec<[usize; 2]> {
+// This function should not be used in the public API but must be exported for integration testing purposes.
+#[doc(hidden)]
+pub fn setup_pairs_by_particle_type(
+    system: &System,
+    particle_types: (ParticleType, ParticleType),
+) -> Vec<[usize; 2]> {
     let mut possible_indices: Vec<[usize; 2]> = Vec::with_capacity(system.size.pow(2));
     for i in 0..system.size {
         let pt_i = system.particle_types[system.particle_type_map[i]];
@@ -70,13 +75,15 @@ pub(crate) fn setup_pairs_by_particle_type(system: &System, particle_types: (Par
     possible_indices
 }
 
-pub(crate) fn setup_pairs_with_charge(system: &System, _: ()) -> Vec<[usize; 2]> {
+// This function should not be used in the public API but must be exported for integration testing purposes.
+#[doc(hidden)]
+pub fn setup_pairs_with_charge(system: &System, _: ()) -> Vec<[usize; 2]> {
     let mut possible_indices: Vec<[usize; 2]> = Vec::with_capacity(system.size.pow(2));
     for i in 0..system.size {
         let pt_i = system.particle_types[system.particle_type_map[i]];
         for j in (i + 1)..system.size {
             let pt_j = system.particle_types[system.particle_type_map[j]];
-            if pt_i.charge().abs() <= Float::EPSILON || pt_j.charge().abs() <= Float::EPSILON {
+            if pt_i.charge().abs() > Float::EPSILON || pt_j.charge().abs() > Float::EPSILON {
                 possible_indices.push([i, j]);
             }
         }
@@ -85,7 +92,13 @@ pub(crate) fn setup_pairs_with_charge(system: &System, _: ()) -> Vec<[usize; 2]>
     possible_indices
 }
 
-pub(crate) fn update_pairs_by_cutoff_radius(system: &System, indices: &[[usize; 2]], cutoff: Float) -> Vec<[usize; 2]> {
+// This function should not be used in the public API but must be exported for integration testing purposes.
+#[doc(hidden)]
+pub fn update_pairs_by_cutoff_radius(
+    system: &System,
+    indices: &[[usize; 2]],
+    cutoff: Float,
+) -> Vec<[usize; 2]> {
     indices
         .iter()
         .filter(|[i, j]| {
@@ -96,5 +109,4 @@ pub(crate) fn update_pairs_by_cutoff_radius(system: &System, indices: &[[usize; 
         })
         .copied()
         .collect()
-
 }
