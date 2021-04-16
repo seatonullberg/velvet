@@ -8,6 +8,48 @@ use crate::potentials::Potentials;
 use crate::properties::{IntrinsicProperty, Property};
 use crate::system::System;
 
+/// Potential energy due to Coulombic potentials.
+#[derive(Clone, Copy, Debug)]
+pub struct CoulombicEnergy;
+
+impl Property for CoulombicEnergy {
+    type Res = Float;
+
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        let coulomb_potentials = &potentials.coulomb_potentials.potentials;
+        let selections = &potentials.coulomb_potentials.selections;
+        let cutoffs = &potentials.coulomb_potentials.cutoffs;
+
+        coulomb_potentials
+            .iter()
+            .zip(selections.iter())
+            .zip(cutoffs.iter())
+            .map(|((pot, select), &cut)| -> Float {
+                select
+                    .indices()
+                    .map(|[i, j]| {
+                        let pos_i = &system.positions[*i];
+                        let qi = &system.particle_types[system.particle_type_map[*i]].charge();
+                        let pos_j = &system.positions[*j];
+                        let qj = &system.particle_types[system.particle_type_map[*j]].charge();
+                        let r = system.cell.distance(&pos_i, &pos_j);
+                        if r < cut {
+                            pot.energy(*qi, *qj, r)
+                        } else {
+                            0.0 as Float
+                        }
+                    })
+                    .sum()
+            })
+            .sum()
+    }
+
+    fn name(&self) -> String {
+        "coulombic_energy".to_string()
+    }
+}
+
+
 /// Potential energy due to pairwise potentials.
 #[derive(Clone, Copy, Debug)]
 pub struct PairEnergy;
@@ -46,17 +88,17 @@ impl Property for PairEnergy {
     #[cfg(feature = "rayon")]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let pair_potentials = &potentials.pair_potentials.potentials;
-        let neighbor_lists = &potentials.pair_potentials.neighbor_lists;
+        let selections = &potentials.pair_potentials.selections;
         let cutoffs = &potentials.pair_potentials.cutoffs;
 
         pair_potentials
             .iter()
-            .zip(neighbor_lists.iter())
+            .zip(selections.iter())
             .zip(cutoffs.iter())
-            .map(|((pot, nl), &cut)| -> Float {
-                nl.indices()
-                    .par_iter()
-                    .map(|(i, j)| {
+            .map(|((pot, select), &cut)| -> Float {
+                select
+                    .par_indices()
+                    .map(|[i, j]| {
                         let pos_i = &system.positions[*i];
                         let pos_j = &system.positions[*j];
                         let r = system.cell.distance(&pos_i, &pos_j);
@@ -84,8 +126,9 @@ impl Property for PotentialEnergy {
     type Res = Float;
 
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        let coulomb_energy = CoulombicEnergy.calculate(system, potentials);
         let pair_energy = PairEnergy.calculate(system, potentials);
-        pair_energy
+        coulomb_energy + pair_energy
     }
 
     fn name(&self) -> String {

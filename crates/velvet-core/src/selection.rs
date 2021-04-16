@@ -1,5 +1,8 @@
 //! Generic representation of a query of the system's indices.
 
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+
 use std::marker::PhantomData;
 
 use crate::internal::Float;
@@ -46,6 +49,12 @@ where
     /// Returns an iterator over the selection's current indices.
     pub fn indices(&self) -> impl Iterator<Item = &[usize; N]> {
         self.current_indices.iter()
+    }
+
+    /// Returns a parallel iterator over the selection's current indices.
+    #[cfg(feature = "rayon")]
+    pub fn par_indices(&self) -> impl ParallelIterator<Item = &[usize; N]> {
+        self.current_indices.par_iter()
     }
 }
 
