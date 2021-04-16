@@ -7,11 +7,7 @@ use crate::system::particle::ParticleType;
 use crate::system::System;
 
 /// Generic representation of a query of the system's indices.
-pub struct Selection<SFn, SArgs, UFn, UArgs, const N: usize>
-where
-    SFn: Fn(&System, SArgs) -> Vec<[usize; N]>,
-    UFn: Fn(&System, &[[usize; N]], UArgs) -> Vec<[usize; N]>,
-{
+pub struct Selection<SFn, SArgs, UFn, UArgs, const N: usize> {
     possible_indices: Vec<[usize; N]>,
     current_indices: Vec<[usize; N]>,
     setup_func: SFn,

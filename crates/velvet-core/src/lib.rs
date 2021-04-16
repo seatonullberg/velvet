@@ -18,7 +18,6 @@ extern crate strum_macros;
 pub mod config;
 pub mod integrators;
 mod internal;
-pub mod neighbors;
 pub mod outputs;
 pub mod potentials;
 pub mod propagators;

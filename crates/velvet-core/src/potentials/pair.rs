@@ -1,9 +1,9 @@
 //! Potentials which describe pairwise nonbonded interactions..
 
 use crate::internal::Float;
-use crate::neighbors::NeighborList;
 use crate::potentials::functions::{Buckingham, Harmonic, LennardJones, Mie, Morse};
 use crate::potentials::Potential;
+use crate::selection::{setup_pairs_by_particle_type, update_pairs_by_cutoff_radius, Selection};
 use crate::system::particle::ParticleType;
 use crate::system::System;
 
@@ -93,86 +93,95 @@ impl PairPotential for Morse {
     }
 }
 
+type PairSetupFn = fn(&System, (ParticleType, ParticleType)) -> Vec<[usize; 2]>;
+
+type PairUpdateFn = fn(&System, &[[usize; 2]], Float) -> Vec<[usize; 2]>;
+
+type PairSelection = Selection<PairSetupFn, (ParticleType, ParticleType), PairUpdateFn, Float, 2>;
+
 pub(crate) struct PairPotentials {
     pub potentials: Vec<Box<dyn PairPotential>>,
-    pub neighbor_lists: Vec<NeighborList>,
+    pub selections: Vec<PairSelection>,
+    pub particle_types: Vec<(ParticleType, ParticleType)>,
     pub cutoffs: Vec<Float>,
+    pub thicknesses: Vec<Float>,
     pub update_frequency: usize,
 }
 
 impl PairPotentials {
     pub fn setup(&mut self, system: &System) {
-        self.neighbor_lists
+        self.selections
             .iter_mut()
-            .for_each(|nl| nl.setup(system));
+            .zip(self.particle_types.iter().copied())
+            .for_each(|(selection, particle_types)| selection.setup(system, particle_types))
     }
 
     pub fn update(&mut self, system: &System) {
-        // update neighbor lists
-        self.neighbor_lists
+        self.selections
             .iter_mut()
-            .for_each(|nl| nl.update(system));
+            .zip(self.cutoffs.iter())
+            .zip(self.thicknesses.iter())
+            .for_each(|((selection, cutoff), thickness)| {
+                selection.update(system, cutoff + thickness)
+            })
     }
 }
 
-/// Convenient constructor for [`PairPotentials`].
 pub(crate) struct PairPotentialsBuilder {
     potentials: Vec<Box<dyn PairPotential>>,
-    neighbor_lists: Vec<NeighborList>,
+    selections: Vec<PairSelection>,
+    particle_types: Vec<(ParticleType, ParticleType)>,
     cutoffs: Vec<Float>,
+    thicknesses: Vec<Float>,
     update_frequency: usize,
 }
 
 impl PairPotentialsBuilder {
-    /// Returns a new `PairPotentialsBuilder`.
     pub fn new() -> PairPotentialsBuilder {
         PairPotentialsBuilder {
             potentials: Vec::new(),
-            neighbor_lists: Vec::new(),
+            selections: Vec::new(),
+            particle_types: Vec::new(),
             cutoffs: Vec::new(),
+            thicknesses: Vec::new(),
             update_frequency: 1,
         }
     }
 
-    /// Adds a new potential to the collection.
-    pub fn pair<P>(
-        mut self,
-        potential: P,
-        particle_types: (ParticleType, ParticleType),
-        cutoff: Float,
-        thickness: Float,
-    ) -> PairPotentialsBuilder
-    where
-        P: PairPotential + 'static,
-    {
-        let potential = Box::new(potential);
-        self.potentials.push(potential);
-        let neighbor_list = NeighborList::new(cutoff + thickness, Some(particle_types));
-        self.neighbor_lists.push(neighbor_list);
-        self.cutoffs.push(cutoff);
-        self
-    }
-
-    /// Sets the number of iterations between each call to `update`.
     pub fn update_frequency(mut self, freq: usize) -> PairPotentialsBuilder {
         self.update_frequency = freq;
         self
     }
 
-    /// Consumes the builder and returns a new [`PairPotentials`] object.
+    pub fn pair<P: PairPotential + 'static>(
+        mut self,
+        potential: P,
+        particle_types: (ParticleType, ParticleType),
+        cutoff: Float,
+        thickness: Float,
+    ) -> PairPotentialsBuilder {
+        let potential = Box::new(potential);
+        self.potentials.push(potential);
+        let selection = Selection::new(
+            setup_pairs_by_particle_type as PairSetupFn,
+            update_pairs_by_cutoff_radius as PairUpdateFn,
+        );
+        self.selections.push(selection);
+        self.particle_types.push(particle_types);
+        self.cutoffs.push(cutoff);
+        self.thicknesses.push(thickness);
+        self
+    }
+
     pub fn build(self) -> PairPotentials {
         PairPotentials {
             potentials: self.potentials,
-            neighbor_lists: self.neighbor_lists,
+            selections: self.selections,
+            particle_types: self.particle_types,
             cutoffs: self.cutoffs,
+            thicknesses: self.thicknesses,
             update_frequency: self.update_frequency,
         }
-    }
-}
-
-impl Default for PairPotentialsBuilder {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

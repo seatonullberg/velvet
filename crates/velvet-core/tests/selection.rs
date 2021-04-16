@@ -15,11 +15,9 @@ fn setup_pairs_by_particle_type_update_pairs_by_cutoff_radius() {
     let mut selection = Selection::new(setup_pairs_by_particle_type, update_pairs_by_cutoff_radius);
     selection.setup(&system, particle_types);
     selection.update(&system, cutoff);
-    for pairs in selection.indices() {
-        let i = pairs[0];
-        let j = pairs[1];
-        assert_eq!(system.particle_types[system.particle_type_map[i]], argon);
-        assert_eq!(system.particle_types[system.particle_type_map[j]], xenon);
+    for [i, j] in selection.indices() {
+        assert_eq!(system.particle_types[system.particle_type_map[*i]], argon);
+        assert_eq!(system.particle_types[system.particle_type_map[*j]], xenon);
     }
 }
 

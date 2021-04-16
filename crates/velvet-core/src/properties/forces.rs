@@ -20,29 +20,31 @@ impl Property for PairForces {
     // TODO: implement rayon version
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let pair_potentials = &potentials.pair_potentials.potentials;
-        let neighbor_lists = &potentials.pair_potentials.neighbor_lists;
+        let selections = &potentials.pair_potentials.selections;
         let cutoffs = &potentials.pair_potentials.cutoffs;
 
         pair_potentials
             .iter()
-            .zip(neighbor_lists.iter())
+            .zip(selections.iter())
             .zip(cutoffs.iter())
-            .map(|((pot, nl), &cut)| -> Vec<(Vector3<Float>, usize, usize)> {
-                nl.indices()
-                    .iter()
-                    .map(move |(i, j)| {
-                        let pos_i = &system.positions[*i];
-                        let pos_j = &system.positions[*j];
-                        let r = system.cell.distance(&pos_i, &pos_j);
-                        if r < cut {
-                            let dir = system.cell.direction(&pos_i, &pos_j);
-                            (pot.force(r) * dir, *i, *j)
-                        } else {
-                            (Vector3::zeros(), *i, *j)
-                        }
-                    })
-                    .collect()
-            })
+            .map(
+                |((pot, select), &cut)| -> Vec<(Vector3<Float>, usize, usize)> {
+                    select
+                        .indices()
+                        .map(move |[i, j]| {
+                            let pos_i = &system.positions[*i];
+                            let pos_j = &system.positions[*j];
+                            let r = system.cell.distance(&pos_i, &pos_j);
+                            if r < cut {
+                                let dir = system.cell.direction(&pos_i, &pos_j);
+                                (pot.force(r) * dir, *i, *j)
+                            } else {
+                                (Vector3::zeros(), *i, *j)
+                            }
+                        })
+                        .collect()
+                },
+            )
             .fold(
                 vec![Vector3::zeros(); system.size],
                 |mut accumulator, forces_metadata| {

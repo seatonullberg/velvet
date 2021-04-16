@@ -1,7 +1,7 @@
 //! Velvet is a classical atomistic simulation engine with a focus on user-friendliness and extensibility.
 //!
 //! This project is largely a learning exercise, but as development continues I hope to accomplish the following goals:
-//! 
+//!
 //! * Extensibility via user-defined plugin modules
 //! * Optimized single CPU performace with multithreading and SIMD support
 //! * Implement a wide variety of interatomic potentials
