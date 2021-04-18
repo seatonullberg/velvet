@@ -1,4 +1,4 @@
-//! Algorithms to integrate classical equations of motion.
+//! Algorithms which integrate the classical equations of motion.
 
 use nalgebra::Vector3;
 
@@ -8,15 +8,19 @@ use crate::properties::forces::Forces;
 use crate::properties::Property;
 use crate::system::System;
 
-/// A numerical integration algorithm.
+/// Shared behavior for algorithms which integrate the classical equations of motion.
 pub trait Integrator: Send + Sync {
-    /// Prepare the integrator to run.
+    /// Prepares the integrator to run.
     fn setup(&mut self, _: &System, _: &Potentials) {}
     /// Integrates one time step.
     fn integrate(&mut self, system: &mut System, potentials: &Potentials);
 }
 
 /// Velocity Verlet integration algorithm.
+///
+/// # References
+///
+/// [1] Swope, William C., et al. "A computer simulation method for the calculation of equilibrium constants for the formation of physical clusters of molecules: Application to small water clusters." The Journal of chemical physics 76.1 (1982): 637-649.
 #[derive(Clone, Debug)]
 pub struct VelocityVerlet {
     timestep: Float,
@@ -24,11 +28,11 @@ pub struct VelocityVerlet {
 }
 
 impl VelocityVerlet {
-    /// Returns a new velocity verlet algorithm.
+    /// Returns a new [`VelocityVerlet`] algorithm.
     ///
     /// # Arguments
     ///
-    /// * `timestep` - Timestep duration
+    /// * `timestep` - Timestep duration.
     pub fn new(timestep: Float) -> VelocityVerlet {
         VelocityVerlet {
             timestep,

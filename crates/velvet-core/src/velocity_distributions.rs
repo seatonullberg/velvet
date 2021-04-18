@@ -1,4 +1,4 @@
-//! Algorithms to initialize the temperature of a sytem from a velocity distribution.
+//! Algorithms which initialize the temperature of a sytem from a velocity distribution.
 
 use nalgebra::Vector3;
 use rand_distr::{Distribution, Normal};
@@ -9,13 +9,17 @@ use crate::properties::temperature::Temperature;
 use crate::properties::IntrinsicProperty;
 use crate::system::System;
 
-/// Shared behavior for algorithms that can initialize a velocity distribution.
+/// Shared behavior for algorithms which initialize the temperature of a system from a velocity distribution.
 pub trait VelocityDistribution: Send + Sync {
     /// Applies the distribution to a system.
     fn apply(&self, system: &mut System);
 }
 
-/// Maxwell Boltzmann style velocity distribution.
+/// Maxwell-Boltzmann style velocity distribution.
+///
+/// # References 
+///
+/// [1] Hernandez, Hugo. "Standard Maxwell-Boltzmann distribution: definition and properties." ForsChem Research Reports 2 (2017): 2017-2.
 #[derive(Clone, Copy, Debug)]
 pub struct Boltzmann {
     target: Float,
@@ -23,11 +27,11 @@ pub struct Boltzmann {
 }
 
 impl Boltzmann {
-    /// Returns a new Boltzmann velocity distribution.
+    /// Returns a new [`Boltzmann`] velocity distribution.
     ///
     /// # Arguments
     ///
-    /// * `target` - Target temperature (Kelvin)
+    /// * `target` - Target temperature.
     pub fn new(target: Float) -> Boltzmann {
         let distr = Normal::new(0.0, Float::sqrt(BOLTZMANN * target)).unwrap();
         Boltzmann { target, distr }
@@ -36,7 +40,6 @@ impl Boltzmann {
 
 impl VelocityDistribution for Boltzmann {
     fn apply(&self, system: &mut System) {
-        // !!! this block is more efficient without `par_iter`
         system.velocities = system
             .particle_type_map
             .iter()
@@ -57,6 +60,5 @@ impl VelocityDistribution for Boltzmann {
 fn scale(system: &mut System, target: Float) {
     let temperature = Temperature.calculate_intrinsic(system);
     let factor = Float::sqrt(target / temperature);
-    // !!! this block is more efficient without `par_iter`
     system.velocities = system.velocities.iter().map(|&x| x * factor).collect();
 }
