@@ -35,11 +35,14 @@ fn main() {
         .output(Temperature)
         .build();
 
-    // Create an output group which writes the forces acting on each atom to a text file.
+    // Write the same outputs to a file for post-processing.
     let file_group = RawOutputGroupBuilder::new()
-        .destination(std::fs::File::create("argon-forces.txt").unwrap())
-        .interval(500)
-        .output(Forces)
+        .destination(std::fs::File::create("argon.txt").unwrap())
+        .interval(100)
+        .output(PotentialEnergy)
+        .output(KineticEnergy)
+        .output(TotalEnergy)
+        .output(Temperature)
         .build();
 
     // Build the configuration.
