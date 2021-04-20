@@ -1,5 +1,7 @@
 //! High level abstraction for an atomistic simulation.
 
+use indicatif::{ProgressBar, ProgressStyle, ProgressDrawTarget};
+
 use crate::config::Configuration;
 use crate::potentials::Potentials;
 use crate::propagators::Propagator;
@@ -40,6 +42,11 @@ impl Simulation {
         // setup propagation
         self.propagator.setup(&mut self.system, &self.potentials);
 
+        // setup progress bar
+        let pb = ProgressBar::new(steps as u64);
+        pb.set_style(ProgressStyle::default_bar()
+            .template("[{eta_precise}] {bar:40.cyan/blue} {pos:>7} /{len:>7} steps"));
+
         // start iteration loop
         for i in 0..steps {
             // do one propagation step
@@ -72,8 +79,10 @@ impl Simulation {
                         }
                     }
                 }
-            }
+            }   
+            pb.inc(1);
         }
+        pb.finish();
     }
 
     /// Consume the simulation and return its [`System`] and [`Potentials`].

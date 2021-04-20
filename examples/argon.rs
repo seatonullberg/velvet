@@ -26,16 +26,7 @@ fn main() {
     // Run MD with no thermostat to simulate the NVE ensemble.
     let md = MolecularDynamics::new(velocity_verlet, NullThermostat);
 
-    // Create an output group which writes scalar properties to stderr (the default destination).
-    let stderr_group = RawOutputGroupBuilder::new()
-        .interval(100)
-        .output(PotentialEnergy)
-        .output(KineticEnergy)
-        .output(TotalEnergy)
-        .output(Temperature)
-        .build();
-
-    // Write the same outputs to a file for post-processing.
+    // Create an output group which writes scalar properties to a file for post-processing.
     let file_group = RawOutputGroupBuilder::new()
         .destination(std::fs::File::create("argon.txt").unwrap())
         .interval(100)
@@ -47,7 +38,6 @@ fn main() {
 
     // Build the configuration.
     let config = ConfigurationBuilder::new()
-        .raw_output_group(stderr_group)
         .raw_output_group(file_group)
         .build();
 

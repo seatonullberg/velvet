@@ -36,6 +36,7 @@ hdf5-sys = { version = "0.7", optional = true }
 approx = "0.4"
 criterion = "0.3"
 nalgebra = "0.26"
+serial_test = "0.5"
 velvet-test-utils = { path = "crates/velvet-test-utils" }
 
 [features]
@@ -55,7 +56,10 @@ rayon = [
 ]
 
 [package.metadata.docs.rs]
-features = ["hdf5-sys/static", "hdf5-sys/zlib"]
+features = [
+    "hdf5-sys/static", 
+    "hdf5-sys/zlib"
+]
 
 [[bench]]
 name = "argon-benchmarks"

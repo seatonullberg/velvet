@@ -1,4 +1,5 @@
 use approx::*;
+use serial_test::serial;
 
 use velvet::prelude::*;
 use velvet_test_utils as test_utils;
@@ -6,6 +7,7 @@ use velvet_test_utils as test_utils;
 static ITERATIONS: usize = 10_000;
 
 #[test]
+#[serial]
 fn nve() {
     let system = test_utils::binary_gas_system();
     let potentials = test_utils::binary_gas_potentials();
@@ -37,6 +39,7 @@ fn nve() {
 }
 
 #[test]
+#[serial]
 fn nvt() {
     let system = test_utils::binary_gas_system();
     let potentials = test_utils::binary_gas_potentials();
