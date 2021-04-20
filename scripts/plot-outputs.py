@@ -77,7 +77,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plots the results of a Velvet simulation.")
     parser.add_argument("src", help="Path to the source file.")
     parser.add_argument("dst", help="Path to the destination file.")
-    parser.add_argument("output_frequency", default=None, help="Number of timesteps between outputs. Only required for raw output.")
+    parser.add_argument("--output-frequency", default=None, help="Number of timesteps between outputs. Only required for raw output.")
     parser.add_argument("-pe", action="store_true", help="Plot potential energy.")
     parser.add_argument("-ke", action="store_true", help="Plot kinetic energy.")
     parser.add_argument("-etotal", action="store_true", help="Plot total energy.")

@@ -4,7 +4,7 @@
 
 ```bash
 $ cargo run --release --example argon
-$ python scripts/plot-outputs.py argon.txt argon.png 100 -etotal
+$ python scripts/plot-outputs.py argon.txt argon.png --output-frequency=100 -etotal
 ```
 
 <p align="center"><img src="../assets/argon.png"></p>
@@ -13,7 +13,7 @@ $ python scripts/plot-outputs.py argon.txt argon.png 100 -etotal
 
 ```bash
 $ cargo run --release --example binary-gas
-$ python scripts/plot-outputs.py binary-gas.txt binary-gas.png 100 -temp
+$ python scripts/plot-outputs.py binary-gas.txt binary-gas.png --output-frequency=100 -temp
 ```
 
 <p align="center"><img src="../assets/binary-gas.png"></p>
