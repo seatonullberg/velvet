@@ -47,6 +47,9 @@ impl Simulation {
         pb.set_style(ProgressStyle::default_bar()
             .template("[{eta_precise}] {bar:40.cyan/blue} {pos:>7} /{len:>7} steps"));
 
+        #[cfg(feature = "quiet")]
+        pb.set_draw_target(ProgressDrawTarget::hidden());
+
         // start iteration loop
         for i in 0..steps {
             // do one propagation step

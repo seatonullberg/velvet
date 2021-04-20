@@ -51,6 +51,9 @@ hdf5-output = [
     "hdf5-sys",
     "velvet-core/hdf5-output",
 ]
+quiet = [
+    "velvet-core/quiet"
+]
 rayon = [
     "velvet-core/rayon",
 ]

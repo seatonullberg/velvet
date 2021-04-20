@@ -3,22 +3,26 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use velvet::prelude::*;
 use velvet_test_utils as test_utils;
 
-static ITERATIONS: usize = 1000;
+static ITERATIONS: usize = 100;
 
 // benchmark an entire NVE loop for the argon gas system
 pub fn benchmark_nve(c: &mut Criterion) {
-    let system = test_utils::argon_system();
-    let potentials = test_utils::argon_potentials();
-    let mut sim = test_utils::nve_simulation(system, potentials);
-    c.bench_function("argon-nve", |b| b.iter(|| sim.run(ITERATIONS)));
+    c.bench_function("argon-nve", |b| b.iter(|| {
+        let system = test_utils::argon_system();
+        let potentials = test_utils::argon_potentials();
+        let mut sim = test_utils::nve_simulation(system, potentials);
+        sim.run(ITERATIONS);
+    }));
 }
 
 // benchmark an entire NVT loop for the argon gas system
 pub fn benchmark_nvt(c: &mut Criterion) {
-    let system = test_utils::argon_system();
-    let potentials = test_utils::argon_potentials();
-    let mut sim = test_utils::nvt_simulation(system, potentials);
-    c.bench_function("argon-nvt", |b| b.iter(|| sim.run(ITERATIONS)));
+    c.bench_function("argon-nvt", |b| b.iter(|| {
+        let system = test_utils::argon_system();
+        let potentials = test_utils::argon_potentials();
+        let mut sim = test_utils::nvt_simulation(system, potentials);
+        sim.run(ITERATIONS);
+    }));
 }
 
 // benchmark expensive property calculations for the argon gas system
