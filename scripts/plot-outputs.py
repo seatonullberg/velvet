@@ -1,27 +1,35 @@
 import argparse
+
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 import numpy as np
 
+LABELS = {
+    "potential_energy": "Potential Energy (kcal/mol)",
+    "kinetic_energy": "Kinetic Energy (kcal/mol)",
+    "total_energy": "Total Energy (kcal/mol)",
+    "temperature": "Temperature (Kelvin)"
+}
 
-def generate_plots(filepath, output_format, output_interval, properties):
-    if output_format == "raw":
-        _generate_plots_raw(filepath, output_interval, properties)
-    elif output_format == "hdf5":
+def generate_plots(args, fmt, properties):
+    if fmt == "raw":
+        _generate_plots_raw(args, properties)
+    elif fmt == "hdf5":
         raise NotImplementedError("HDF5 format is not yet implemented")
     else:
-        raise ValueError("unsupported output format: {}".format(output_format))
+        raise ValueError("unsupported format: {}".format(fmt))
 
 
-def _generate_plots_raw(filepath, output_interval, properties):
-    # validate output interval
-    if output_interval is None:
-        raise ValueError("output interval is required to parse raw format")
+def _generate_plots_raw(args, properties):
+    # validate output frequency
+    freq = args.output_frequency
+    if freq is None:
+        raise ValueError("output frequency is required to parse 'raw' formatted data")
     else:
-        output_interval = int(output_interval)
+        freq = int(freq)
 
     # read raw text file
-    with open(filepath, "r") as f:
+    with open(args.src, "r") as f:
         lines = [line.strip() for line in f.readlines()]
 
     # parse desired properties
@@ -33,50 +41,53 @@ def _generate_plots_raw(filepath, output_interval, properties):
         if key in data:
             data[key].append(float(value))
 
-    # correct timestep for output interval
-    corrected_data = {k: [] for k in data}
+    # format data for plotting
+    formatted_data = {k: [] for k in data}
     for key in data:
-        corrected_values = {"x": [], "y": []}
+        formatted_values = {"x": [], "y": []}
         for i, value in enumerate(data[key]):
-            corrected_values["x"].append(i * output_interval)
-            corrected_values["y"].append(value)
-        corrected_data[key] = corrected_values
-    
-    # actually generate plots
-    _generate_plots_inner(corrected_data)
+            formatted_values["x"].append(i * freq)
+            formatted_values["y"].append(value)
+        formatted_data[key] = formatted_values
+
+    # generate plots
+    _generate_plots_inner(args, formatted_data)
 
 
-def _generate_plots_hdf5(filepath, properties):
+def _generate_plots_hdf5(args, properties):
     pass
 
 
-def _generate_plots_inner(data):
-    for key in data:
-        fig, ax = plt.subplots(tight_layout=True)
-        x = data[key]["x"]
-        y = data[key]["y"]
-        ax.plot(x, y, linewidth=0.5)
-        ax.set_xlabel("timesteps")
-        ax.set_ylabel(key)
-        ax.grid(True)
-        ax.yaxis.set_major_formatter(FormatStrFormatter("%.4f"))
-        fig.savefig("{}.png".format(key), dpi=300)
+def _generate_plots_inner(args, data):
+    fig, ax = plt.subplots(nrows=len(data), tight_layout=True, sharex=True)
+    for i, key in enumerate(data):
+        if len(data) > 1:
+            _ax = ax[i]
+        else:
+            _ax = ax
+        _ax.plot(data[key]["x"], data[key]["y"], linewidth=0.5)
+        _ax.set_ylabel(LABELS[key])
+        _ax.grid(True)
+        _ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+    plt.xlabel("Iteration")
+    plt.savefig(args.dst, dpi=300)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plots the results of a Velvet simulation.")
-    parser.add_argument("filepath", help="Path to the results file.")
-    parser.add_argument("output_interval", default=None, help="Number of timesteps between outputs. Only required for raw output.")
+    parser.add_argument("src", help="Path to the source file.")
+    parser.add_argument("dst", help="Path to the destination file.")
+    parser.add_argument("output_frequency", default=None, help="Number of timesteps between outputs. Only required for raw output.")
     parser.add_argument("-pe", action="store_true", help="Plot potential energy.")
     parser.add_argument("-ke", action="store_true", help="Plot kinetic energy.")
     parser.add_argument("-etotal", action="store_true", help="Plot total energy.")
     parser.add_argument("-temp", action="store_true", help="Plot instantaneous temperature.")
     args = parser.parse_args()
 
-    # determine output format from file extension
-    output_format = "raw"
-    if args.filepath.endswith("h5") or args.filepath.endswith("hdf5"):
-        output_format = "hdf5"
+    # determine source format from file extension
+    fmt = "raw"
+    if args.src.endswith("h5") or args.src.endswith("hdf5"):
+        fmt = "hdf5"
     
     # determine desired plots from flags
     properties = []
@@ -89,4 +100,4 @@ if __name__ == "__main__":
     if args.temp:
         properties.append("temperature")
 
-    generate_plots(args.filepath, output_format, args.output_interval, properties)    
+    generate_plots(args, fmt, properties)    
