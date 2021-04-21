@@ -31,84 +31,117 @@ type CoulombUpdateFn = fn(&System, &[[usize; 2]], Float) -> Vec<[usize; 2]>;
 
 type CoulombSelection = Selection<CoulombSetupFn, (), CoulombUpdateFn, Float, 2>;
 
-pub(crate) struct CoulombPotentials {
-    pub potentials: Vec<Box<dyn CoulombPotential>>,
-    pub selections: Vec<CoulombSelection>,
-    pub cutoffs: Vec<Float>,
-    pub thicknesses: Vec<Float>,
-    pub update_frequency: usize,
+pub(crate) struct CoulombPotentialMeta {
+    pub potential: Box<dyn CoulombPotential>,
+    pub cutoff: Float,
+    pub thickness: Float,
+    pub selection: CoulombSelection,
 }
 
-impl CoulombPotentials {
-    pub fn setup(&mut self, system: &System) {
-        self.selections
-            .iter_mut()
-            .for_each(|selection| selection.setup(system, ()));
-    }
-
-    pub fn update(&mut self, system: &System) {
-        self.selections
-            .iter_mut()
-            .zip(self.cutoffs.iter())
-            .zip(self.thicknesses.iter())
-            .for_each(|((selection, cutoff), thickness)| {
-                selection.update(system, cutoff + thickness)
-            })
-    }
-}
-
-pub(crate) struct CoulombPotentialsBuilder {
-    potentials: Vec<Box<dyn CoulombPotential>>,
-    selections: Vec<CoulombSelection>,
-    cutoffs: Vec<Float>,
-    thicknesses: Vec<Float>,
-    update_frequency: usize,
-}
-
-impl CoulombPotentialsBuilder {
-    pub fn new() -> CoulombPotentialsBuilder {
-        CoulombPotentialsBuilder {
-            potentials: Vec::new(),
-            selections: Vec::new(),
-            cutoffs: Vec::new(),
-            thicknesses: Vec::new(),
-            update_frequency: 1,
-        }
-    }
-
-    pub fn update_frequency(mut self, freq: usize) -> CoulombPotentialsBuilder {
-        self.update_frequency = freq;
-        self
-    }
-
-    pub fn coulomb<P: CoulombPotential + 'static>(
-        mut self,
-        potential: P,
-        cutoff: Float,
-        thickness: Float,
-    ) -> CoulombPotentialsBuilder {
-        let potential = Box::new(potential);
-        self.potentials.push(potential);
+impl CoulombPotentialMeta {
+    pub fn new<T>(potential: T, cutoff: Float, thickness: Float) -> CoulombPotentialMeta
+    where
+        T: CoulombPotential + 'static,
+    {
         let selection = Selection::new(
             setup_pairs_with_charge as CoulombSetupFn,
             update_pairs_by_cutoff_radius as CoulombUpdateFn,
         );
-        self.selections.push(selection);
-        self.cutoffs.push(cutoff);
-        self.thicknesses.push(thickness);
-        self
-    }
-
-    pub fn build(self) -> CoulombPotentials {
-        CoulombPotentials {
-            potentials: self.potentials,
-            selections: self.selections,
-            cutoffs: self.cutoffs,
-            thicknesses: self.thicknesses,
-            update_frequency: self.update_frequency,
+        CoulombPotentialMeta {
+            potential: Box::new(potential),
+            selection,
+            cutoff,
+            thickness,
         }
     }
+
+    pub fn setup(&mut self, system: &System) {
+        self.selection.setup(system, ())
+    }
+
+    pub fn update(&mut self, system: &System) {
+        self.selection.update(system, self.cutoff + self.thickness)
+    }
 }
+
+// pub(crate) struct CoulombPotentials {
+//     pub potentials: Vec<Box<dyn CoulombPotential>>,
+//     pub selections: Vec<CoulombSelection>,
+//     pub cutoffs: Vec<Float>,
+//     pub thicknesses: Vec<Float>,
+//     pub update_frequency: usize,
+// }
+
+// impl CoulombPotentials {
+//     pub fn setup(&mut self, system: &System) {
+//         self.selections
+//             .iter_mut()
+//             .for_each(|selection| selection.setup(system, ()));
+//     }
+
+//     pub fn update(&mut self, system: &System) {
+//         self.selections
+//             .iter_mut()
+//             .zip(self.cutoffs.iter())
+//             .zip(self.thicknesses.iter())
+//             .for_each(|((selection, cutoff), thickness)| {
+//                 selection.update(system, cutoff + thickness)
+//             })
+//     }
+// }
+
+// pub(crate) struct CoulombPotentialsBuilder {
+//     potentials: Vec<Box<dyn CoulombPotential>>,
+//     selections: Vec<CoulombSelection>,
+//     cutoffs: Vec<Float>,
+//     thicknesses: Vec<Float>,
+//     update_frequency: usize,
+// }
+
+// impl CoulombPotentialsBuilder {
+//     pub fn new() -> CoulombPotentialsBuilder {
+//         CoulombPotentialsBuilder {
+//             potentials: Vec::new(),
+//             selections: Vec::new(),
+//             cutoffs: Vec::new(),
+//             thicknesses: Vec::new(),
+//             update_frequency: 1,
+//         }
+//     }
+
+//     pub fn update_frequency(mut self, freq: usize) -> CoulombPotentialsBuilder {
+//         self.update_frequency = freq;
+//         self
+//     }
+
+//     pub fn coulomb<P: CoulombPotential + 'static>(
+//         mut self,
+//         potential: P,
+//         cutoff: Float,
+//         thickness: Float,
+//     ) -> CoulombPotentialsBuilder {
+//         let potential = Box::new(potential);
+//         self.potentials.push(potential);
+//         let selection = Selection::new(
+//             setup_pairs_with_charge as CoulombSetupFn,
+//             update_pairs_by_cutoff_radius as CoulombUpdateFn,
+//         );
+//         self.selections.push(selection);
+//         self.cutoffs.push(cutoff);
+//         self.thicknesses.push(thickness);
+//         self
+//     }
+
+//     pub fn build(self) -> CoulombPotentials {
+//         CoulombPotentials {
+//             potentials: self.potentials,
+//             selections: self.selections,
+//             cutoffs: self.cutoffs,
+//             thicknesses: self.thicknesses,
+//             update_frequency: self.update_frequency,
+//         }
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

@@ -16,7 +16,7 @@ fn main() {
 
     // Store all of the system's potentials in a Potentials struct.
     let potentials = PotentialsBuilder::new()
-        .pair_update_frequency(3)
+        .update_frequency(3)
         .pair(lj, (argon, argon), 8.5, 1.0)
         .build();
 

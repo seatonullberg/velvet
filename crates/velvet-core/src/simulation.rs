@@ -1,6 +1,8 @@
 //! High level abstraction for an atomistic simulation.
 
-use indicatif::{ProgressBar, ProgressStyle, ProgressDrawTarget};
+#[cfg(feature = "quiet")]
+use indicatif::ProgressDrawTarget;
+use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::config::Configuration;
 use crate::potentials::Potentials;
@@ -15,7 +17,7 @@ pub struct Simulation {
     config: Configuration,
 }
 
-impl Simulation {
+impl<'a> Simulation {
     /// Returns a new [`Simulation`].
     pub fn new<P>(
         system: System,
@@ -44,8 +46,10 @@ impl Simulation {
 
         // setup progress bar
         let pb = ProgressBar::new(steps as u64);
-        pb.set_style(ProgressStyle::default_bar()
-            .template("[{eta_precise}] {bar:40.cyan/blue} {pos:>7} /{len:>7} steps"));
+        pb.set_style(
+            ProgressStyle::default_bar()
+                .template("[{eta_precise}] {bar:40.cyan/blue} {pos:>7} /{len:>7} steps"),
+        );
 
         #[cfg(feature = "quiet")]
         pb.set_draw_target(ProgressDrawTarget::hidden());
@@ -82,7 +86,7 @@ impl Simulation {
                         }
                     }
                 }
-            }   
+            }
             pb.inc(1);
         }
         pb.finish();

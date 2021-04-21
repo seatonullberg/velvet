@@ -24,7 +24,7 @@ fn main() {
     let cutoff_coul = 10.0;
     let thickness = 3.0;
     let potentials = PotentialsBuilder::new()
-        .pair_update_frequency(3)
+        .update_frequency(3)
         .pair(buck_mg_o, (magnesium, oxygen), cutoff_buck, thickness)
         .pair(buck_o_o, (oxygen, oxygen), cutoff_buck, thickness)
         .coulomb(coul, cutoff_coul, thickness)

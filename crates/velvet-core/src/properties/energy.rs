@@ -5,6 +5,8 @@ use rayon::prelude::*;
 
 use crate::internal::Float;
 use crate::potentials::Potentials;
+use crate::potentials::coulomb::CoulombPotentialMeta;
+use crate::potentials::pair::PairPotentialMeta;
 use crate::properties::{IntrinsicProperty, Property};
 use crate::system::System;
 
@@ -12,36 +14,48 @@ use crate::system::System;
 #[derive(Clone, Copy, Debug)]
 pub struct CoulombicEnergy;
 
+impl CoulombicEnergy {
+    fn calculate_inner(&self, meta: &CoulombPotentialMeta, system: &System, i: usize, j: usize) -> Float {
+        let pos_i = system.positions[i];
+        let qi = system.particle_types[system.particle_type_map[i]].charge();
+        let pos_j = system.positions[j];
+        let qj = system.particle_types[system.particle_type_map[j]].charge();
+        let r = system.cell.distance(&pos_i, &pos_j);
+        if r < meta.cutoff {
+            meta.potential.energy(qi, qj, r)
+        } else {
+            0.0
+        }
+    }
+}
+
 impl Property for CoulombicEnergy {
     type Res = Float;
 
+    #[cfg(not(feature = "rayon"))]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let coulomb_potentials = &potentials.coulomb_potentials.potentials;
-        let selections = &potentials.coulomb_potentials.selections;
-        let cutoffs = &potentials.coulomb_potentials.cutoffs;
+        match &potentials.coulomb_meta {
+            None => 0.0,
+            Some(meta) => meta
+                .selection
+                .indices()
+                .map(|&[i, j]| {
+                    self.calculate_inner(meta, system, i, j)
+                }).sum()
+        }
+    }
 
-        coulomb_potentials
-            .iter()
-            .zip(selections.iter())
-            .zip(cutoffs.iter())
-            .map(|((pot, select), &cut)| -> Float {
-                select
-                    .indices()
-                    .map(|[i, j]| {
-                        let pos_i = &system.positions[*i];
-                        let qi = &system.particle_types[system.particle_type_map[*i]].charge();
-                        let pos_j = &system.positions[*j];
-                        let qj = &system.particle_types[system.particle_type_map[*j]].charge();
-                        let r = system.cell.distance(&pos_i, &pos_j);
-                        if r < cut {
-                            pot.energy(*qi, *qj, r)
-                        } else {
-                            0.0 as Float
-                        }
-                    })
-                    .sum()
-            })
-            .sum()
+    #[cfg(feature = "rayon")]
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        match &potentials.coulomb_meta {
+            None => 0.0,
+            Some(meta) => meta
+                .selection
+                .par_indices()
+                .map(|&[i, j]| {
+                    self.calculate_inner(meta, system, i, j)
+                }).sum()
+        }
     }
 
     fn name(&self) -> String {
@@ -49,68 +63,52 @@ impl Property for CoulombicEnergy {
     }
 }
 
-
 /// Potential energy due to pairwise potentials.
 #[derive(Clone, Copy, Debug)]
 pub struct PairEnergy;
+
+impl PairEnergy {
+    fn calculate_inner(&self, meta: &PairPotentialMeta, system: &System, i: usize, j: usize) -> Float {
+        let pos_i = system.positions[i];
+        let pos_j = system.positions[j];
+        let r = system.cell.distance(&pos_i, &pos_j);
+        if r < meta.cutoff {
+            meta.potential.energy(r)
+        } else {
+            0.0
+        }
+    }
+}
 
 impl Property for PairEnergy {
     type Res = Float;
 
     #[cfg(not(feature = "rayon"))]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let pair_potentials = &potentials.pair_potentials.potentials;
-        let selections = &potentials.pair_potentials.selections;
-        let cutoffs = &potentials.pair_potentials.cutoffs;
-
-        pair_potentials
+        potentials
+            .pair_metas
             .iter()
-            .zip(selections.iter())
-            .zip(cutoffs.iter())
-            .map(|((pot, select), &cut)| -> Float {
-                select
+            .map(|meta| -> Float {
+                meta.selection
                     .indices()
-                    .map(|[i, j]| {
-                        let pos_i = &system.positions[*i];
-                        let pos_j = &system.positions[*j];
-                        let r = system.cell.distance(&pos_i, &pos_j);
-                        if r < cut {
-                            pot.energy(r)
-                        } else {
-                            0.0 as Float
-                        }
-                    })
-                    .sum()
-            })
-            .sum()
+                    .map(|&[i, j]| -> Float {
+                        self.calculate_inner(meta, system, i, j)
+                    }).sum()
+            }).sum()
     }
 
     #[cfg(feature = "rayon")]
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let pair_potentials = &potentials.pair_potentials.potentials;
-        let selections = &potentials.pair_potentials.selections;
-        let cutoffs = &potentials.pair_potentials.cutoffs;
-
-        pair_potentials
+        potentials
+            .pair_metas
             .iter()
-            .zip(selections.iter())
-            .zip(cutoffs.iter())
-            .map(|((pot, select), &cut)| -> Float {
-                select
+            .map(|meta| -> Float {
+                meta.selection
                     .par_indices()
-                    .map(|[i, j]| {
-                        let pos_i = &system.positions[*i];
-                        let pos_j = &system.positions[*j];
-                        let r = system.cell.distance(&pos_i, &pos_j);
-                        if r < cut {
-                            pot.energy(r)
-                        } else {
-                            0.0 as Float
-                        }
-                    })
-                    .sum()
-            })
-            .sum()
+                    .map(|&[i, j]| -> Float {
+                        self.calculate_inner(meta, system, i, j)
+                    }).sum()
+            }).sum()
     }
 
     fn name(&self) -> String {

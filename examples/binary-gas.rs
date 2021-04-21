@@ -21,7 +21,7 @@ fn main() {
     let cutoff = 12.0;
     let thickness = 1.5;
     let potentials = PotentialsBuilder::new()
-        .pair_update_frequency(3)
+        .update_frequency(3)
         .pair(lj_argon_argon, (argon, argon), cutoff, thickness)
         .pair(lj_xenon_xenon, (xenon, xenon), cutoff, thickness)
         .pair(lj_argon_xenon, (argon, xenon), cutoff, thickness)

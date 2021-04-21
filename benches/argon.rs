@@ -7,22 +7,26 @@ static ITERATIONS: usize = 100;
 
 // benchmark an entire NVE loop for the argon gas system
 pub fn benchmark_nve(c: &mut Criterion) {
-    c.bench_function("argon-nve", |b| b.iter(|| {
-        let system = test_utils::argon_system();
-        let potentials = test_utils::argon_potentials();
-        let mut sim = test_utils::nve_simulation(system, potentials);
-        sim.run(ITERATIONS);
-    }));
+    c.bench_function("argon-nve", |b| {
+        b.iter(|| {
+            let system = test_utils::argon_system();
+            let potentials = test_utils::argon_potentials();
+            let mut sim = test_utils::nve_simulation(system, potentials);
+            sim.run(ITERATIONS);
+        })
+    });
 }
 
 // benchmark an entire NVT loop for the argon gas system
 pub fn benchmark_nvt(c: &mut Criterion) {
-    c.bench_function("argon-nvt", |b| b.iter(|| {
-        let system = test_utils::argon_system();
-        let potentials = test_utils::argon_potentials();
-        let mut sim = test_utils::nvt_simulation(system, potentials);
-        sim.run(ITERATIONS);
-    }));
+    c.bench_function("argon-nvt", |b| {
+        b.iter(|| {
+            let system = test_utils::argon_system();
+            let potentials = test_utils::argon_potentials();
+            let mut sim = test_utils::nvt_simulation(system, potentials);
+            sim.run(ITERATIONS);
+        })
+    });
 }
 
 // benchmark expensive property calculations for the argon gas system

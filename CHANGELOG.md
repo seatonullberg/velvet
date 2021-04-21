@@ -9,9 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Optional `f64` storage type.
 * Neighbor list optimization.
-* `Particle` struct for custom atom types.
-* Support for grouped outputs.
+* Custom `ParticleType`s.
+* Grouped outputs for raw and HDF5 formatted data.
+* Generic `Selection`s of atoms.
+* `CoulombPotential` trait with a `StandardCoulombic` implementation.
+* `Buckingham` pair potential.
+* MgO example.
+* Progress bar.
+
+### Changed
+
+* Improved flexibility of the example visualization script with support for command line arguments.
+
+### Removed
+
+* `serde` serialization and deserialization.
 
 ## [0.4.1] - 2021-02-12
 
