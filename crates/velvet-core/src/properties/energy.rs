@@ -141,7 +141,6 @@ pub struct KineticEnergy;
 impl IntrinsicProperty for KineticEnergy {
     type Res = Float;
 
-    // NOTE: This function is faster without rayon.
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic_energy: Float = system
             .particle_type_map

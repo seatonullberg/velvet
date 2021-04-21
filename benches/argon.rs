@@ -47,6 +47,14 @@ pub fn benchmark_properties(c: &mut Criterion) {
         b.iter(|| PotentialEnergy.calculate(&system, &potentials))
     });
 
+    group.bench_function("kinetic-energy", |b| {
+        b.iter(|| KineticEnergy.calculate(&system, &potentials))
+    });
+
+    group.bench_function("temperature", |b| {
+        b.iter(|| Temperature.calculate(&system, &potentials))
+    });
+
     group.finish();
 }
 
