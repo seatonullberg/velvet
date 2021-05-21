@@ -9,6 +9,7 @@ edition = "2018"
 
 [dependencies]
 indicatif = "0.15"
+libm = "0.2"
 nalgebra = "0.26"
 rand = "0.7"
 rand_distr = "0.3"

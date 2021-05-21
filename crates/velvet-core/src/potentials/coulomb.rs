@@ -1,8 +1,15 @@
 //! Potentials which describe Coulombic electrostatic interactions.
 
+#[cfg(feature = "f64")]
+use libm::erfc as erfc;
+
+#[cfg(not(feature = "f64"))]
+use libm::erfcf as erfc;
+
 use crate::internal::consts::COULOMB;
 use crate::internal::Float;
-use crate::potentials::types::StandardCoulombic;
+use crate::internal::consts::FRAC_2_SQRT_PI;
+use crate::potentials::types::{DampedShiftedForce, StandardCoulombic};
 use crate::potentials::Potential;
 use crate::selection::{setup_pairs_with_charge, update_pairs_by_cutoff_radius, Selection};
 use crate::system::System;
@@ -13,6 +20,36 @@ pub trait CoulombPotential: Potential {
     fn energy(&self, qi: Float, qj: Float, r: Float) -> Float;
     /// Returns the magnitude of the force acting on an atom separated from another by a distance `r` with charges `qi` and `qj`.
     fn force(&self, qi: Float, qj: Float, r: Float) -> Float;
+}
+
+impl CoulombPotential for DampedShiftedForce {
+    fn energy(&self, qi: Float, qj: Float, r: Float) -> Float {
+        let factor = FRAC_2_SQRT_PI * self.alpha;
+        let alpha2 = self.alpha.powi(2);
+        let cutoff2 = self.cutoff.powi(2);
+
+        let term_a = erfc(self.alpha * r) / r;
+        let term_b = erfc(self.alpha * self.cutoff) / self.cutoff;
+        let term_c = erfc(self.alpha * self.cutoff) / cutoff2;
+        let term_d = factor * (Float::exp(-alpha2 * cutoff2) / self.cutoff);
+        let term_e = r - self.cutoff;
+
+        qi * qj * (term_a - term_b + (term_c + term_d) * term_e)
+    }
+
+    fn force(&self, qi: Float, qj: Float, r: Float) -> Float {
+        let factor = FRAC_2_SQRT_PI * self.alpha;
+        let r2 = r.powi(2);
+        let alpha2 = self.alpha.powi(2);
+        let cutoff2 = self.cutoff.powi(2);
+
+        let term_a = erfc(self.alpha * r) / r2;
+        let term_b = factor * Float::exp(-alpha2 * r2) / r;
+        let term_c = erfc(self.alpha * self.cutoff) / cutoff2;
+        let term_d = factor * Float::exp(-alpha2 * cutoff2) / self.cutoff;
+
+        qi * qj * ((term_a + term_b) - (term_c + term_d))
+    }
 }
 
 impl CoulombPotential for StandardCoulombic {

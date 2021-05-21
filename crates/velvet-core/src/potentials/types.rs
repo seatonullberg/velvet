@@ -23,6 +23,26 @@ impl Buckingham {
 
 impl Potential for Buckingham {}
 
+/// [Damped Shifted Force](https://lammps.sandia.gov/doc/pair_coul.html#description) potential.
+#[derive(Clone, Copy, Debug)]
+pub struct DampedShiftedForce {
+    /// Damping parameter.
+    pub alpha: Float,
+    /// Cutoff radius
+    pub cutoff: Float,
+}
+
+impl DampedShiftedForce {
+    /// Returns a new [`DampedShiftedForce`] potential.
+    pub fn new(alpha: Float, cutoff: Float) -> DampedShiftedForce {
+        DampedShiftedForce {alpha, cutoff}
+    }
+}
+
+impl Potential for DampedShiftedForce {}
+
+
+
 /// [Harmonic](https://lammps.sandia.gov/doc/bond_harmonic.html#description) oscillator potential.
 #[derive(Clone, Copy, Debug)]
 pub struct Harmonic {
