@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * `serde` serialization and deserialization.
 
+## [0.4.2] - 2021-02-12
+
+### Added
+
+* Optional support for multithreading with the `rayon` feature.
+
 ## [0.4.1] - 2021-02-12
 
 ### Changed
@@ -34,10 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Make HDF5 an optional dependency with the `hdf5-output` feature.
 
 ## [0.4.0] - 2021-02-10
-
-### Added
-
-* Optional support for multithreading with the `rayon` feature.
 
 ### Changed
 
