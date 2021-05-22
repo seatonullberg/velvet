@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Optional `f64` storage type.
 * Neighbor list optimization.
-* Custom `ParticleType`s.
+* Custom chemical `Species`.
 * Grouped outputs for raw and HDF5 formatted data.
 * Generic `Selection`s of atoms.
 * `CoulombPotential` trait with a `StandardCoulombic` implementation.
