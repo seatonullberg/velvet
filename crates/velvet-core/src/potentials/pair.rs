@@ -3,8 +3,8 @@
 use crate::internal::Float;
 use crate::potentials::types::{Buckingham, Harmonic, LennardJones, Mie, Morse};
 use crate::potentials::Potential;
-use crate::selection::{setup_pairs_by_particle_type, update_pairs_by_cutoff_radius, Selection};
-use crate::system::particle::ParticleType;
+use crate::selection::{setup_pairs_by_species, update_pairs_by_cutoff_radius, Selection};
+use crate::system::species::Species;
 use crate::system::System;
 
 /// Shared behavior for pair potentials.
@@ -93,15 +93,15 @@ impl PairPotential for Morse {
     }
 }
 
-type PairSetupFn = fn(&System, (ParticleType, ParticleType)) -> Vec<[usize; 2]>;
+type PairSetupFn = fn(&System, (Species, Species)) -> Vec<[usize; 2]>;
 
 type PairUpdateFn = fn(&System, &[[usize; 2]], Float) -> Vec<[usize; 2]>;
 
-type PairSelection = Selection<PairSetupFn, (ParticleType, ParticleType), PairUpdateFn, Float, 2>;
+type PairSelection = Selection<PairSetupFn, (Species, Species), PairUpdateFn, Float, 2>;
 
 pub(crate) struct PairPotentialMeta {
     pub potential: Box<dyn PairPotential>,
-    pub particle_types: (ParticleType, ParticleType),
+    pub species: (Species, Species),
     pub cutoff: Float,
     pub thickness: Float,
     pub selection: PairSelection,
@@ -110,7 +110,7 @@ pub(crate) struct PairPotentialMeta {
 impl PairPotentialMeta {
     pub fn new<T>(
         potential: T,
-        particle_types: (ParticleType, ParticleType),
+        species: (Species, Species),
         cutoff: Float,
         thickness: Float,
     ) -> PairPotentialMeta
@@ -118,12 +118,12 @@ impl PairPotentialMeta {
         T: PairPotential + 'static,
     {
         let selection = Selection::new(
-            setup_pairs_by_particle_type as PairSetupFn,
+            setup_pairs_by_species as PairSetupFn,
             update_pairs_by_cutoff_radius as PairUpdateFn,
         );
         PairPotentialMeta {
             potential: Box::new(potential),
-            particle_types,
+            species,
             cutoff,
             thickness,
             selection,
@@ -131,7 +131,7 @@ impl PairPotentialMeta {
     }
 
     pub fn setup(&mut self, system: &System) {
-        self.selection.setup(system, self.particle_types)
+        self.selection.setup(system, self.species)
     }
 
     pub fn update(&mut self, system: &System) {

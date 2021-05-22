@@ -19,9 +19,9 @@ pub struct CoulombicForces;
 impl CoulombicForces {
     fn calculate_inner(&self, mut accumulator: Vec<Vector3<Float>>, meta: &CoulombPotentialMeta, system: &System, i: usize, j: usize) -> Vec<Vector3<Float>> {
         let pos_i = system.positions[i];
-        let qi = system.particle_types[system.particle_type_map[i]].charge();
+        let qi = system.species[i].charge();
         let pos_j = system.positions[j];
-        let qj = system.particle_types[system.particle_type_map[j]].charge();
+        let qj = system.species[j].charge();
         let r = system.cell.distance(&pos_i, &pos_j);
         if r < meta.cutoff {
             let dir = system.cell.direction(&pos_i, &pos_j);

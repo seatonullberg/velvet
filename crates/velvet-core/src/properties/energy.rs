@@ -17,9 +17,9 @@ pub struct CoulombicEnergy;
 impl CoulombicEnergy {
     fn calculate_inner(&self, meta: &CoulombPotentialMeta, system: &System, i: usize, j: usize) -> Float {
         let pos_i = system.positions[i];
-        let qi = system.particle_types[system.particle_type_map[i]].charge();
+        let qi = system.species[i].charge();
         let pos_j = system.positions[j];
-        let qj = system.particle_types[system.particle_type_map[j]].charge();
+        let qj = system.species[j].charge();
         let r = system.cell.distance(&pos_i, &pos_j);
         if r < meta.cutoff {
             meta.potential.energy(qi, qj, r)
@@ -143,12 +143,11 @@ impl IntrinsicProperty for KineticEnergy {
 
     fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
         let kinetic_energy: Float = system
-            .particle_type_map
+            .species
             .iter()
             .zip(system.velocities.iter())
-            .map(|(idx, vel)| {
-                let pt = system.particle_types[*idx];
-                0.5 * pt.mass() * vel.norm_squared()
+            .map(|(species, vel)| {
+                0.5 * species.mass() * vel.norm_squared()
             })
             .sum();
         kinetic_energy

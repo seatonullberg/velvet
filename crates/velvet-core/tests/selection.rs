@@ -1,23 +1,23 @@
 use velvet_core::selection::{
-    setup_pairs_by_particle_type, setup_pairs_with_charge, update_pairs_by_cutoff_radius, Selection,
+    setup_pairs_by_species, setup_pairs_with_charge, update_pairs_by_cutoff_radius, Selection,
 };
 use velvet_core::system::elements::Element;
-use velvet_core::system::particle::ParticleType;
+use velvet_core::system::species::Species;
 use velvet_test_utils as test_utils;
 
 #[test]
-fn setup_pairs_by_particle_type_update_pairs_by_cutoff_radius() {
+fn setup_pairs_by_species_update_pairs_by_cutoff_radius() {
     let system = test_utils::binary_gas_system();
-    let argon = ParticleType::from_element(Element::Ar);
-    let xenon = ParticleType::from_element(Element::Xe);
-    let particle_types = (argon, xenon);
+    let argon = Species::from_element(Element::Ar);
+    let xenon = Species::from_element(Element::Xe);
+    let species = (argon, xenon);
     let cutoff = 10.0;
-    let mut selection = Selection::new(setup_pairs_by_particle_type, update_pairs_by_cutoff_radius);
-    selection.setup(&system, particle_types);
+    let mut selection = Selection::new(setup_pairs_by_species, update_pairs_by_cutoff_radius);
+    selection.setup(&system, species);
     selection.update(&system, cutoff);
     for [i, j] in selection.indices() {
-        assert_eq!(system.particle_types[system.particle_type_map[*i]], argon);
-        assert_eq!(system.particle_types[system.particle_type_map[*j]], xenon);
+        assert_eq!(system.species[*i], argon);
+        assert_eq!(system.species[*j], xenon);
     }
 }
 

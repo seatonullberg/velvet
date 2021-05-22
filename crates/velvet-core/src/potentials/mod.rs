@@ -7,7 +7,7 @@ pub mod types;
 use crate::internal::Float;
 use crate::potentials::coulomb::{CoulombPotential, CoulombPotentialMeta};
 use crate::potentials::pair::{PairPotential, PairPotentialMeta};
-use crate::system::particle::ParticleType;
+use crate::system::species::Species;
 use crate::system::System;
 
 /// Base trait for all potentials.
@@ -75,7 +75,7 @@ impl PotentialsBuilder {
     pub fn pair<T>(
         mut self,
         potential: T,
-        particle_types: (ParticleType, ParticleType),
+        species: (Species, Species),
         cutoff: Float,
         thickness: Float,
     ) -> PotentialsBuilder
@@ -84,7 +84,7 @@ impl PotentialsBuilder {
     {
         self.pair_metas.push(PairPotentialMeta::new(
             potential,
-            particle_types,
+            species,
             cutoff,
             thickness,
         ));

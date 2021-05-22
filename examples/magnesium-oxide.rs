@@ -10,9 +10,9 @@ fn main() {
     let boltz = Boltzmann::new(300.0);
     boltz.apply(&mut system);
 
-    // Initialize Buckingham style pair potentials between each pair of particle types.
-    let magnesium = ParticleType::from_element(Element::Mg);
-    let oxygen = ParticleType::from_element(Element::O);
+    // Initialize Buckingham style pair potentials between each pair of chemical species.
+    let magnesium = Species::from_element(Element::Mg);
+    let oxygen = Species::from_element(Element::O);
     let buck_mg_o = Buckingham::new(18946.9176, 0.32, 0.0);
     let buck_o_o = Buckingham::new(524960.604, 0.149, 642.94068);
 

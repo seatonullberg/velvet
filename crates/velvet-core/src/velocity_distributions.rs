@@ -41,11 +41,10 @@ impl Boltzmann {
 impl VelocityDistribution for Boltzmann {
     fn apply(&self, system: &mut System) {
         system.velocities = system
-            .particle_type_map
+            .species
             .iter()
-            .map(|idx| {
-                let pt = system.particle_types[*idx];
-                let inv_mass = 1.0 / pt.mass();
+            .map(|species| {
+                let inv_mass = 1.0 / species.mass();
                 let x = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
                 let y = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
                 let z = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());

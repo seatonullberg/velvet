@@ -2,13 +2,13 @@
 
 pub mod cell;
 pub mod elements;
-pub mod particle;
+pub mod species;
 
 use nalgebra::Vector3;
 
 use crate::internal::Float;
 use crate::system::cell::Cell;
-use crate::system::particle::ParticleType;
+use crate::system::species::Species;
 
 /// Collection of atomic properties and bonding information.
 #[derive(Clone, Debug)]
@@ -17,10 +17,8 @@ pub struct System {
     pub size: usize,
     /// Simulation cell with periodic boundary conditions.
     pub cell: Cell,
-    /// Each particle type in the system.
-    pub particle_types: Vec<ParticleType>,
-    /// Mapping of each atom in the system to its index in the vec of particle types.
-    pub particle_type_map: Vec<usize>,
+    /// Chemical species of each atom in the system.
+    pub species: Vec<Species>,
     /// Position of each atom in the system.
     pub positions: Vec<Vector3<Float>>,
     /// Velocity of each atom in the system.

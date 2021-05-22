@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-use std::ops::Not;
 use std::str::FromStr;
 
 use nalgebra::{Matrix3, Vector3};
@@ -60,37 +58,14 @@ impl StructureFormat for Poscar {
         );
         let cell = Cell::from_matrix(matrix);
 
-        let particle_types: Vec<ParticleType> = match poscar.group_symbols() {
+        let species: Vec<Species> = match poscar.site_symbols() {
             Some(symbols) => symbols.fold(Vec::new(), |mut accumulator, symbol| {
                 let element = Element::from_str(symbol).unwrap();
-                let pt = ParticleType::from_element(element);
-                accumulator.push(pt);
+                let sp = Species::from_element(element);
+                accumulator.push(sp);
                 accumulator
             }),
-            None => panic!("Missing particle types."),
-        };
-
-        let particle_type_map: Vec<usize> = match poscar.site_symbols() {
-            Some(symbols) => {
-                let mut id = 0;
-                let mut scanned_symbols = HashSet::new();
-                symbols
-                    .map(|symbol| {
-                        // TODO: refactor this mess
-                        if scanned_symbols.is_empty() {
-                            scanned_symbols.insert(symbol);
-                            id
-                        } else {
-                            if scanned_symbols.contains(symbol).not() {
-                                scanned_symbols.insert(symbol);
-                                id += 1;
-                            }
-                            id
-                        }
-                    })
-                    .collect()
-            }
-            None => panic!("Missing particle type map."),
+            None => panic!("Missing chemical species."),
         };
 
         // Set system positions.
@@ -111,8 +86,7 @@ impl StructureFormat for Poscar {
         System {
             size,
             cell,
-            particle_types,
-            particle_type_map,
+            species,
             positions,
             velocities,
         }

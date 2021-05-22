@@ -49,7 +49,7 @@ pub mod prelude {
     pub use super::simulation::*;
     pub use super::system::cell::*;
     pub use super::system::elements::*;
-    pub use super::system::particle::*;
+    pub use super::system::species::*;
     pub use super::system::*;
     pub use super::thermostats::*;
     pub use super::velocity_distributions::*;

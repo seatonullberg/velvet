@@ -6,7 +6,7 @@ use rayon::prelude::*;
 use std::marker::PhantomData;
 
 use crate::internal::Float;
-use crate::system::particle::ParticleType;
+use crate::system::species::Species;
 use crate::system::System;
 
 /// Generic representation of a query of the system's indices.
@@ -60,18 +60,18 @@ where
 
 // This function should not be used in the public API but must be exported for integration testing purposes.
 #[doc(hidden)]
-pub fn setup_pairs_by_particle_type(
+pub fn setup_pairs_by_species(
     system: &System,
-    particle_types: (ParticleType, ParticleType),
+    species: (Species, Species),
 ) -> Vec<[usize; 2]> {
     let mut possible_indices: Vec<[usize; 2]> = Vec::with_capacity(system.size.pow(2));
     for i in 0..system.size {
-        let pt_i = system.particle_types[system.particle_type_map[i]];
+        let species_i = system.species[i];
         for j in (i + 1)..system.size {
-            let pt_j = system.particle_types[system.particle_type_map[j]];
-            if (pt_i, pt_j) == particle_types {
+            let species_j = system.species[j];
+            if (species_i, species_j) == species {
                 possible_indices.push([i, j]);
-            } else if (pt_j, pt_i) == particle_types {
+            } else if (species_j, species_i) == species {
                 possible_indices.push([j, i]);
             }
         }
@@ -85,10 +85,10 @@ pub fn setup_pairs_by_particle_type(
 pub fn setup_pairs_with_charge(system: &System, _: ()) -> Vec<[usize; 2]> {
     let mut possible_indices: Vec<[usize; 2]> = Vec::with_capacity(system.size.pow(2));
     for i in 0..system.size {
-        let pt_i = system.particle_types[system.particle_type_map[i]];
+        let species_i = system.species[i];
         for j in (i + 1)..system.size {
-            let pt_j = system.particle_types[system.particle_type_map[j]];
-            if pt_i.charge().abs() > Float::EPSILON || pt_j.charge().abs() > Float::EPSILON {
+            let species_j = system.species[j];
+            if species_i.charge().abs() > Float::EPSILON || species_j.charge().abs() > Float::EPSILON {
                 possible_indices.push([i, j]);
             }
         }
