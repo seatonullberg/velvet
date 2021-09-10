@@ -23,4 +23,6 @@ pub struct System {
     pub positions: Vec<Vector3<Float>>,
     /// Velocity of each atom in the system.
     pub velocities: Vec<Vector3<Float>>,
+    /// Acceleration of each atom in the system.
+    pub accelerations: Vec<Vector3<Float>>,
 }

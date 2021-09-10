@@ -9,7 +9,6 @@
 //! * `force` - Kcal/mole-angstrom
 //! * `temperature` - Kelvin
 
-#![warn(missing_docs)]
 #![warn(clippy::all)]
 
 #[macro_use]

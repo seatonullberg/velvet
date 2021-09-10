@@ -83,12 +83,15 @@ impl StructureFormat for Poscar {
             None => vec![Vector3::zeros(); positions.len()],
         };
 
+        let accelerations = vec![Vector3::zeros(); positions.len()];
+
         System {
             size,
             cell,
             species,
             positions,
             velocities,
+            accelerations,
         }
     }
 }

@@ -20,11 +20,12 @@ pub trait Integrator: Send + Sync {
 ///
 /// # References
 ///
-/// [1] Swope, William C., et al. "A computer simulation method for the calculation of equilibrium constants for the formation of physical clusters of molecules: Application to small water clusters." The Journal of chemical physics 76.1 (1982): 637-649.
+/// [1] Swope, William C., et al. "A computer simulation method for the calculation of equilibrium 
+/// constants for the formation of physical clusters of molecules: Application to small water clusters." 
+/// The Journal of chemical physics 76.1 (1982): 637-649.
 #[derive(Clone, Debug)]
 pub struct VelocityVerlet {
     timestep: Float,
-    accelerations: Vec<Vector3<Float>>,
 }
 
 impl VelocityVerlet {
@@ -36,15 +37,11 @@ impl VelocityVerlet {
     pub fn new(timestep: Float) -> VelocityVerlet {
         VelocityVerlet {
             timestep,
-            accelerations: Vec::new(),
         }
     }
 }
 
 impl Integrator for VelocityVerlet {
-    fn setup(&mut self, system: &System, _: &Potentials) {
-        self.accelerations = vec![Vector3::zeros(); system.size];
-    }
 
     fn integrate(&mut self, system: &mut System, potentials: &Potentials) {
         let dt = self.timestep;
@@ -53,7 +50,7 @@ impl Integrator for VelocityVerlet {
             .positions
             .iter_mut()
             .zip(system.velocities.iter())
-            .zip(self.accelerations.iter())
+            .zip(system.accelerations.iter())
             .for_each(|((pos, vel), acc)| {
                 *pos += (vel * dt) + (0.5 * acc * dt.powi(2));
             });
@@ -68,12 +65,12 @@ impl Integrator for VelocityVerlet {
         system
             .velocities
             .iter_mut()
-            .zip(self.accelerations.iter())
+            .zip(system.accelerations.iter())
             .zip(new_accelerations.iter())
             .for_each(|((vel, acc), new_acc)| {
                 *vel += 0.5 * dt * (acc + new_acc);
             });
 
-        self.accelerations = new_accelerations;
+        system.accelerations = new_accelerations;
     }
 }
