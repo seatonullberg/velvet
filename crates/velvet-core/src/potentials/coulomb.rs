@@ -1,4 +1,4 @@
-//! Potentials which describe Coulombic electrostatic interactions.
+//! Implementations of potentials which describe electrostatic interactions.
 
 #[cfg(feature = "f64")]
 use libm::erfc as erfc;
@@ -9,7 +9,7 @@ use libm::erfcf as erfc;
 use crate::internal::consts::COULOMB;
 use crate::internal::Float;
 use crate::internal::consts::FRAC_2_SQRT_PI;
-use crate::potentials::types::{DampedShiftedForce, StandardCoulombic};
+use crate::potentials::{DampedShiftedForce, StandardCoulombic};
 use crate::potentials::Potential;
 use crate::selection::{setup_pairs_with_charge, update_pairs_by_cutoff_radius, Selection};
 use crate::system::System;

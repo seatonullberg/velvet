@@ -1,7 +1,7 @@
-//! Potentials which describe pairwise nonbonded interactions..
+//! Implementations of potentials which describe pairwise nonbonded interactions.
 
 use crate::internal::Float;
-use crate::potentials::types::{Buckingham, Harmonic, LennardJones, Mie, Morse};
+use crate::potentials::{Buckingham, Harmonic, LennardJones, Mie, Morse};
 use crate::potentials::Potential;
 use crate::selection::{setup_pairs_by_species, update_pairs_by_cutoff_radius, Selection};
 use crate::system::species::Species;

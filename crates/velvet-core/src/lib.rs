@@ -37,7 +37,6 @@ pub mod prelude {
     pub use super::outputs::*;
     pub use super::potentials::coulomb::*;
     pub use super::potentials::pair::*;
-    pub use super::potentials::types::*;
     pub use super::potentials::*;
     pub use super::propagators::*;
     pub use super::properties::energy::*;
