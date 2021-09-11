@@ -38,37 +38,39 @@ impl<'a> Simulation {
 
     /// Runs the full iteration loop of the simulation.
     pub fn run(&mut self, steps: usize) {
-        // setup global threadpool
-        rayon::ThreadPoolBuilder::new()
+        // Setup the global threadpool.
+        // TODO: Actually handle the possible error. Causes issues with unit testing if I unwrap().
+        let _ = rayon::ThreadPoolBuilder::new()
             .num_threads(self.config.n_threads)
             .build_global();
 
-        // setup potentials
+        // Setup potentials.
         self.potentials.setup(&self.system);
 
-        // setup propagation
+        // Setup propagation method.
         self.propagator.setup(&mut self.system, &self.potentials);
 
-        // setup progress bar
+        // Setup progress bar.
         let pb = ProgressBar::new(steps as u64);
         pb.set_style(
             ProgressStyle::default_bar()
                 .template("[{eta_precise}] {bar:40.green} {pos:>7} /{len:>7} steps"),
         );
 
+        // Hide the progress bar if the `quiet` feature is enabled.
         #[cfg(feature = "quiet")]
         pb.set_draw_target(ProgressDrawTarget::hidden());
 
-        // start iteration loop
+        // Start iteration loop.
         for i in 0..steps {
-            // do one propagation step
+            // Do one propagation step.
             self.propagator
                 .propagate(&mut self.system, &self.potentials);
 
-            // update the potentials
+            // Update the potentials.
             self.potentials.update(&self.system, i);
 
-            // raw outputs
+            // Generate raw outputs at appropriate intervals.
             for group in self.config.raw_output_groups() {
                 let should_output = i % group.interval == 0 || i == steps - 1;
                 let destination = group.destination.as_mut();
@@ -79,7 +81,7 @@ impl<'a> Simulation {
                 }
             }
 
-            // HDF5 outputs
+            // Generate HDF5 formatted outputs of the `hdf5-output` feature is enabled.
             #[cfg(feature = "hdf5-output")]
             {
                 for group in self.config.hdf5_output_groups() {
@@ -92,8 +94,12 @@ impl<'a> Simulation {
                     }
                 }
             }
+
+            // Update the progress bar at the end of each step.
             pb.inc(1);
         }
+
+        // Finish the progress bar once iteration has terminated.
         pb.finish();
     }
 

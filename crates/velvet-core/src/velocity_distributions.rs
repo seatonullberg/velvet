@@ -19,7 +19,8 @@ pub trait VelocityDistribution: Send + Sync {
 ///
 /// # References
 ///
-/// [1] Hernandez, Hugo. "Standard Maxwell-Boltzmann distribution: definition and properties." ForsChem Research Reports 2 (2017): 2017-2.
+/// [1] Hernandez, Hugo. "Standard Maxwell-Boltzmann distribution: definition and properties."
+/// ForsChem Research Reports 2 (2017): 2017-2.
 #[derive(Clone, Copy, Debug)]
 pub struct Boltzmann {
     target: Float,

@@ -77,5 +77,10 @@ pub fn benchmark_xenon(c: &mut Criterion) {
     });
 }
 
-criterion_group!(properties, benchmark_argon, benchmark_binary_gas, benchmark_xenon);
+criterion_group!(
+    properties,
+    benchmark_argon,
+    benchmark_binary_gas,
+    benchmark_xenon
+);
 criterion_main!(properties);

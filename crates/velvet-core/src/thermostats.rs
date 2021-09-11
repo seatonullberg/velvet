@@ -64,7 +64,8 @@ impl Thermostat for Berendsen {
 ///
 /// # References
 ///
-/// [1] Evans, Denis J., and Brad Lee Holian. "The nose–hoover thermostat." The Journal of chemical physics 83.8 (1985): 4069-4074.
+/// [1] Evans, Denis J., and Brad Lee Holian. "The nose–hoover thermostat."
+/// The Journal of chemical physics 83.8 (1985): 4069-4074.
 ///
 /// [2] Rühle, Victor. "Berendsen and nose-hoover thermostats." Am. J. Phys (2007).
 #[derive(Clone, Debug)]

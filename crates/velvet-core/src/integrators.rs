@@ -12,7 +12,7 @@ use crate::system::System;
 pub trait Integrator: Send + Sync {
     /// Prepares the integrator to run.
     fn setup(&mut self, _: &System, _: &Potentials) {}
-    /// Integrates one time step.
+    /// Integrates one timestep.
     fn integrate(&mut self, system: &mut System, potentials: &Potentials);
 }
 

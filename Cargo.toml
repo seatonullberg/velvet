@@ -65,3 +65,8 @@ features = [
 name = "properties-benchmarks"
 path = "benches/properties.rs"
 harness = false
+
+[[bench]]
+name = "selection-benchmarks"
+path = "benches/selection.rs"
+harness = false
