@@ -62,6 +62,6 @@ features = [
 ]
 
 [[bench]]
-name = "argon-benchmarks"
-path = "benches/argon.rs"
+name = "properties-benchmarks"
+path = "benches/properties.rs"
 harness = false
