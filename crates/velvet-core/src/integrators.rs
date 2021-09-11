@@ -20,8 +20,8 @@ pub trait Integrator: Send + Sync {
 ///
 /// # References
 ///
-/// [1] Swope, William C., et al. "A computer simulation method for the calculation of equilibrium 
-/// constants for the formation of physical clusters of molecules: Application to small water clusters." 
+/// [1] Swope, William C., et al. "A computer simulation method for the calculation of equilibrium
+/// constants for the formation of physical clusters of molecules: Application to small water clusters."
 /// The Journal of chemical physics 76.1 (1982): 637-649.
 #[derive(Clone, Debug)]
 pub struct VelocityVerlet {
@@ -35,14 +35,11 @@ impl VelocityVerlet {
     ///
     /// * `timestep` - Timestep duration.
     pub fn new(timestep: Float) -> VelocityVerlet {
-        VelocityVerlet {
-            timestep,
-        }
+        VelocityVerlet { timestep }
     }
 }
 
 impl Integrator for VelocityVerlet {
-
     fn integrate(&mut self, system: &mut System, potentials: &Potentials) {
         let dt = self.timestep;
 

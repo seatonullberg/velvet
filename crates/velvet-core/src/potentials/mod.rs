@@ -82,10 +82,7 @@ impl PotentialsBuilder {
         T: PairPotential + 'static,
     {
         self.pair_metas.push(PairPotentialMeta::new(
-            potential,
-            species,
-            cutoff,
-            thickness,
+            potential, species, cutoff, thickness,
         ));
         self
     }
@@ -136,13 +133,11 @@ pub struct DampedShiftedForce {
 impl DampedShiftedForce {
     /// Returns a new [`DampedShiftedForce`] potential.
     pub fn new(alpha: Float, cutoff: Float) -> DampedShiftedForce {
-        DampedShiftedForce {alpha, cutoff}
+        DampedShiftedForce { alpha, cutoff }
     }
 }
 
 impl Potential for DampedShiftedForce {}
-
-
 
 /// [Harmonic](https://lammps.sandia.gov/doc/bond_harmonic.html#description) oscillator potential.
 #[derive(Clone, Copy, Debug)]

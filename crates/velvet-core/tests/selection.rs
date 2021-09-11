@@ -15,7 +15,7 @@ fn setup_pairs_by_species_update_pairs_by_cutoff_radius() {
     let mut selection = Selection::new(setup_pairs_by_species, update_pairs_by_cutoff_radius);
     selection.setup(&system, species);
     selection.update(&system, cutoff);
-    for [i, j] in selection.indices() {
+    for [i, j] in selection.iter_indices() {
         assert_eq!(system.species[*i], argon);
         assert_eq!(system.species[*j], xenon);
     }
@@ -29,11 +29,11 @@ fn setup_pairs_with_charge_update_pairs_by_cutoff_radius() {
     let mut selection = Selection::new(setup_pairs_with_charge, update_pairs_by_cutoff_radius);
     selection.setup(&system, ());
     selection.update(&system, cutoff);
-    assert_eq!(selection.indices().count(), 0);
+    assert_eq!(selection.iter_indices().count(), 0);
 
     // system with charged particles
     let system = test_utils::magnesium_oxide_system();
     selection.setup(&system, ());
     selection.update(&system, cutoff);
-    assert_ne!(selection.indices().count(), 0);
+    assert_ne!(selection.iter_indices().count(), 0);
 }

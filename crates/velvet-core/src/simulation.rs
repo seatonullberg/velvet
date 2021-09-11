@@ -38,6 +38,11 @@ impl<'a> Simulation {
 
     /// Runs the full iteration loop of the simulation.
     pub fn run(&mut self, steps: usize) {
+        // setup global threadpool
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(self.config.n_threads)
+            .build_global();
+
         // setup potentials
         self.potentials.setup(&self.system);
 
@@ -48,7 +53,7 @@ impl<'a> Simulation {
         let pb = ProgressBar::new(steps as u64);
         pb.set_style(
             ProgressStyle::default_bar()
-                .template("[{eta_precise}] {bar:40.cyan/blue} {pos:>7} /{len:>7} steps"),
+                .template("[{eta_precise}] {bar:40.green} {pos:>7} /{len:>7} steps"),
         );
 
         #[cfg(feature = "quiet")]
