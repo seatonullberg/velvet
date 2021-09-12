@@ -12,4 +12,5 @@ pub mod consts {
 
     pub const BOLTZMANN: super::Float = 0.001985875;
     pub const COULOMB: super::Float = 332.0636;
+    pub const SQRT_PI: super::Float = 1.77245385091;
 }
