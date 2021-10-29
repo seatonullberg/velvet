@@ -1,0 +1,21 @@
+[package]
+name = "velvet-system"
+version = "0.1.0"
+authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+edition = "2021"
+repository = "https://github.com/seatonullberg/velvet"
+description = "Velvet's representation of an atomistic system"
+license = "MIT"
+
+[dependencies]
+nalgebra = "0.29"
+strum = "0.22"
+strum_macros = "0.22"
+velvet-internals = { path = "../velvet-internals", version = "0.1.0" }
+
+[dev-dependencies]
+approx = "0.5"
+
+[features]
+default = []
+f64 = ["velvet-internals/f64"]
