@@ -1,16 +1,16 @@
-use velvet_chemfiles::FromChemfiles;
+use velvet_chemfiles::FromChemfile;
 use velvet_system::System;
 
 pub fn argon_system() -> System {
-    System::from_chemfiles(resources_path("argon.xyz"), "XYZ")
+    System::from_chemfile(resources_path("argon.xyz"))
 }
 
 pub fn argon_xenon_system() -> System {
-    System::from_chemfiles(resources_path("argon-xenon.xyz"), "XYZ")
+    System::from_chemfile(resources_path("argon-xenon.xyz"))
 }
 
 pub fn zirconia_system() -> System {
-    System::from_chemfiles(resources_path("zirconia.cif"), "CIF")
+    System::from_chemfile(resources_path("zirconia.cif"))
 }
 
 // pub fn argon_potentials() -> Potentials {
