@@ -1,0 +1,12 @@
+[package]
+name = "velvet-internals"
+version = "0.1.0"
+authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+description = "Velvet's shared internals"
+license = "MIT"
+repository = "https://github.com/seatonullberg/velvet"
+edition = "2021"
+
+[features]
+default = []
+f64 = []
