@@ -6,9 +6,12 @@ edition = "2018"
 publish = false
 
 [dependencies]
-nalgebra = "0.26"
-velvet-core = { path = "../velvet-core" }
-velvet-external-data = { path = "../velvet-external-data" }
+nalgebra = "0.29"
+velvet-chemfiles = { path = "../velvet-chemfiles" }
+velvet-system = { path = "../velvet-system" }
 
 [features]
-f64 = ["velvet-core/f64", "velvet-external-data/f64"]
+f64 = [
+    "velvet-chemfiles/f64", 
+    "velvet-system/f64",
+]
