@@ -1,0 +1,22 @@
+[package]
+name = "velvet-chemfiles"
+version = "0.1.0"
+authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+description = "Velvet's interface to the chemfiles library"
+license = "MIT"
+repository = "https://github.com/seatonullberg/velvet"
+edition = "2021"
+
+[dependencies]
+chemfiles = "0.10"
+nalgebra = "0.29"
+velvet-internals = { path = "../velvet-internals", version = "0.1.0" }
+velvet-system = { path = "../velvet-system", version = "0.1.0" }
+
+[dev-dependencies]
+approx = "0.5"
+velvet-test-utils = { path = "../velvet-test-utils" }
+
+[features]
+default = []
+f64 = ["velvet-internals/f64"]
