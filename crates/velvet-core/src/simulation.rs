@@ -4,7 +4,6 @@
 use indicatif::ProgressDrawTarget;
 use indicatif::{ProgressBar, ProgressStyle};
 
-use crate::config::Configuration;
 use crate::potentials::Potentials;
 use crate::propagators::Propagator;
 use crate::system::System;
@@ -14,7 +13,6 @@ pub struct Simulation {
     system: System,
     potentials: Potentials,
     propagator: Box<dyn Propagator>,
-    config: Configuration,
 }
 
 impl<'a> Simulation {

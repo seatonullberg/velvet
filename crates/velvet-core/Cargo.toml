@@ -2,15 +2,15 @@
 name = "velvet-core"
 version = "0.4.2"
 authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
-description = "Core feature library for the Velvet simulation engine."
+description = "Velvet's core functionality"
 license = "MIT"
 repository = "https://github.com/seatonullberg/velvet"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 indicatif = "0.15"
 libm = "0.2"
-nalgebra = "0.26"
+nalgebra = "0.29"
 num_cpus = "1"
 rand = "0.7"
 rand_distr = "0.3"
@@ -18,12 +18,15 @@ rayon = "1.5"
 strum = "0.20"
 strum_macros = "0.20"
 uuid = { version = "0.8", features = ["v4"] }
+velvet-internals = { path = "../velvet-internals", version = "0.1.0" }
+velvet-system = { path = "../velvet-system", version = "0.1.0" }
 
 hdf5 = { version = "0.7", optional = true }
 hdf5-sys = { version = "0.7", optional = true }
 
 [dev-dependencies]
-approx = "0.4"
+approx = "0.5"
+velvet-chemfiles = { path = "../velvet-chemfiles" }
 velvet-test-utils = { path = "../velvet-test-utils" }
 
 [features]

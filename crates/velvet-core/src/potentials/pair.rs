@@ -1,27 +1,76 @@
-//! Implementations of potentials which describe pairwise nonbonded interactions.
+//! Implementations of potentials which describe nonbonded pairwise interactions.
 
-use crate::internal::Float;
-use crate::potentials::Potential;
-use crate::potentials::{Buckingham, Harmonic, LennardJones, Mie, Morse};
-use crate::selection::{setup_pairs_by_species, update_pairs_by_cutoff_radius, Selection};
-use crate::system::species::Species;
-use crate::system::System;
+use crate::neighbors::NeighborList;
+use crate::potentials::types::{Buckingham, Harmonic, LennardJones, Mie, Morse};
+use velvet_internals::float::Float;
+use velvet_system::species::Species;
+use velvet_system::System;
 
 /// Shared behavior for pair potentials.
-pub trait PairPotential: Potential {
+pub trait PairPotential {
     /// Returns the potential energy of an atom in a pair separated by a distance `r`.
     fn energy(&self, r: Float) -> Float;
     /// Returns the magnitude of the force acting on an atom separated from another by a distance `r`.
     fn force(&self, r: Float) -> Float;
 }
 
+/// Metadata describing a nonbonded pairwise interaction.
+pub struct PairMeta {
+    species: (Species, Species),
+    potential: Box<dyn PairPotential>,
+    neighbor_list: NeighborList,
+}
+
+impl PairMeta {
+    pub fn new<P>(species: (Species, Species), cutoff: Float, potential: P) -> Self
+    where
+        P: PairPotential + 'static,
+    {
+        let potential = Box::new(potential);
+        let neighbor_list = NeighborList::new(cutoff);
+        PairMeta {
+            species,
+            potential,
+            neighbor_list,
+        }
+    }
+
+    pub fn setup(&mut self, system: &System) {
+        self.neighbor_list.setup_with_species(&self.species, system)
+    }
+
+    pub fn update(&mut self, system: &System) {
+        self.neighbor_list.update(system)
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &(usize, usize)> {
+        self.neighbor_list.iter()
+    }
+}
+
+impl PairPotential for PairMeta {
+    fn energy(&self, r: Float) -> Float {
+        if r < self.neighbor_list.cutoff {
+            self.potential.energy(r)
+        } else {
+            0 as Float
+        }
+    }
+
+    fn force(&self, r: Float) -> Float {
+        if r < self.neighbor_list.cutoff {
+            self.potential.force(r)
+        } else {
+            0 as Float
+        }
+    }
+}
+
 impl PairPotential for Buckingham {
-    #[inline]
     fn energy(&self, r: Float) -> Float {
         self.a * Float::exp(-r / self.rho) - (self.c / r.powi(6))
     }
 
-    #[inline]
     fn force(&self, r: Float) -> Float {
         let term_a = (6.0 * self.c) / r.powi(7);
         let term_b = (self.a * Float::exp(-r / self.rho)) / self.rho;
@@ -30,26 +79,22 @@ impl PairPotential for Buckingham {
 }
 
 impl PairPotential for Harmonic {
-    #[inline]
     fn energy(&self, r: Float) -> Float {
         let dr = r - self.x0;
         self.k * dr * dr
     }
 
-    #[inline]
     fn force(&self, r: Float) -> Float {
         2.0 * self.k * (r - self.x0)
     }
 }
 
 impl PairPotential for LennardJones {
-    #[inline]
     fn energy(&self, r: Float) -> Float {
         let term = (self.sigma / r).powi(6);
         4.0 * self.epsilon * (term * term - term)
     }
 
-    #[inline]
     fn force(&self, r: Float) -> Float {
         let term_a = (24.0 * self.sigma.powi(6)) / r.powi(7);
         let term_b = (48.0 * self.sigma.powi(12)) / r.powi(13);
@@ -58,7 +103,6 @@ impl PairPotential for LennardJones {
 }
 
 impl PairPotential for Mie {
-    #[inline]
     fn energy(&self, r: Float) -> Float {
         let term_a = (self.sigma / r).powf(self.gamma_r);
         let term_b = (self.sigma / r).powf(self.gamma_a);
@@ -67,7 +111,6 @@ impl PairPotential for Mie {
         c * self.epsilon * (term_a - term_b)
     }
 
-    #[inline]
     fn force(&self, r: Float) -> Float {
         let c = (self.gamma_r / (self.gamma_r - self.gamma_a))
             * (self.gamma_r / self.gamma_a).powf(self.gamma_a / (self.gamma_r - self.gamma_a));
@@ -78,64 +121,16 @@ impl PairPotential for Mie {
 }
 
 impl PairPotential for Morse {
-    #[inline]
     fn energy(&self, r: Float) -> Float {
         let term_a = Float::exp(-2.0 * self.a * (r - self.r_e));
         let term_b = 2.0 * Float::exp(-self.a * (r - self.r_e));
         self.d_e * (term_a - term_b)
     }
 
-    #[inline]
     fn force(&self, r: Float) -> Float {
         let term_a = Float::exp(-self.a * (r - self.r_e));
         let term_b = Float::exp(-2.0 * self.a * (r - self.r_e));
         2.0 * self.a * self.d_e * (term_a - term_b)
-    }
-}
-
-type PairSetupFn = fn(&System, (Species, Species)) -> Vec<[usize; 2]>;
-
-type PairUpdateFn = fn(&System, &[[usize; 2]], Float) -> Vec<[usize; 2]>;
-
-type PairSelection = Selection<PairSetupFn, (Species, Species), PairUpdateFn, Float, 2>;
-
-pub(crate) struct PairPotentialMeta {
-    pub potential: Box<dyn PairPotential>,
-    pub species: (Species, Species),
-    pub cutoff: Float,
-    pub thickness: Float,
-    pub selection: PairSelection,
-}
-
-impl PairPotentialMeta {
-    pub fn new<T>(
-        potential: T,
-        species: (Species, Species),
-        cutoff: Float,
-        thickness: Float,
-    ) -> PairPotentialMeta
-    where
-        T: PairPotential + 'static,
-    {
-        let selection = Selection::new(
-            setup_pairs_by_species as PairSetupFn,
-            update_pairs_by_cutoff_radius as PairUpdateFn,
-        );
-        PairPotentialMeta {
-            potential: Box::new(potential),
-            species,
-            cutoff,
-            thickness,
-            selection,
-        }
-    }
-
-    pub fn setup(&mut self, system: &System) {
-        self.selection.setup(system, self.species)
-    }
-
-    pub fn update(&mut self, system: &System) {
-        self.selection.update(system, self.cutoff + self.thickness)
     }
 }
 

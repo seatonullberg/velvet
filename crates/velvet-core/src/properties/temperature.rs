@@ -1,27 +1,25 @@
-//! Instantaneous temperature of the system.
-
-use crate::internal::consts::BOLTZMANN;
-use crate::internal::Float;
+use crate::potentials::Potentials;
 use crate::properties::energy::KineticEnergy;
-use crate::properties::IntrinsicProperty;
-use crate::system::System;
+use crate::properties::Property;
+use velvet_internals::consts::BOLTZMANN;
+use velvet_internals::float::Float;
+use velvet_system::System;
 
 /// Instantaneous temperature of the system.
 #[derive(Clone, Copy, Debug)]
 pub struct Temperature;
 
-impl IntrinsicProperty for Temperature {
+impl Property for Temperature {
     type Res = Float;
 
-    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
-        let kinetic = KineticEnergy.calculate_intrinsic(system);
-        // NOTE: Calculating DOF this way is a potentially nasty bug if future
-        // support is added for degrees of freedom beyond just 3D particles.
-        let dof = (system.size * 3) as Float;
-        2.0 * kinetic / (dof * BOLTZMANN)
+    fn name(&self) -> String {
+        "Temperature".to_string()
     }
 
-    fn name(&self) -> String {
-        "temperature".to_string()
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        let kinetic = KineticEnergy.calculate(system, potentials);
+        // NOTE: This value DOF is only valid for atomic resolution simulations.
+        let dof = (system.n_atoms * 3) as Float;
+        2.0 * kinetic / (dof * BOLTZMANN)
     }
 }

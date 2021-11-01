@@ -1,118 +1,101 @@
-//! Types of energy that can be evaluated.
-
-use nalgebra::Vector3;
-use rayon::prelude::*;
-
-use crate::internal::Float;
-use crate::potentials::pair::PairPotentialMeta;
+use crate::potentials::pair::PairPotential;
 use crate::potentials::Potentials;
-use crate::properties::{IntrinsicProperty, Property};
-use crate::system::System;
+use crate::properties::Property;
+use nalgebra::Vector3;
+use velvet_internals::float::Float;
+use velvet_system::System;
 
-/// Potential energy due to pairwise potentials.
+/// Potential energy due to nonbonded pairwise interactions.
 #[derive(Clone, Copy, Debug)]
 pub struct PairEnergy;
-
-impl PairEnergy {
-    fn calculate_inner(
-        &self,
-        meta: &PairPotentialMeta,
-        system: &System,
-        indices: &[[usize; 2]],
-    ) -> Float {
-        // Initialize loop variables.
-        let mut total: Float = 0 as Float;
-        let mut pos_i: Vector3<Float> = Vector3::zeros();
-        let mut pos_j: Vector3<Float> = Vector3::zeros();
-        let mut r: Float = 0 as Float;
-        // Iterate over the pairs of indices and sum the energy contribution of each one.
-        indices.iter().for_each(|&[i, j]| {
-            pos_i = system.positions[i];
-            pos_j = system.positions[j];
-            r = system.cell.distance(&pos_i, &pos_j);
-            if r < meta.cutoff {
-                total += meta.potential.energy(r)
-            }
-        });
-        // Return the total energy of the given pairs.
-        total
-    }
-}
 
 impl Property for PairEnergy {
     type Res = Float;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        potentials
-            .pair_metas
-            .iter()
-            .map(|meta| -> Float {
-                meta.selection
-                    .par_iter_chunks()
-                    .map(|chunk| -> Float { self.calculate_inner(meta, system, chunk) })
-                    .sum()
-            })
-            .sum()
+    fn name(&self) -> String {
+        "PairEnergy".to_string()
     }
 
-    fn name(&self) -> String {
-        "pair_energy".to_string()
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        // initialize loop variables
+        let mut pos_i: Vector3<Float> = Vector3::zeros();
+        let mut pos_j: Vector3<Float> = Vector3::zeros();
+        let mut r: Float = 0 as Float;
+
+        // evaluate all pair interactions
+        let pair_metas = &potentials.pair_metas;
+        match pair_metas {
+            Some(pair_metas) => pair_metas
+                .iter()
+                .map(|meta| -> Float {
+                    meta.iter()
+                        .map(|(i, j)| -> Float {
+                            pos_i = system.positions[*i];
+                            pos_j = system.positions[*j];
+                            r = system.cell.distance(&pos_i, &pos_j);
+                            meta.energy(r)
+                        })
+                        .sum()
+                })
+                .sum(),
+            None => 0 as Float,
+        }
     }
 }
 
-/// Potential energy of the whole system.
+/// Total potential energy.
 #[derive(Clone, Copy, Debug)]
 pub struct PotentialEnergy;
 
 impl Property for PotentialEnergy {
     type Res = Float;
 
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
-        let pair_energy = PairEnergy.calculate(system, potentials);
-        pair_energy
+    fn name(&self) -> String {
+        "PotentialEnergy".to_string()
     }
 
-    fn name(&self) -> String {
-        "potential_energy".to_string()
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+        let pair_energy = PairEnergy.calculate(system, potentials);
+        // TODO: include other potential energy contributions
+        pair_energy
     }
 }
 
-/// Kinetic energy of the whole system
+/// Total kinetic energy.
 #[derive(Clone, Copy, Debug)]
 pub struct KineticEnergy;
 
-impl IntrinsicProperty for KineticEnergy {
+impl Property for KineticEnergy {
     type Res = Float;
 
-    fn calculate_intrinsic(&self, system: &System) -> <Self as IntrinsicProperty>::Res {
-        let kinetic_energy: Float = system
+    fn name(&self) -> String {
+        "KineticEnergy".to_string()
+    }
+
+    fn calculate(&self, system: &System, _: &Potentials) -> Self::Res {
+        system
             .species
             .iter()
             .zip(system.velocities.iter())
-            .map(|(species, vel)| 0.5 * species.mass() * vel.norm_squared())
-            .sum();
-        kinetic_energy
-    }
-
-    fn name(&self) -> String {
-        "kinetic_energy".to_string()
+            .map(|(species, velocity)| 0.5 * species.mass() * velocity.norm_squared())
+            .sum()
     }
 }
 
-/// Sum of potential and kinetic energy.
+/// Sum of potential and kinetic energy
 #[derive(Clone, Copy, Debug)]
 pub struct TotalEnergy;
 
 impl Property for TotalEnergy {
     type Res = Float;
 
+    fn name(&self) -> String {
+        "TotalEnergy".to_string()
+    }
+
     fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
         let kinetic = KineticEnergy.calculate(system, potentials);
         let potential = PotentialEnergy.calculate(system, potentials);
         kinetic + potential
-    }
-
-    fn name(&self) -> String {
-        "total_energy".to_string()
     }
 }
