@@ -25,6 +25,8 @@ pub enum Element {
     Cl,
     /// Argon
     Ar,
+    /// Zirconium
+    Zr,
     /// Xenon
     Xe,
 }
@@ -43,6 +45,7 @@ impl Element {
             Element::Mg => 24.305,
             Element::Cl => 35.453,
             Element::Ar => 39.948,
+            Element::Zr => 91.224,
             Element::Xe => 131.293,
         }
     }
@@ -60,6 +63,7 @@ impl Element {
             Element::Mg => 2.0,
             Element::Cl => -1.0,
             Element::Ar => 0.0,
+            Element::Zr => 4.0,
             Element::Xe => 0.0,
         }
     }
@@ -77,6 +81,7 @@ impl Element {
             Element::Mg => 12,
             Element::Cl => 17,
             Element::Ar => 18,
+            Element::Zr => 40,
             Element::Xe => 54,
         }
     }
