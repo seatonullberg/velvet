@@ -107,6 +107,8 @@ mod tests {
     use crate::FromChemfile;
     use approx::*;
     use velvet_system::System;
+    use velvet_system::elements::Element;
+    use velvet_system::species::Species;
     use velvet_test_utils::resources_path;
 
     #[test]
@@ -116,18 +118,21 @@ mod tests {
         assert_relative_eq!(system.cell.a(), 100.0, epsilon = 1e-5);
         assert_relative_eq!(system.cell.b(), 100.0, epsilon = 1e-5);
         assert_relative_eq!(system.cell.c(), 100.0, epsilon = 1e-5);
-        assert_eq!(system.species[0].name(), "Ar");
+        let argon = Species::from_element(&Element::Ar);
+        assert_eq!(system.species[0], argon);
     }
 
     #[test]
     fn argon_xenon() {
         let system = System::from_chemfile(resources_path("argon-xenon.xyz"));
         assert_eq!(system.n_atoms, 2000);
-        assert_relative_eq!(system.cell.a(), 100.0, epsilon = 1e-5);
-        assert_relative_eq!(system.cell.b(), 100.0, epsilon = 1e-5);
-        assert_relative_eq!(system.cell.c(), 100.0, epsilon = 1e-5);
-        assert_eq!(system.species[0].name(), "Ar");
-        assert_eq!(system.species[system.n_atoms - 1].name(), "Xe");
+        assert_relative_eq!(system.cell.a(), 50.0, epsilon = 1e-5);
+        assert_relative_eq!(system.cell.b(), 50.0, epsilon = 1e-5);
+        assert_relative_eq!(system.cell.c(), 50.0, epsilon = 1e-5);
+        let argon = Species::from_element(&Element::Ar);
+        let xenon = Species::from_element(&Element::Xe);
+        assert_eq!(system.species[0], argon);
+        assert_eq!(system.species[system.n_atoms - 1], xenon);
     }
 
     #[test]
@@ -137,7 +142,9 @@ mod tests {
         assert_relative_eq!(system.cell.a(), 18.004, epsilon = 1e-5);
         assert_relative_eq!(system.cell.b(), 18.004, epsilon = 1e-5);
         assert_relative_eq!(system.cell.c(), 25.896499, epsilon = 1e-5);
-        assert_eq!(system.species[0].name(), "O");
-        assert_eq!(system.species[system.n_atoms - 1].name(), "Zr");
+        let oxygen = Species::from_element(&Element::O);
+        let zirconium = Species::from_element(&Element::Zr);
+        assert_eq!(system.species[0], oxygen);
+        assert_eq!(system.species[system.n_atoms - 1], zirconium);
     }
 }
