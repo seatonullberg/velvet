@@ -1,0 +1,21 @@
+[package]
+name = "velvet-md"
+version = "0.1.0"
+authors = ["Seaton Ullberg <seatonullberg@gmail.com>"]
+description = "Velvet's support for molecular dynamics"
+license = "MIT"
+repository = "https://github.com/seatonullberg/velvet"
+edition = "2021"
+
+[dependencies]
+nalgebra = "0.29"
+rand = "0.7"
+rand_distr = "0.3"
+velvet-core = { path = "../velvet-core", version = "0.4.2" }
+velvet-internals = { path = "../velvet-internals", version = "0.1.0" }
+velvet-system = { path = "../velvet-system", version = "0.1.0" }
+
+
+[features]
+default = []
+f64 = []
