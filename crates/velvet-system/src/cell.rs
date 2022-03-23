@@ -101,29 +101,29 @@ impl Cell {
 
     /// Returns the 'a' vector.
     pub fn a_vector(&self) -> Vector3<Float> {
-        Vector3::new(
-            self.matrix[(0, 0)],
-            self.matrix[(1, 0)],
-            self.matrix[(2, 0)],
-        )
+        let mut vec: Vector3<Float> = Vector3::zeros();
+        vec[0] = self.matrix[(0, 0)];
+        vec[1] = self.matrix[(1, 0)];
+        vec[2] = self.matrix[(2, 0)];
+        vec
     }
 
     /// Returns the 'b' vector.
     pub fn b_vector(&self) -> Vector3<Float> {
-        Vector3::new(
-            self.matrix[(0, 1)],
-            self.matrix[(1, 1)],
-            self.matrix[(2, 1)],
-        )
+        let mut vec: Vector3<Float> = Vector3::zeros();
+        vec[0] = self.matrix[(0, 1)];
+        vec[1] = self.matrix[(1, 1)];
+        vec[2] = self.matrix[(2, 1)];
+        vec
     }
 
     /// Returns the 'c' vector.
     pub fn c_vector(&self) -> Vector3<Float> {
-        Vector3::new(
-            self.matrix[(0, 2)],
-            self.matrix[(1, 2)],
-            self.matrix[(2, 2)],
-        )
+        let mut vec: Vector3<Float> = Vector3::zeros();
+        vec[0] = self.matrix[(0, 2)];
+        vec[1] = self.matrix[(1, 2)];
+        vec[2] = self.matrix[(2, 2)];
+        vec
     }
 
     /// Converts a cartesian position to a fractional position.
@@ -353,7 +353,14 @@ fn cell_matrix(
     let c_y = c * (cos_alpha - cos_beta * cos_gamma) / sin_gamma;
     let c_z = Float::sqrt(c * c - c_y * c_y - c_x * c_x);
 
-    Matrix3::new(a, b_x, c_x, 0.0, b_y, c_y, 0.0, 0.0, c_z)
+    let mut matrix: Matrix3<Float> = Matrix3::zeros();
+    matrix[(0, 0)] = a;
+    matrix[(0, 1)] = b_x;
+    matrix[(0, 2)] = c_x;
+    matrix[(1, 1)] = b_y;
+    matrix[(1, 2)] = c_y;
+    matrix[(2, 2)] = c_z;
+    matrix
 }
 
 #[cfg(test)]
@@ -366,118 +373,92 @@ mod tests {
 
     #[test]
     fn triclinic() {
-        let cell = Cell::triclinic(3.0, 4.0, 5.0, 80.0, 90.0, 110.0);
-        assert_eq!(cell.a_vector(), Vector3::new(3.0, 0.0, 0.0));
-        assert_eq!(cell.b_vector()[2], 0.0);
-
-        assert_relative_eq!(cell.a(), 3.0);
-        assert_relative_eq!(cell.b(), 4.0);
-        assert_relative_eq!(cell.c(), 5.0);
-
-        assert_relative_eq!(cell.alpha(), 80.0);
-        assert_relative_eq!(cell.beta(), 90.0);
-        assert_relative_eq!(cell.gamma(), 110.0);
+        // Kyanite parameters: http://database.iem.ac.ru/mincryst/s_carta.php?KYANITE+2426
+        let cell = Cell::triclinic(7.12, 7.8479, 5.5738, 89.9740, 101.1170, 106.0);
+        assert_relative_eq!(cell.volume(), 293.31, epsilon = 0.01)
     }
 
     #[test]
     fn cubic() {
-        let a0 = 4.0;
-        let angle = 90.0;
-        let cell = Cell::cubic(a0);
-
-        assert_relative_eq!(cell.a(), a0);
-        assert_relative_eq!(cell.b(), a0);
-        assert_relative_eq!(cell.c(), a0);
-
-        assert_relative_eq!(cell.alpha(), angle);
-        assert_relative_eq!(cell.beta(), angle);
-        assert_relative_eq!(cell.gamma(), angle);
+        let cell = Cell::cubic(4.0);
+        assert_relative_eq!(cell.volume(), 64.0);
     }
 
     #[test]
-    fn fractional_cartesian() {
-        let cell = Cell::triclinic(5.0, 6.0, 3.6, 90.0, 53.0, 77.0);
-        let tests = vec![Vector3::new(0.0, 10.0, 4.0), Vector3::new(-5.0, 12.0, 4.9)];
+    fn cartesian_to_fractional() {
+        let cell = Cell::cubic(4.0);
+        let fractional_position: Vector3<Float> = Vector3::from_element(0.1);
+        let cartesian_position: Vector3<Float> = Vector3::from_element(0.4);
+        assert_relative_eq!(fractional_position, cell.fractional(&cartesian_position));
+    }
 
-        for test in &tests {
-            let res = cell.cartesian(&cell.fractional(test));
-            assert_relative_eq!((test - &res).norm(), 0.0, epsilon = 1e-5);
-        }
+    #[test]
+    fn fractional_to_cartesian() {
+        let cell = Cell::cubic(4.0);
+        let fractional_position: Vector3<Float> = Vector3::from_element(0.1);
+        let cartesian_position: Vector3<Float> = Vector3::from_element(0.4);
+        assert_relative_eq!(cartesian_position, cell.cartesian(&fractional_position));
     }
 
     #[test]
     fn wrap_vector() {
-        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
-        let mut v = Vector3::new(1.0, 1.5, 6.0);
-        cell.wrap_vector(&mut v);
-        let res = Vector3::new(1.0, 1.5, 1.0);
-        assert_relative_eq!((v - &res).norm(), 0.0, epsilon = 1e-5);
+        let cell = Cell::cubic(4.0);
+        let mut vec: Vector3<Float> = Vector3::from_element(7.0);
+        cell.wrap_vector(&mut vec);
+        let res: Vector3<Float> = Vector3::from_element(3.0);
+        assert_relative_eq!((vec - &res).norm(), 0.0, epsilon = 1e-5)
     }
 
     #[test]
     fn vector_image() {
-        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
-        let mut v = Vector3::new(1.0, 1.5, 6.0);
-        cell.vector_image(&mut v);
-        let res = Vector3::new(1.0, 1.5, 1.0);
-        assert_relative_eq!((v - &res).norm(), 0.0, epsilon = 1e-5);
-    }
-
-    #[test]
-    fn distance() {
-        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
-        let v1 = Vector3::new(0.0, 0.0, 0.0);
-        let v2 = Vector3::new(1.0, 2.0, 6.0);
-        assert_relative_eq!(cell.distance(&v1, &v2), Float::sqrt(6.0));
-        let cell = Cell::triclinic(1.0, 1.0, 1.0, 90.0, 90.0, 90.0);
-        let v1 = Vector3::new(0.1, 0.0, 0.0);
-        let v2 = Vector3::new(0.9, 0.0, 0.0);
-        assert_relative_eq!(cell.distance(&v1, &v2), 0.2);
-    }
-
-    #[test]
-    fn angle() {
-        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
-        let a = Vector3::new(1.0, 0.0, 0.0);
-        let b = Vector3::new(0.0, 0.0, 0.0);
-        let c = Vector3::new(0.0, 1.0, 0.0);
-        assert_relative_eq!(cell.angle(&a, &b, &c), PI / 2.0);
-        let a = Vector3::new(1.0, 0.0, 0.0);
-        let b = Vector3::new(0.0, 0.0, 0.0);
-        let c = Vector3::new(Float::cos(1.877), Float::sin(1.877), 0.0);
-        assert_relative_eq!(cell.angle(&a, &b, &c), 1.877);
+        let cell = Cell::cubic(4.0);
+        let mut vec: Vector3<Float> = Vector3::from_element(7.0);
+        cell.vector_image(&mut vec);
+        let res: Vector3<Float> = Vector3::from_element(-1.0);
+        assert_relative_eq!((vec - &res).norm(), 0.0, epsilon = 1e-5)
     }
 
     #[test]
     fn direction() {
-        let cell = Cell::triclinic(1.0, 1.0, 1.0, 90.0, 90.0, 90.0);
-        let v1 = Vector3::new(0.5, 0.5, 0.5);
-        let v2 = Vector3::new(0.5, 0.5, 1.1);
-        let res = cell.direction(&v1, &v2);
-        assert_relative_eq!(res[0], 0.0, epsilon = 1e-5);
-        assert_relative_eq!(res[1], 0.0, epsilon = 1e-5);
-        assert_relative_eq!(res[2], -1.0);
+        let cell = Cell::cubic(4.0);
+        let v1: Vector3<Float> = Vector3::zeros();
+        let v2: Vector3<Float> = Vector3::from_element(7.0);
+        let res: Vector3<Float> = Vector3::from_element(-1.0 / Float::sqrt(3.0));
+        assert_relative_eq!((cell.direction(&v1, &v2) - res).norm(), 0.0, epsilon = 1e-5)
+    }
+
+    #[test]
+    fn distance() {
+        let cell = Cell::cubic(4.0);
+        let v1: Vector3<Float> = Vector3::zeros();
+        let v2: Vector3<Float> = Vector3::from_element(7.0);
+        let res: Float = Float::sqrt(3.0);
+        assert_relative_eq!((cell.distance(&v1, &v2) - res), 0.0, epsilon = 1e-5)
+    }
+
+    #[test]
+    fn angle() {
+        let cell = Cell::cubic(4.0);
+        let mut v1: Vector3<Float> = Vector3::zeros();
+        let v2: Vector3<Float> = Vector3::zeros();
+        let mut v3: Vector3<Float> = Vector3::zeros();
+        v1[0] = 1.0;
+        v3[1] = 1.0;
+        assert_relative_eq!(cell.angle(&v1, &v2, &v3), PI / 2.0);
     }
 
     #[test]
     fn dihedral() {
-        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
-        let v1 = Vector3::new(0.0, 0.0, 0.0);
-        let v2 = Vector3::new(1.0, 0.0, 0.0);
-        let v3 = Vector3::new(1.0, 1.0, 0.0);
-        let v4 = Vector3::new(2.0, 1.0, 0.0);
-        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), PI, epsilon = 1e-6);
-        let v1 = Vector3::new(1.241, 0.444, 0.349);
-        let v2 = Vector3::new(-0.011, -0.441, 0.333);
-        let v3 = Vector3::new(-1.176, 0.296, -0.332);
-        let v4 = Vector3::new(-1.396, 1.211, 0.219);
-        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), -1.045379, epsilon = 1e-6);
-    }
-
-    #[test]
-    fn volume() {
-        let cell = Cell::triclinic(3.0, 4.0, 5.0, 90.0, 90.0, 90.0);
-        let volume = 60.0;
-        assert_relative_eq!(cell.volume(), volume, epsilon = 1e-5);
+        let cell = Cell::cubic(4.0);
+        let v1: Vector3<Float> = Vector3::zeros();
+        let mut v2: Vector3<Float> = Vector3::zeros();
+        let mut v3: Vector3<Float> = Vector3::zeros();
+        let mut v4: Vector3<Float> = Vector3::zeros();
+        v2[0] = 1.0;
+        v3[0] = 1.0;
+        v3[1] = 1.0;
+        v4[0] = 2.0;
+        v4[1] = 1.0;
+        assert_relative_eq!(cell.dihedral(&v1, &v2, &v3, &v4), PI)
     }
 }
