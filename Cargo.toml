@@ -19,23 +19,24 @@ categories = [
 
 [workspace]
 members = [
-    "crates/velvet-cli",
+    "crates/velvet-chemfiles",
     "crates/velvet-core",
-    "crates/velvet-external-data",
+    "crates/velvet-internals",
+    "crates/velvet-md",
+    "crates/velvet-system",
     "crates/velvet-test-utils",
 ]
 
 [dependencies]
+velvet-chemfiles = { path = "crates/velvet-chemfiles", version = "0.1.0" }
 velvet-core = { path = "crates/velvet-core", version = "0.4.2" }
-velvet-external-data = { path = "crates/velvet-external-data", version = "0.1.0" }
-
-hdf5 = { version = "0.7", optional = true }
-hdf5-sys = { version = "0.7", optional = true }
+velvet-md = { path = "crates/velvet-md", version = "0.1.0" }
+velvet-system = { path = "crates/velvet-system", version = "0.1.0" }
 
 [dev-dependencies]
 approx = "0.4"
 criterion = "0.3"
-nalgebra = "0.26"
+nalgebra = "0.29"
 serial_test = "0.5"
 velvet-test-utils = { path = "crates/velvet-test-utils" }
 
@@ -43,30 +44,15 @@ velvet-test-utils = { path = "crates/velvet-test-utils" }
 default = []
 f64 = [
     "velvet-core/f64", 
-    "velvet-external-data/f64", 
     "velvet-test-utils/f64",
 ]
-hdf5-output = [
-    "hdf5", 
-    "hdf5-sys",
-    "velvet-core/hdf5-output",
-]
-quiet = [
-    "velvet-core/quiet"
-]
 
-[package.metadata.docs.rs]
-features = [
-    "hdf5-sys/static", 
-    "hdf5-sys/zlib"
-]
+# [[bench]]
+# name = "properties-benchmarks"
+# path = "benches/properties.rs"
+# harness = false
 
-[[bench]]
-name = "properties-benchmarks"
-path = "benches/properties.rs"
-harness = false
-
-[[bench]]
-name = "selection-benchmarks"
-path = "benches/selection.rs"
-harness = false
+# [[bench]]
+# name = "selection-benchmarks"
+# path = "benches/selection.rs"
+# harness = false

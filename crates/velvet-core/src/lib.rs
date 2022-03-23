@@ -9,12 +9,12 @@
 //! * `force` - Kcal/mole-angstrom
 //! * `temperature` - Kelvin
 
-#![warn(clippy::all)]
-
 pub mod neighbors;
+pub mod outputs;
 pub mod potentials;
-pub mod propagators;
+pub mod propagator;
 pub mod properties;
+pub mod simulation;
 
 /// User facing exports.
 pub mod prelude {

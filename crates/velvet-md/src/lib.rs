@@ -3,7 +3,7 @@ pub mod thermostats;
 pub mod velocity_distributions;
 
 use velvet_core::potentials::Potentials;
-use velvet_core::propagators::Propagator;
+use velvet_core::propagator::Propagator;
 use velvet_system::System;
 
 use crate::integrators::Integrator;

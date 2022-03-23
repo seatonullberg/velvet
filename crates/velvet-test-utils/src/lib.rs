@@ -1,6 +1,14 @@
 use velvet_chemfiles::FromChemfile;
 use velvet_system::System;
 
+pub fn resources_path(filename: &str) -> String {
+    format!(
+        "{}/../../resources/test/{}",
+        env!("CARGO_MANIFEST_DIR"),
+        filename
+    )
+}
+
 pub fn argon_system() -> System {
     System::from_chemfile(resources_path("argon.xyz"))
 }
@@ -66,14 +74,6 @@ pub fn zirconia_system() -> System {
 //         .pair(lj, (xenon, xenon), cutoff, thickness)
 //         .build()
 // }
-
-pub fn resources_path(filename: &str) -> String {
-    format!(
-        "{}/../../resources/test/{}",
-        env!("CARGO_MANIFEST_DIR"),
-        filename
-    )
-}
 
 // pub fn nve_simulation(mut system: System, potentials: Potentials) -> Simulation {
 //     let boltz = Boltzmann::new(300.0);

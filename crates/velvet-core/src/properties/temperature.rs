@@ -10,13 +10,9 @@ use velvet_system::System;
 pub struct Temperature;
 
 impl Property for Temperature {
-    type Res = Float;
+    type T = Float;
 
-    fn name(&self) -> String {
-        "Temperature".to_string()
-    }
-
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::T {
         let kinetic = KineticEnergy.calculate(system, potentials);
         // NOTE: This value DOF is only valid for atomic resolution simulations.
         let dof = (system.n_atoms * 3) as Float;

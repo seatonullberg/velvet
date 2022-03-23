@@ -51,7 +51,11 @@ impl VelocityDistribution for Boltzmann {
                 let x: Float = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
                 let y: Float = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
                 let z: Float = inv_mass.sqrt() * self.distr.sample(&mut rand::thread_rng());
-                Vector3::new(x, y, z)
+                let mut vec: Vector3<Float> = Vector3::zeros();
+                vec[0] = x;
+                vec[1] = y;
+                vec[2] = z;
+                vec
             })
             .collect();
         scale(system, potentials, self.target);

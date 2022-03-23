@@ -7,8 +7,8 @@ publish = false
 
 [dependencies]
 nalgebra = "0.29"
-velvet-chemfiles = { path = "../velvet-chemfiles" }
-velvet-system = { path = "../velvet-system" }
+velvet-chemfiles = { path = "../velvet-chemfiles", version = "0.1.0" }
+velvet-system = { path = "../velvet-system", version = "0.1.0" }
 
 [features]
 f64 = [

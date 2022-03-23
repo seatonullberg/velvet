@@ -12,7 +12,10 @@
 /// `use velvet::prelude::*;` to import common components.
 pub mod prelude {
     pub use velvet_core::prelude::*;
-    pub use velvet_external_data::prelude::*;
+}
+
+pub mod chemfiles {
+    pub use velvet_chemfiles::*;
 }
 
 pub mod core {
@@ -20,7 +23,10 @@ pub mod core {
     pub use velvet_core::*;
 }
 
-pub mod external_data {
-    //! Utilities to import and export data in external formats.
-    pub use velvet_external_data::*;
+pub mod md {
+    pub use velvet_md::*;
+}
+
+pub mod system {
+    pub use velvet_system::*;
 }

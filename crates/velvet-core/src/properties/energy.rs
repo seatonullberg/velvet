@@ -1,4 +1,3 @@
-use crate::potentials::pair::PairPotential;
 use crate::potentials::Potentials;
 use crate::properties::Property;
 use nalgebra::Vector3;
@@ -10,13 +9,9 @@ use velvet_system::System;
 pub struct PairEnergy;
 
 impl Property for PairEnergy {
-    type Res = Float;
+    type T = Float;
 
-    fn name(&self) -> String {
-        "PairEnergy".to_string()
-    }
-
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::T {
         // initialize loop variables
         let mut pos_i: Vector3<Float> = Vector3::zeros();
         let mut pos_j: Vector3<Float> = Vector3::zeros();
@@ -29,7 +24,7 @@ impl Property for PairEnergy {
                 .iter()
                 .map(|meta| -> Float {
                     meta.iter()
-                        .map(|(i, j)| -> Float {
+                        .map(|[i, j]| -> Float {
                             pos_i = system.positions[*i];
                             pos_j = system.positions[*j];
                             r = system.cell.distance(&pos_i, &pos_j);
@@ -48,13 +43,9 @@ impl Property for PairEnergy {
 pub struct PotentialEnergy;
 
 impl Property for PotentialEnergy {
-    type Res = Float;
+    type T = Float;
 
-    fn name(&self) -> String {
-        "PotentialEnergy".to_string()
-    }
-
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::T {
         let pair_energy = PairEnergy.calculate(system, potentials);
         // TODO: include other potential energy contributions
         pair_energy
@@ -66,13 +57,9 @@ impl Property for PotentialEnergy {
 pub struct KineticEnergy;
 
 impl Property for KineticEnergy {
-    type Res = Float;
+    type T = Float;
 
-    fn name(&self) -> String {
-        "KineticEnergy".to_string()
-    }
-
-    fn calculate(&self, system: &System, _: &Potentials) -> Self::Res {
+    fn calculate(&self, system: &System, _: &Potentials) -> Self::T {
         system
             .species
             .iter()
@@ -87,13 +74,9 @@ impl Property for KineticEnergy {
 pub struct TotalEnergy;
 
 impl Property for TotalEnergy {
-    type Res = Float;
+    type T = Float;
 
-    fn name(&self) -> String {
-        "TotalEnergy".to_string()
-    }
-
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::T {
         let kinetic = KineticEnergy.calculate(system, potentials);
         let potential = PotentialEnergy.calculate(system, potentials);
         kinetic + potential

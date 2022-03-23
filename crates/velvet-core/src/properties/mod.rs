@@ -10,11 +10,8 @@ use velvet_system::System;
 /// Calculates a system-wide property.
 pub trait Property {
     /// The property's return type.
-    type Res: std::fmt::Debug;
-
-    /// Returns the name of the property.
-    fn name(&self) -> String;
+    type T;
 
     /// Returns a physical property of the system.
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res;
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::T;
 }

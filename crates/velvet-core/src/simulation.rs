@@ -1,107 +1,102 @@
 //! High level abstraction for an atomistic simulation.
 
-#[cfg(feature = "quiet")]
-use indicatif::ProgressDrawTarget;
-use indicatif::{ProgressBar, ProgressStyle};
-
+use crate::outputs::{Output, OutputMeta};
 use crate::potentials::Potentials;
-use crate::propagators::Propagator;
-use crate::system::System;
+use crate::propagator::Propagator;
+use velvet_system::System;
 
 /// High level abstraction for an atomistic simulation.
 pub struct Simulation {
     system: System,
     potentials: Potentials,
     propagator: Box<dyn Propagator>,
+    outputs: Option<Vec<OutputMeta>>,
 }
 
-impl<'a> Simulation {
-    /// Returns a new [`Simulation`].
-    pub fn new<P>(
-        system: System,
-        potentials: Potentials,
-        propagator: P,
-        config: Configuration,
-    ) -> Simulation
+pub struct SimulationBuilder {
+    system: System,
+    potentials: Potentials,
+    propagator: Box<dyn Propagator>,
+    outputs: Option<Vec<OutputMeta>>
+}
+
+impl SimulationBuilder {
+    pub fn new<P>(system: System, potentials: Potentials, propagator: P) -> Self 
     where
         P: Propagator + 'static,
     {
+        let propagator = Box::new(propagator);
+        let outputs = None;
+        SimulationBuilder {
+            system,
+            potentials,
+            propagator,
+            outputs,
+        }
+    }
+
+    pub fn output<O, W>(mut self, output: O, writer: W, interval: usize) -> Self 
+    where
+        O: Output + 'static,
+        W: std::io::Write + 'static,
+    {
+        let output_meta = OutputMeta::new(output, writer, interval);
+        let output_metas = &mut self.outputs;
+        match output_metas {
+            Some(output_metas) => {
+                output_metas.push(output_meta);
+            }
+            None => {
+                let mut output_metas = Vec::new();
+                output_metas.push(output_meta);
+                self.outputs = Some(output_metas);
+            }
+        }
+        self
+    }
+
+    pub fn build(self) -> Simulation {
+        let system = self.system;
+        let potentials = self.potentials;
+        let propagator = self.propagator;
+        let outputs = self.outputs;
         Simulation {
             system,
             potentials,
-            propagator: Box::new(propagator),
-            config,
+            propagator,
+            outputs,
         }
     }
+}
 
-    /// Runs the full iteration loop of the simulation.
-    pub fn run(&mut self, steps: usize) {
-        // Setup the global threadpool.
-        // TODO: Actually handle the possible error. Causes issues with unit testing if I unwrap().
-        let _ = rayon::ThreadPoolBuilder::new()
-            .num_threads(self.config.n_threads)
-            .build_global();
-
+impl Simulation {
+    pub fn run(&mut self, timesteps: usize) {
         // Setup potentials.
         self.potentials.setup(&self.system);
-
-        // Setup propagation method.
+        // Setup propagator.
         self.propagator.setup(&mut self.system, &self.potentials);
-
-        // Setup progress bar.
-        let pb = ProgressBar::new(steps as u64);
-        pb.set_style(
-            ProgressStyle::default_bar()
-                .template("[{eta_precise}] {bar:40.green} {pos:>7} /{len:>7} steps"),
-        );
-
-        // Hide the progress bar if the `quiet` feature is enabled.
-        #[cfg(feature = "quiet")]
-        pb.set_draw_target(ProgressDrawTarget::hidden());
-
         // Start iteration loop.
-        for i in 0..steps {
-            // Do one propagation step.
-            self.propagator
-                .propagate(&mut self.system, &self.potentials);
-
-            // Update the potentials.
-            self.potentials.update(&self.system, i);
-
-            // Generate raw outputs at appropriate intervals.
-            for group in self.config.raw_output_groups() {
-                let should_output = i % group.interval == 0 || i == steps - 1;
-                let destination = group.destination.as_mut();
-                for output in group.outputs.iter() {
-                    if should_output {
-                        output.output_raw(&self.system, &self.potentials, destination)
-                    }
+        for i in 0..timesteps {
+            // Propagate 1 timestep.
+            self.propagator.propagate(&mut self.system, &self.potentials);
+            // TODO: updates should NOT be done every timestep.
+            self.potentials.update(&self.system);
+            // Log outputs if any exist.
+            match &mut self.outputs {
+                Some(outputs) => {
+                    outputs
+                        .iter_mut()
+                        .for_each(|meta| {
+                            if i % meta.interval == 0 {
+                                meta.output(&self.system, &self.potentials, i);
+                            }
+                        });
                 }
+                None => {}
             }
-
-            // Generate HDF5 formatted outputs of the `hdf5-output` feature is enabled.
-            #[cfg(feature = "hdf5-output")]
-            {
-                for group in self.config.hdf5_output_groups() {
-                    let should_output = i % group.interval == 0 || i == steps - 1;
-                    let g = group.file_handle.create_group(&format!("{}", i)).unwrap();
-                    for output in group.outputs.iter() {
-                        if should_output {
-                            output.output_hdf5(&self.system, &self.potentials, &g)
-                        }
-                    }
-                }
-            }
-
-            // Update the progress bar at the end of each step.
-            pb.inc(1);
         }
-
-        // Finish the progress bar once iteration has terminated.
-        pb.finish();
     }
 
-    /// Consume the simulation and return its [`System`] and [`Potentials`].
     pub fn consume(self) -> (System, Potentials) {
         (self.system, self.potentials)
     }

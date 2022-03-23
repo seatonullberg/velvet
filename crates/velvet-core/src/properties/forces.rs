@@ -1,4 +1,3 @@
-use crate::potentials::pair::PairPotential;
 use crate::potentials::Potentials;
 use crate::properties::Property;
 use nalgebra::Vector3;
@@ -10,13 +9,9 @@ use velvet_system::System;
 pub struct PairForces;
 
 impl Property for PairForces {
-    type Res = Vec<Vector3<Float>>;
+    type T = Vec<Vector3<Float>>;
 
-    fn name(&self) -> String {
-        "PairForces".to_string()
-    }
-
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::T {
         // initialize loop variables
         let mut pos_i: Vector3<Float> = Vector3::zeros();
         let mut pos_j: Vector3<Float> = Vector3::zeros();
@@ -31,7 +26,7 @@ impl Property for PairForces {
         let pair_metas = &potentials.pair_metas;
         match pair_metas {
             Some(pair_metas) => pair_metas.iter().for_each(|meta| {
-                meta.iter().for_each(|(i, j)| {
+                meta.iter().for_each(|[i, j]| {
                     pos_i = system.positions[*i];
                     pos_j = system.positions[*j];
                     r = system.cell.distance(&pos_i, &pos_j);
@@ -52,13 +47,9 @@ impl Property for PairForces {
 pub struct Forces;
 
 impl Property for Forces {
-    type Res = Vec<Vector3<Float>>;
+    type T = Vec<Vector3<Float>>;
 
-    fn name(&self) -> String {
-        "Forces".to_string()
-    }
-
-    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::Res {
+    fn calculate(&self, system: &System, potentials: &Potentials) -> Self::T {
         let pair_forces = PairForces.calculate(system, potentials);
         // TODO: include other force contributions
         pair_forces
