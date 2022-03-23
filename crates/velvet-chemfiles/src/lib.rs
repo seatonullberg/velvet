@@ -6,11 +6,15 @@ use velvet_system::cell::Cell;
 use velvet_system::species::Species;
 use velvet_system::System;
 
+/// Shared behavior to construct an object from a chemfiles supported file format.
+/// The list of available formats can be found [here](https://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats).
 pub trait FromChemfile {
+    /// Constructs an object from a file with automatic format detection.
     fn from_chemfile<P>(path: P) -> Self
     where
         P: AsRef<Path>;
 
+    /// Constructs an object from a file with manual format specification.
     fn from_chemfile_with_format<'a, P, S>(path: P, format: S) -> Self
     where
         P: AsRef<Path>,
@@ -37,10 +41,11 @@ impl FromChemfile for System {
 }
 
 fn new_system_from_trajectory(trajectory: &mut Trajectory) -> System {
+    // Initialize an empty frame to read the trajectory into.
     let mut frame = Frame::new();
     trajectory.read(&mut frame).unwrap();
 
-    // process the frame properties
+    // Process the frame's properties.
     let n_atoms = frame.size();
     let positions: Vec<Vector3<Float>> = get_rows(frame.positions());
     let velocities: Vec<Vector3<Float>>;
@@ -50,7 +55,7 @@ fn new_system_from_trajectory(trajectory: &mut Trajectory) -> System {
         velocities = vec![Vector3::zeros(); n_atoms];
     }
 
-    // process the atomic properties
+    // Create a Species for each atom in the frame.
     let species: Vec<Species> = Vec::from_iter((0..n_atoms).into_iter().map(|i| {
         let atom = frame.atom(i);
         Species::new(
@@ -60,16 +65,16 @@ fn new_system_from_trajectory(trajectory: &mut Trajectory) -> System {
         )
     }));
 
-    // process the topology properties
+    // Extract a topology from the frame and process bonding information.
     let topology = frame.topology();
     let bonds = topology.bonds();
     let angles = topology.angles();
     let dihedrals = topology.dihedrals();
 
-    // process the unit cell properties
+    // Process the bounds of the simulation cell.
     let cell = Cell::from_matrix(get_matrix(&frame.cell().matrix()));
 
-    // return the initialized system
+    // Return the initialized System.
     System {
         n_atoms,
         cell,
@@ -84,31 +89,37 @@ fn new_system_from_trajectory(trajectory: &mut Trajectory) -> System {
 
 fn get_rows(data: &[[f64; 3]]) -> Vec<Vector3<Float>> {
     data.iter()
-        .map(|[x, y, z]| Vector3::new(*x as Float, *y as Float, *z as Float))
+        .map(|[x, y, z]| {
+            let mut vec: Vector3<Float> = Vector3::zeros();
+            vec[0] = *x as Float;
+            vec[1] = *y as Float;
+            vec[2] = *z as Float;
+            vec
+        })
         .collect()
 }
 
 fn get_matrix(data: &[[f64; 3]; 3]) -> Matrix3<Float> {
-    Matrix3::new(
-        data[0][0] as Float,
-        data[0][1] as Float,
-        data[0][2] as Float,
-        data[1][0] as Float,
-        data[1][1] as Float,
-        data[1][2] as Float,
-        data[2][0] as Float,
-        data[2][1] as Float,
-        data[2][2] as Float,
-    )
+    let mut matrix: Matrix3<Float> = Matrix3::zeros();
+    matrix[(0, 0)] = data[0][0] as Float;
+    matrix[(0, 1)] = data[0][1] as Float;
+    matrix[(0, 2)] = data[0][2] as Float;
+    matrix[(1, 0)] = data[1][0] as Float;
+    matrix[(1, 1)] = data[1][1] as Float;
+    matrix[(1, 2)] = data[1][2] as Float;
+    matrix[(2, 0)] = data[2][0] as Float;
+    matrix[(2, 1)] = data[2][1] as Float;
+    matrix[(2, 2)] = data[2][2] as Float;
+    matrix
 }
 
 #[cfg(test)]
 mod tests {
     use crate::FromChemfile;
     use approx::*;
-    use velvet_system::System;
     use velvet_system::elements::Element;
     use velvet_system::species::Species;
+    use velvet_system::System;
     use velvet_test_utils::resources_path;
 
     #[test]
@@ -119,7 +130,10 @@ mod tests {
         assert_relative_eq!(system.cell.b(), 100.0, epsilon = 1e-5);
         assert_relative_eq!(system.cell.c(), 100.0, epsilon = 1e-5);
         let argon = Species::from_element(&Element::Ar);
-        assert_eq!(system.species[0], argon);
+        system
+            .species
+            .into_iter()
+            .for_each(|species| assert_eq!(species, argon));
     }
 
     #[test]
@@ -131,8 +145,12 @@ mod tests {
         assert_relative_eq!(system.cell.c(), 50.0, epsilon = 1e-5);
         let argon = Species::from_element(&Element::Ar);
         let xenon = Species::from_element(&Element::Xe);
-        assert_eq!(system.species[0], argon);
-        assert_eq!(system.species[system.n_atoms - 1], xenon);
+        (0..1000)
+            .into_iter()
+            .for_each(|i| assert_eq!(system.species[i], argon));
+        (1000..2000)
+            .into_iter()
+            .for_each(|i| assert_eq!(system.species[i], xenon));
     }
 
     #[test]
@@ -144,7 +162,11 @@ mod tests {
         assert_relative_eq!(system.cell.c(), 25.896499, epsilon = 1e-5);
         let oxygen = Species::from_element(&Element::O);
         let zirconium = Species::from_element(&Element::Zr);
-        assert_eq!(system.species[0], oxygen);
-        assert_eq!(system.species[system.n_atoms - 1], zirconium);
+        (0..500)
+            .into_iter()
+            .for_each(|i| assert_eq!(system.species[i], oxygen));
+        (500..750)
+            .into_iter()
+            .for_each(|i| assert_eq!(system.species[i], zirconium));
     }
 }
