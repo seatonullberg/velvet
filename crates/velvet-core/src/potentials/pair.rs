@@ -16,49 +16,53 @@ pub trait PairPotential {
 
 /// Metadata describing a nonbonded pairwise interaction.
 pub struct PairMeta {
-    species: (Species, Species),
     potential: Box<dyn PairPotential>,
-    neighbor_list: NeighborList,
+    species_i: Species,
+    species_j: Species,
+    cutoff: Float,
+    neighbor_list: NeighborList<2>,
 }
 
 impl PairMeta {
-    pub fn new<P>(species: (Species, Species), cutoff: Float, potential: P) -> Self
+    pub fn new<P>(potential: P, species_i: Species, species_j: Species, cutoff: Float) -> Self
     where
         P: PairPotential + 'static,
     {
         let potential = Box::new(potential);
         let neighbor_list = NeighborList::new(cutoff);
         PairMeta {
-            species,
             potential,
+            species_i,
+            species_j,
+            cutoff,
             neighbor_list,
         }
     }
 
     pub fn setup(&mut self, system: &System) {
-        self.neighbor_list.setup_with_species(&self.species, system)
+        self.neighbor_list.setup_with_species(system, self.species_i, self.species_j)
     }
 
     pub fn update(&mut self, system: &System) {
         self.neighbor_list.update(system)
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = &(usize, usize)> {
+    pub fn iter(&self) -> impl Iterator<Item = &[usize; 2]> {
         self.neighbor_list.iter()
     }
-}
 
-impl PairPotential for PairMeta {
-    fn energy(&self, r: Float) -> Float {
-        if r < self.neighbor_list.cutoff {
+    // Intentionally do not implement PairPotential for PairMeta to avoid the possibility of nesting.
+    pub fn energy(&self, r: Float) -> Float {
+        if r < self.cutoff {
             self.potential.energy(r)
         } else {
             0 as Float
         }
     }
 
-    fn force(&self, r: Float) -> Float {
-        if r < self.neighbor_list.cutoff {
+    // Intentionally do not implement PairPotential for PairMeta to avoid the possibility of nesting.
+    pub fn force(&self, r: Float) -> Float {
+        if r < self.cutoff {
             self.potential.force(r)
         } else {
             0 as Float

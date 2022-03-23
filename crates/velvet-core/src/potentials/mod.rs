@@ -10,10 +10,6 @@ use velvet_system::System;
 
 pub struct Potentials {
     pub pair_metas: Option<Vec<PairMeta>>,
-    // pub coulomb_meta: Option<CoulombMeta>,
-    // pub bond_metas: Option<Vec<BondMeta>>,
-    // pub angle_metas: Option<Vec<AngleMeta>>,
-    // pub dihedral_metas: Option<Vec<DihedralMeta>>,
 }
 
 impl Potentials {
@@ -34,10 +30,6 @@ impl Potentials {
 
 pub struct PotentialsBuilder {
     pair_metas: Option<Vec<PairMeta>>,
-    // pub coulomb_meta: Option<CoulombMeta>,
-    // pub bond_metas: Option<Vec<BondMeta>>,
-    // pub angle_metas: Option<Vec<AngleMeta>>,
-    // pub dihedral_metas: Option<Vec<DihedralMeta>>,
 }
 
 impl PotentialsBuilder {
@@ -45,18 +37,18 @@ impl PotentialsBuilder {
         PotentialsBuilder { pair_metas: None }
     }
 
-    pub fn pair<P>(mut self, species: (Species, Species), cutoff: Float, potential: P) -> Self
+    pub fn pair<P>(mut self, potential: P, species_i: Species, species_j: Species, cutoff: Float) -> Self
     where
         P: PairPotential + 'static,
     {
-        let pair_meta = PairMeta::new(species, cutoff, potential);
+        let pair_meta = PairMeta::new(potential, species_i, species_j, cutoff);
         let pair_metas = &mut self.pair_metas;
         match pair_metas {
             Some(pair_metas) => {
                 pair_metas.push(pair_meta);
             }
             None => {
-                let mut pair_metas = Vec::with_capacity(1);
+                let mut pair_metas = Vec::new();
                 pair_metas.push(pair_meta);
                 self.pair_metas = Some(pair_metas);
             }
