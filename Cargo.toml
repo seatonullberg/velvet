@@ -19,6 +19,7 @@ categories = [
 
 [dependencies]
 chemfiles = "0.10.3"
+itertools = "0.10.5"
 nalgebra = "0.32.2"
 rayon = "1.7.0"
 thiserror = "1.0.40"

@@ -14,6 +14,10 @@ pub struct AtomType {
 }
 
 impl AtomType {
+    pub fn new(id: u16, mass: f64, charge: f64) -> Self {
+        AtomType { id, mass, charge }
+    }
+
     /// Returns the ID of this atom type.
     pub fn id(&self) -> u16 {
         self.id
@@ -44,9 +48,6 @@ impl PartialEq for AtomType {
 
 impl Eq for AtomType {}
 
-/// Type representing a unique molecule in the simulation environment.
-pub type MoleculeID = u16;
-
 /// Collection of all atoms in the simulation environment.
 ///
 /// This object should not be instantiated directly. Refer to
@@ -54,13 +55,11 @@ pub type MoleculeID = u16;
 /// preferred constructor.
 #[derive(Clone, Debug, Default)]
 pub struct Atoms {
-    atom_types: Vec<AtomType>,
-    molecule_ids: Vec<MoleculeID>,
-    positions: Vec<Vector3<f64>>,
-    velocities: Vec<Vector3<f64>>,
-    accelerations: Vec<Vector3<f64>>,
-    indices_by_atom_type: HashMap<AtomType, Vec<usize>>,
-    indices_by_molecule_id: HashMap<MoleculeID, Vec<usize>>,
+    pub(crate) atom_types: Vec<AtomType>,
+    pub(crate) positions: Vec<Vector3<f64>>,
+    pub(crate) velocities: Vec<Vector3<f64>>,
+    pub(crate) accelerations: Vec<Vector3<f64>>,
+    pub(crate) indices_by_atom_type: HashMap<AtomType, Vec<usize>>,
 }
 
 impl Atoms {
@@ -71,15 +70,6 @@ impl Atoms {
     /// scope of this project.
     pub fn atom_types(&self) -> &[AtomType] {
         &self.atom_types
-    }
-
-    /// Returns a slice containing the id of the molecule that each atom is a member of.
-    /// All atoms are members of exactly __one__ molecule.
-    ///
-    /// A simulation's molecule ID's are immutable because breaking or forming
-    /// bonds during the course of a simulation is outside the scope of this project.
-    pub fn molecule_ids(&self) -> &[u16] {
-        &self.molecule_ids
     }
 
     /// Returns a slice containing the 3D spatial coordinate of each atom.
@@ -116,11 +106,6 @@ impl Atoms {
     pub fn atoms_of_type(&self, atom_type: &AtomType) -> Option<&Vec<usize>> {
         self.indices_by_atom_type.get(atom_type)
     }
-
-    /// Returns the indices of all atoms belonging to the given molecule or [`None`][`std::option::Option`] if the atom type does not exist.
-    pub fn atoms_in_molecule(&self, molecule_id: &MoleculeID) -> Option<&Vec<usize>> {
-        self.indices_by_molecule_id.get(molecule_id)
-    }
 }
 
 #[cfg(test)]
@@ -130,19 +115,38 @@ mod tests {
 
     #[test]
     fn test_chemfiles() {
-        let lmp_file_path = "/home/seaton/repos/velvet/water.pdb";
-        let mut traj = Trajectory::open_with_format(lmp_file_path, 'r', "PDB").unwrap();
+        let lmp_file_path = "/home/seaton/repos/velvet/water.lmp";
+        let mut traj = Trajectory::open_with_format(lmp_file_path, 'r', "LAMMPS Data").unwrap();
         let mut frame = Frame::new();
         traj.read_step(0, &mut frame).unwrap();
-        for atom in frame.iter_atoms() {
-            let mass = atom.mass();
-            let charge = atom.charge();
-            let atomic_type = atom.atomic_type();
-            let name = atom.name();
-            println!(
-                "Mass: {:?}, Charge: {:?}, Type: {:?}, Name: {:?}",
-                mass, charge, atomic_type, name
-            );
+        let topo = frame.topology();
+        println!(
+            "Bonds: {:?} Angles: {:?} Residues: {:?}",
+            topo.bonds_count(),
+            topo.angles_count(),
+            topo.residues_count()
+        );
+        for bond in topo.bonds() {
+            println!("{:?}", bond);
         }
+        // for i in 0..100 {
+        //     let res = topo.residue(i).unwrap();
+        //     println!(
+        //         "ID: {:?}, Size: {:?}, Name: {:?}",
+        //         res.id(),
+        //         res.size(),
+        //         res.name()
+        //     );
+        // }
+        // for atom in frame.iter_atoms() {
+        //     let mass = atom.mass();
+        //     let charge = atom.charge();
+        //     let atomic_type = atom.atomic_type();
+        //     let name = atom.name();
+        //     println!(
+        //         "Mass: {:?}, Charge: {:?}, Type: {:?}, Name: {:?}",
+        //         mass, charge, atomic_type, name
+        //     );
+        // }
     }
 }

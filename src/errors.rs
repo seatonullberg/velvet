@@ -7,8 +7,10 @@ use thiserror::Error;
 pub enum SystemInitializationError {
     #[error("missing or improperly formatted trajectory file")]
     InvalidTrajectoryFile(#[from] chemfiles::Error),
-    #[error("no atom types found in frame or supplied by user")]
-    MissingAtomTypes,
+    #[error("no atom type found for atom in frame")]
+    MissingAtomType,
+    #[error("missing frame required for build")]
+    MissingFrame,
     #[error("found atom type `{found:?}` which does not match any user-provided atom types `{expected:?}`")]
     InvalidAtomType {
         expected: Vec<String>,
