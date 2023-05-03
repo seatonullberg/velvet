@@ -7,7 +7,7 @@ use thiserror::Error;
 pub enum SystemInitializationError {
     #[error("missing or improperly formatted trajectory file")]
     InvalidTrajectoryFile(#[from] chemfiles::Error),
-    #[error("no atom type found for atom in frame")]
+    #[error("no atom type found for one or more atoms in frame")]
     MissingAtomType,
     #[error("missing frame required for build")]
     MissingFrame,

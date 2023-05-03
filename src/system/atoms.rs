@@ -110,12 +110,12 @@ impl Atoms {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::internal::get_resource_filepath;
     use chemfiles::{Frame, Trajectory};
 
     #[test]
     fn test_chemfiles() {
-        let lmp_file_path = "/home/seaton/repos/velvet/water.lmp";
+        let lmp_file_path = get_resource_filepath("water.lmp");
         let mut traj = Trajectory::open_with_format(lmp_file_path, 'r', "LAMMPS Data").unwrap();
         let mut frame = Frame::new();
         traj.read_step(0, &mut frame).unwrap();

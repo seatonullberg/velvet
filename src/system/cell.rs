@@ -68,7 +68,8 @@ impl Cell {
     /// ```
     ///
     /// # Errors
-    /// - [`SystemInitializationError::InvalidCellMatrix`] if the given lattice parameters produce a
+    ///
+    /// - [`InvalidCellMatrix`](SystemInitializationError::InvalidCellMatrix) if the given lattice parameters produce a
     /// [non-invertable matrix](https://en.wikipedia.org/wiki/Invertible_matrix).
     pub fn triclinic(
         a: f64,
