@@ -51,7 +51,7 @@ impl Eq for AtomType {}
 /// Collection of all atoms in the simulation environment.
 ///
 /// This object should not be instantiated directly. Refer to
-/// [`ChemfilesBuilder`][`super::ChemfilesBuilder`] for the
+/// [`ChemfilesBuilder`](super::ChemfilesBuilder) for the
 /// preferred constructor.
 #[derive(Clone, Debug, Default)]
 pub struct Atoms {

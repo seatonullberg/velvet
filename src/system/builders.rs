@@ -12,8 +12,8 @@ use nalgebra::Vector3;
 use std::collections::HashMap;
 use std::path::Path;
 
-/// Constructor for [`Atoms`][`self::atoms::Atoms`], [`Cell`][`self::cell::Cell`],
-/// and [`Topology`][`self::topology::Topology`] which uses the [`chemfiles`] library
+/// Constructor for [`Atoms`][`crate::system::atoms::Atoms`], [`Cell`][`crate::system::cell::Cell`],
+/// and [`Topology`][`crate::system::topology::Topology`] which uses the [`chemfiles`] library
 /// to support multiple data formats.
 #[derive(Clone, Default)]
 pub struct ChemfilesBuilder<'a> {
