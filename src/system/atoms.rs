@@ -55,10 +55,6 @@ impl PartialEq for AtomType {
 impl Eq for AtomType {}
 
 /// Collection of all atoms in the simulation environment.
-///
-/// This object should not be instantiated directly. Refer to
-/// [`ChemfilesBuilder`](super::ChemfilesBuilder) for the
-/// preferred constructor.
 #[derive(Clone, Debug, Default)]
 pub struct Atoms {
     pub(crate) atom_types: Vec<AtomType>,
@@ -71,7 +67,7 @@ pub struct Atoms {
 impl Atoms {
     /// Returns a slice containing the atom type of each atom.
     ///
-    /// A simulation's atom types are immutable because transmutation
+    /// __Note:__ A simulation's atom types are immutable because transmutation
     /// of atom types during the course of a simulation is outside the
     /// scope of this project.
     pub fn atom_types(&self) -> &[AtomType] {
@@ -182,7 +178,6 @@ fn build_atoms<'a, P: AsRef<std::path::Path>, S: Into<&'a str>>(
 }
 
 // Extract vec of atom types from chemfiles frame.
-// Use pub(crate) to enable unit testing.
 pub(crate) fn parse_atom_types(frame: &Frame) -> Result<Vec<AtomType>, SystemInitializationError> {
     // Create a vec to store the parsed atom types.
     let mut atom_types: Vec<AtomType> = Vec::with_capacity(frame.size());
@@ -216,7 +211,6 @@ pub(crate) fn parse_atom_types(frame: &Frame) -> Result<Vec<AtomType>, SystemIni
 }
 
 // Extract vec of atom types from chemfiles frame with additional data from user-provided mapping.
-// Use pub(crate) to enable unit testing.
 pub(crate) fn parse_atom_types_with_mapping(
     frame: &Frame,
     mapping: &HashMap<&str, AtomType>,
@@ -249,7 +243,6 @@ pub(crate) fn parse_atom_types_with_mapping(
 }
 
 // Extract vec of positions from chemfiles frame.
-// Use pub(crate) to enable unit testing.
 pub(crate) fn parse_positions(frame: &mut Frame) -> Vec<Vector3<f64>> {
     Vec::from_iter(
         frame
@@ -260,7 +253,6 @@ pub(crate) fn parse_positions(frame: &mut Frame) -> Vec<Vector3<f64>> {
 }
 
 // Extract vec of velocities from chemfiles frame if they exist else set velocities to zero.
-// Use pub(crate) to enable unit testing.
 pub(crate) fn parse_velocities(frame: &mut Frame) -> Vec<Vector3<f64>> {
     match frame.velocities_mut() {
         Some(velocities) => velocities
@@ -273,7 +265,6 @@ pub(crate) fn parse_velocities(frame: &mut Frame) -> Vec<Vector3<f64>> {
 
 // Create a hash map which maps the indices of individual atoms to their respective atom types.
 // This mapping reduces the time required to produce (i,j) pairs when evaluating nonbonded interactions.
-// Use pub(crate) to enable unit testing.
 pub(crate) fn get_indices_by_atom_type(atom_types: &[AtomType]) -> HashMap<AtomType, Vec<usize>> {
     let mut indices_by_atom_type: HashMap<AtomType, Vec<usize>> =
         HashMap::from_iter(atom_types.iter().unique().map(|&at| (at, Vec::new())));

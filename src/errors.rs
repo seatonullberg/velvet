@@ -9,8 +9,6 @@ pub enum SystemInitializationError {
     InvalidTrajectoryFile(#[from] chemfiles::Error),
     #[error("no atom type found for one or more atoms in frame")]
     MissingAtomType,
-    #[error("missing frame required for build")]
-    MissingFrame,
     #[error("found atom type `{found:?}` which does not match any user-provided atom types `{expected:?}`")]
     InvalidAtomType {
         expected: Vec<String>,

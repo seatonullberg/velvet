@@ -67,7 +67,6 @@ impl FromTrajectoryFile for Cell {
 }
 
 // Extract the simulation cell bounds from chemfiles frame.
-// Use pub(crate) to enable unit testing.
 pub(crate) fn parse_cell(frame: &Frame) -> Result<Cell, SystemInitializationError> {
     let cell = frame.cell();
     // Use the cell shape enum to check if the frame contains simulation cell bounds.
