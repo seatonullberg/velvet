@@ -282,19 +282,17 @@ mod tests {
     use super::{parse_atom_types, parse_atom_types_with_mapping, parse_positions, AtomType};
     use crate::errors::SystemInitializationError;
     use crate::internal::get_resource_filepath;
+    use crate::system::internal::load_frame_from_trajectory_file;
 
     use std::collections::HashMap;
 
     use approx::assert_relative_eq;
-    use chemfiles::{Frame, Trajectory};
 
     // Check that the `parse_positions` function works with a valid lammps data file.
     #[test]
     fn parse_positions_valid_lammps_data_file() {
         let path = get_resource_filepath("water.lmp");
-        let mut trajectory = Trajectory::open_with_format(path, 'r', "LAMMPS Data").unwrap();
-        let mut frame = Frame::new();
-        trajectory.read_step(0, &mut frame).unwrap();
+        let mut frame = load_frame_from_trajectory_file(path, "LAMMPS Data", 0).unwrap();
         let positions = parse_positions(&mut frame);
         assert_eq!(positions.len(), 300);
         assert_eq!(positions[0][0], 12.265);
@@ -306,9 +304,7 @@ mod tests {
     #[test]
     fn parse_atom_types_valid_lammps_data_file() {
         let path = get_resource_filepath("water.lmp");
-        let mut trajectory = Trajectory::open_with_format(path, 'r', "LAMMPS Data").unwrap();
-        let mut frame = Frame::new();
-        trajectory.read_step(0, &mut frame).unwrap();
+        let frame = load_frame_from_trajectory_file(path, "LAMMPS Data", 0).unwrap();
         let atom_types = parse_atom_types(&frame).unwrap();
         assert_eq!(atom_types.len(), 300);
         // Atom type ids are based on the order they occur in the file when none are provided by the user.
@@ -332,9 +328,7 @@ mod tests {
     #[test]
     fn parse_atom_types_with_mapping_valid_lammps_data_file() {
         let path = get_resource_filepath("water.lmp");
-        let mut trajectory = Trajectory::open_with_format(path, 'r', "LAMMPS Data").unwrap();
-        let mut frame = Frame::new();
-        trajectory.read_step(0, &mut frame).unwrap();
+        let frame = load_frame_from_trajectory_file(path, "LAMMPS Data", 0).unwrap();
         let oxygen = AtomType::new(1, 16.0, -2.0);
         let hydrogen = AtomType::new(2, 1.0, 1.0);
         let mapping = HashMap::from([("1", oxygen), ("2", hydrogen)]);
@@ -359,9 +353,7 @@ mod tests {
     #[test]
     fn parse_atom_types_with_mapping_returns_invalid_atom_type_error() {
         let path = get_resource_filepath("water.lmp");
-        let mut trajectory = Trajectory::open_with_format(path, 'r', "LAMMPS Data").unwrap();
-        let mut frame = Frame::new();
-        trajectory.read_step(0, &mut frame).unwrap();
+        let frame = load_frame_from_trajectory_file(path, "LAMMPS Data", 0).unwrap();
         let oxygen = AtomType::new(1, 16.0, -2.0);
         let hydrogen = AtomType::new(2, 1.0, 1.0);
         // Intentionally use keys that are not present in the data file.
@@ -383,9 +375,7 @@ mod tests {
     fn parse_atom_types_returns_missing_atom_type_error() {
         // Use PDB file here because it does not store the atom type.
         let path = get_resource_filepath("water.pdb");
-        let mut trajectory = Trajectory::open_with_format(path, 'r', "PDB").unwrap();
-        let mut frame = Frame::new();
-        trajectory.read_step(0, &mut frame).unwrap();
+        let frame = load_frame_from_trajectory_file(path, "PDB", 0).unwrap();
         match parse_atom_types(&frame) {
             Ok(_) => panic!("unexpected ok result"),
             Err(err) => match err {
@@ -400,9 +390,7 @@ mod tests {
     fn parse_atom_types_with_mapping_returns_missing_atom_type_error() {
         // Use PDB file here because it does not store the atom type.
         let path = get_resource_filepath("water.pdb");
-        let mut trajectory = Trajectory::open_with_format(path, 'r', "PDB").unwrap();
-        let mut frame = Frame::new();
-        trajectory.read_step(0, &mut frame).unwrap();
+        let frame = load_frame_from_trajectory_file(path, "PDB", 0).unwrap();
         let oxygen = AtomType::new(1, 16.0, -2.0);
         let hydrogen = AtomType::new(2, 1.0, 1.0);
         let mapping = HashMap::from([("1", oxygen), ("2", hydrogen)]);
@@ -414,4 +402,6 @@ mod tests {
             },
         }
     }
+
+    // TODO: Check velocity.
 }

@@ -413,15 +413,13 @@ mod tests {
     use super::parse_cell;
     use crate::errors::SystemInitializationError;
     use crate::internal::get_resource_filepath;
-    use chemfiles::{Frame, Trajectory};
+    use crate::system::internal::load_frame_from_trajectory_file;
 
     // Check that the `parse_cell` function works with a valid lammps data file.
     #[test]
     fn parse_cell_valid_lammps_data_file() {
         let path = get_resource_filepath("water.lmp");
-        let mut trajectory = Trajectory::open_with_format(path, 'r', "LAMMPS Data").unwrap();
-        let mut frame = Frame::new();
-        trajectory.read_step(0, &mut frame).unwrap();
+        let frame = load_frame_from_trajectory_file(path, "LAMMPS Data", 0).unwrap();
         let cell = parse_cell(&frame).unwrap();
         assert_eq!(cell.a(), 15.0);
         assert_eq!(cell.b(), 15.0);
@@ -433,9 +431,7 @@ mod tests {
     fn parse_cell_returns_missing_cell_error() {
         // Use PDB here because it does not store the cell.
         let path = get_resource_filepath("water.pdb");
-        let mut trajectory = Trajectory::open_with_format(path, 'r', "PDB").unwrap();
-        let mut frame = Frame::new();
-        trajectory.read_step(0, &mut frame).unwrap();
+        let frame = load_frame_from_trajectory_file(path, "PDB", 0).unwrap();
         match parse_cell(&frame) {
             Ok(_) => panic!("unexpected ok result"),
             Err(err) => match err {
