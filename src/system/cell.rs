@@ -1,6 +1,10 @@
 //! Bounding box of the simulation environment.
 
 use crate::errors::SystemInitializationError;
+use crate::system::internal::load_frame_from_trajectory_file;
+use crate::system::FromTrajectoryFile;
+
+use chemfiles::Frame;
 use nalgebra::{Matrix3, Vector3};
 
 /// Bounding box of the simulation environment.
@@ -45,6 +49,34 @@ impl TryFrom<Matrix3<f64>> for Cell {
             Some(inv_matrix) => Ok(Cell { matrix, inv_matrix }),
         }
     }
+}
+
+impl FromTrajectoryFile for Cell {
+    fn from_trajectory_file<'a, P: AsRef<std::path::Path>, S: Into<&'a str>>(
+        path: P,
+        format: S,
+        step: usize,
+    ) -> Result<Self, SystemInitializationError> {
+        // Load the frame from a trajectory file returning an error on unsuccessful read.
+        let frame = match load_frame_from_trajectory_file(path, format, step) {
+            Ok(frame) => frame,
+            Err(err) => return Err(err),
+        };
+        parse_cell(&frame)
+    }
+}
+
+// Extract the simulation cell bounds from chemfiles frame.
+// Use pub(crate) to enable unit testing.
+pub(crate) fn parse_cell(frame: &Frame) -> Result<Cell, SystemInitializationError> {
+    let cell = frame.cell();
+    // Use the cell shape enum to check if the frame contains simulation cell bounds.
+    // `Infinite` corresponds to a matrix of all zeros.
+    if cell.shape() == chemfiles::CellShape::Infinite {
+        return Err(SystemInitializationError::MissingCell);
+    }
+    let matrix = Matrix3::from(cell.matrix());
+    Cell::try_from(matrix)
 }
 
 impl Cell {
@@ -374,5 +406,43 @@ impl Cell {
     /// Returns the total volume of the cell.
     pub fn volume(&self) -> f64 {
         (self.a_vector().cross(&self.b_vector())).dot(&self.c_vector())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_cell;
+    use crate::errors::SystemInitializationError;
+    use crate::internal::get_resource_filepath;
+    use chemfiles::{Frame, Trajectory};
+
+    // Check that the `parse_cell` function works with a valid lammps data file.
+    #[test]
+    fn parse_cell_valid_lammps_data_file() {
+        let path = get_resource_filepath("water.lmp");
+        let mut trajectory = Trajectory::open_with_format(path, 'r', "LAMMPS Data").unwrap();
+        let mut frame = Frame::new();
+        trajectory.read_step(0, &mut frame).unwrap();
+        let cell = parse_cell(&frame).unwrap();
+        assert_eq!(cell.a(), 15.0);
+        assert_eq!(cell.b(), 15.0);
+        assert_eq!(cell.c(), 15.0);
+    }
+
+    // Check that the `parse_cell` function returns the correct error if the frame does not contain a cell.
+    #[test]
+    fn parse_cell_returns_missing_cell_error() {
+        // Use PDB here because it does not store the cell.
+        let path = get_resource_filepath("water.pdb");
+        let mut trajectory = Trajectory::open_with_format(path, 'r', "PDB").unwrap();
+        let mut frame = Frame::new();
+        trajectory.read_step(0, &mut frame).unwrap();
+        match parse_cell(&frame) {
+            Ok(_) => panic!("unexpected ok result"),
+            Err(err) => match err {
+                SystemInitializationError::MissingCell => {}
+                _ => panic!("unexpected error type"),
+            },
+        }
     }
 }
