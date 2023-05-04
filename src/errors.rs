@@ -18,4 +18,6 @@ pub enum SystemInitializationError {
     },
     #[error("the matrix `{0}` cannot be inverted")]
     InvalidCellMatrix(Matrix3<f64>),
+    #[error("no cell found in frame")]
+    MissingCell,
 }

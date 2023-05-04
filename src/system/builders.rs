@@ -7,7 +7,7 @@ use crate::system::topology::Topology;
 
 use chemfiles::{Frame, Trajectory};
 use itertools::Itertools;
-use nalgebra::Vector3;
+use nalgebra::{Matrix3, Vector3};
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -128,8 +128,14 @@ impl<'a> ChemfilesBuilder<'a> {
     }
 
     /// Build [`Cell`] from the given data.
-    pub fn build_cell(&self) -> Cell {
-        Cell::default()
+    pub fn build_cell(&self) -> Result<Cell, SystemInitializationError> {
+        // Check that the user has supplied a frame to load atoms from.
+        // If no frame has been supplied return an error.
+        let frame = match &self.frame {
+            None => return Err(SystemInitializationError::MissingFrame),
+            Some(frame) => frame.clone(),
+        };
+        parse_cell(&frame)
     }
 
     /// Build [`Topology`] from the given data.
@@ -243,12 +249,35 @@ pub(crate) fn get_indices_by_atom_type(atom_types: &[AtomType]) -> HashMap<AtomT
     indices_by_atom_type
 }
 
+// Extract the simulation cell bounds from chemfiles frame.
+// Use pub(crate) to enable unit testing.
+pub(crate) fn parse_cell(frame: &Frame) -> Result<Cell, SystemInitializationError> {
+    let cell = frame.cell();
+    let matrix = Matrix3::from(cell.matrix());
+    // chemfiles does not tell you if the frame contains a cell but instead silently
+    // returns a default (all zeros) matrix. The best way I can handle this is to check
+    // if all elements are zero and assume that means the file did not have a cell section.
+    // ISSUE FILED: https://github.com/chemfiles/chemfiles.rs/issues/42
+    let mut frame_has_cell = false;
+    for element in matrix.iter() {
+        if element.ne(&0.0) {
+            frame_has_cell = true;
+            break;
+        }
+    }
+    if frame_has_cell {
+        Cell::try_from(matrix)
+    } else {
+        Err(SystemInitializationError::MissingCell)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::errors::SystemInitializationError;
     use crate::internal::get_resource_filepath;
     use crate::system::builders::{
-        parse_atom_types, parse_atom_types_with_mapping, parse_positions,
+        parse_atom_types, parse_atom_types_with_mapping, parse_cell, parse_positions,
     };
     use crate::system::AtomType;
 
@@ -379,6 +408,36 @@ mod tests {
             Ok(_) => panic!("unexpected ok result"),
             Err(err) => match err {
                 SystemInitializationError::MissingAtomType => {}
+                _ => panic!("unexpected error type"),
+            },
+        }
+    }
+
+    // Check that the `parse_cell` function works with a valid lammps data file.
+    #[test]
+    fn parse_cell_valid_lammps_data_file() {
+        let path = get_resource_filepath("water.lmp");
+        let mut trajectory = Trajectory::open_with_format(path, 'r', "LAMMPS Data").unwrap();
+        let mut frame = Frame::new();
+        trajectory.read_step(0, &mut frame).unwrap();
+        let cell = parse_cell(&frame).unwrap();
+        assert_eq!(cell.a(), 15.0);
+        assert_eq!(cell.b(), 15.0);
+        assert_eq!(cell.c(), 15.0);
+    }
+
+    // Check that the `parse_cell` function returns the correct error if the frame does not contain a cell.
+    #[test]
+    fn parse_cell_returns_missing_cell_error() {
+        // Use PDB here because it does not store the cell.
+        let path = get_resource_filepath("water.pdb");
+        let mut trajectory = Trajectory::open_with_format(path, 'r', "PDB").unwrap();
+        let mut frame = Frame::new();
+        trajectory.read_step(0, &mut frame).unwrap();
+        match parse_cell(&frame) {
+            Ok(_) => panic!("unexpected ok result"),
+            Err(err) => match err {
+                SystemInitializationError::MissingCell => {}
                 _ => panic!("unexpected error type"),
             },
         }

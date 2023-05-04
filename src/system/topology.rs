@@ -1,12 +1,12 @@
 //! Collection of all bonds, angles, dihedrals, and impropers in the simulation environment.
 
 /// Collection of all bonds, angles, dihedrals, and impropers in the simulation environment.
-/// 
+///
 /// This object should not be instantiated directly. Refer to
 /// [`ChemfilesBuilder`](super::ChemfilesBuilder) for the
 /// preferred constructor.
-/// 
-/// The [`Topology`]'s fields are all immutable because reactive chemistry is outside the 
+///
+/// The [`Topology`]'s fields are all immutable because reactive chemistry is outside the
 /// scope of this project.
 #[derive(Clone, Debug, Default)]
 pub struct Topology {
