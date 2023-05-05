@@ -1,5 +1,7 @@
 //! Errors that are specific to Velvet.
 
+use crate::potentials::pair::group::MixingStrategy;
+
 use nalgebra::Matrix3;
 use thiserror::Error;
 
@@ -18,4 +20,13 @@ pub enum SystemInitializationError {
     InvalidCellMatrix(Matrix3<f64>),
     #[error("no cell found in frame")]
     MissingCell,
+}
+
+#[derive(Error, Debug)]
+pub enum PotentialsInitializationError {
+    #[error("mixing strategy `{strategy:?}` is invalid in this context: {msg:?}")]
+    InvalidMixingStrategy {
+        strategy: MixingStrategy,
+        msg: String,
+    },
 }

@@ -21,8 +21,11 @@ categories = [
 chemfiles = "0.10.3"
 itertools = "0.10.5"
 nalgebra = "0.32.2"
+petgraph = { version = "0.6.3", features = ["graphmap"] }
 rayon = "1.7.0"
+strum = { version = "0.24.1", features = ["derive"] }
 thiserror = "1.0.40"
+uuid = { version = "1.3.2", features = [ "v4", "fast-rng" ] }
 
 [dev-dependencies]
 approx = "0.5.1"
