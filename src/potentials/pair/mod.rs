@@ -4,6 +4,7 @@ pub mod group;
 
 use crate::potentials::Potential;
 
+/// Shared behavior for nonbonded pair potentials.
 pub trait PairPotential<'a>: Potential<'a> {
     /// Returns the energy of a pair of atoms separated by a distance `r`.
     fn energy(&self, r: f64) -> f64;

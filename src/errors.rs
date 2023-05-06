@@ -29,4 +29,11 @@ pub enum PotentialsInitializationError {
         strategy: MixingStrategy,
         msg: String,
     },
+    #[error(
+        "found parameter names `{found:?}` which do not match the expected names `{expected:?}`"
+    )]
+    IncompatibleParameters {
+        expected: Vec<String>,
+        found: Vec<String>,
+    },
 }

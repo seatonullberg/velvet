@@ -54,6 +54,12 @@ impl PartialEq for AtomType {
 
 impl Eq for AtomType {}
 
+impl PartialOrd for AtomType {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.id.partial_cmp(&other.id)
+    }
+}
+
 /// Collection of all atoms in the simulation environment.
 #[derive(Clone, Debug, Default)]
 pub struct Atoms {
