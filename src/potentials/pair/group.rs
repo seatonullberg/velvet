@@ -37,12 +37,18 @@ where
         // Create a unique ID to accelerate graph lookup.
         let uuid = Uuid::new_v4();
         // If this group links other groups, the mixing strategy must be `Explicit`.
-
-        // NOTE TO SELF:
-        // ONLY DO THE HALF CHECK HERE. NO NEED TO CHECK FOR EXHAUSTIVE LIST
-        // OF ATOM PAIRS UNTIL ALL GROUPS HAVE BEEN COMPILED.
-
-        // TODO: VALIDATE ARGS
+        // Additionally. an explicit mixing strategy requires an exhaustive list of
+        // atom type pairs. However, the check for completeness can be done once when
+        // all groups have been evaluated rather than once per group. Additionaly, to
+        // be completely correct in the check, all atom types in all groups must be
+        // accounted for so doing the check early is unnecessary.
+        if links.is_some() && (mixing_strategy == MixingStrategy::Explicit) {
+            let strategy = mixing_strategy;
+            let msg =
+                "pair potential groups which link others must use the `Explicit` mixing strategy"
+                    .to_string();
+            return Err(PotentialsInitializationError::InvalidMixingStrategy { strategy, msg });
+        }
         Ok(PairPotentialGroup {
             potentials,
             mixing_strategy,
